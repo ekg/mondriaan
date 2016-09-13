@@ -1,0 +1,6 @@
+#!/bin/bash
+echo "Mondriaan GIF Script"
+./MondriaanPlot $1 $2 $3
+convert -delay 100 -loop 0 *.tga $1.gif
+rm -f *.tga
+echo Generated $1.gif

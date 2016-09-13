@@ -1,0 +1,20 @@
+Test PrintVecStatistics: 
+*** Statistics for processor q should be
+    Ns = q, Nr = 2q, Nv = 3q 
+  Proc[0]: Ns = 0, Nr = 0, Nv = 0
+  Proc[1]: Ns = 1, Nr = 2, Nv = 3
+  Proc[2]: Ns = 2, Nr = 4, Nv = 6
+  Proc[3]: Ns = 3, Nr = 6, Nv = 9
+  Proc[4]: Ns = 4, Nr = 8, Nv = 12
+  Proc[5]: Ns = 5, Nr = 10, Nv = 15
+  Proc[6]: Ns = 6, Nr = 12, Nv = 18
+  Proc[7]: Ns = 7, Nr = 14, Nv = 21
+  Proc[8]: Ns = 8, Nr = 16, Nv = 24
+  Proc[9]: Ns = 9, Nr = 18, Nv = 27
+  Proc[10]: Ns = 10, Nr = 20, Nv = 30
+  Proc[11]: Ns = 11, Nr = 22, Nv = 33
+  Proc[12]: Ns = 12, Nr = 24, Nv = 36
+  Proc[13]: Ns = 13, Nr = 26, Nv = 39
+  Proc[14]: Ns = 14, Nr = 28, Nv = 42
+  Proc[15]: Ns = 15, Nr = 30, Nv = 45
+OK

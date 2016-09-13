@@ -1,0 +1,56 @@
+MONDRIAAN version 4.0 (this version released August 2013):
+------------------------
+Copyright May 2002 (version 1.0): Brendan Vastenhouw and Rob H. Bisseling
+Copyright July 2008 (version 2.0): Rob H. Bisseling, Wouter Meesen, Tristan van Leeuwen, 
+                     Brendan Vastenhouw
+Copyright July 2010 (version 3.0): Rob H. Bisseling, Bas Fagginger Auer,
+                     Albert-Jan Yzelman, Brendan Vastenhouw.
+                     Prototype Matlab interface: Ken Stanley.
+Copyright August 2013 (version 4.0): Rob H. Bisseling, Bas Fagginger Auer,
+                     Albert-Jan Yzelman, Daniel Pelt.
+
+Extensive documentation is found in the `docs' directory.
+                     
+To cite this work, please quote the following paper:
+   Brendan Vastenhouw and Rob H. Bisseling,
+   "A two-dimensional data distribution method
+   for parallel sparse matrix-vector multiplication",
+   SIAM Review, Vol. 47, No.1 (2005), pp. 67-95.
+In addition, the vector distribution functions are described in the paper:
+   Rob H. Bisseling and Wouter Meesen
+   "Communication balancing in parallel sparse matrix-vector multiplication",
+   Electronic Transactions on Numerical Analysis 21 (2005), pp. 47-65.
+Ordering of sparse matrices into 1D Separated Block Diagonal form:
+   A. N. Yzelman and Rob H. Bisseling
+   "Cache-oblivious sparse matrix-vector multiplication by using sparse matrix partitioning methods",
+   SIAM Journal of Scientific Computation, Vol. 31, Issue 4, pp. 3128-3154 (2009).
+Ordering of sparse matrices into 2D Separated Block Diagonal form:
+   A. N. Yzelman and Rob H. Bisseling
+   "Two-dimensional cache-oblivious sparse matrix-vector multiplication",
+   Parallel Computing, Vol. 37, Issue 12, pp. 806-819 (2011).
+Hybrid partitioning strategy:
+   Rob H. Bisseling, Bas O. Fagginger Auer, A. N. Yzelman, Tristan van Leeuwen and Umit V. Catalyurek
+   "Two-Dimensional Approaches to Sparse Matrix Partitioning"
+   Chapter 12 of Combinatorial Scientific Computing, Chapman and Hall/CRC, pp. 321-349 (2012).
+The Lambda-times-Lambda-minus-one communication volume metric:
+   O. Fortmeier, H. M. Bucker, B. O. Fagginger Auer, R. H. Bisseling
+   "A new metric enabling an exact hypergraph model for the communication volume in distributed-memory parallel applications"
+   Parallel Computing, Vol. 39, Issue 8, pp. 319-335 (2013).
+The medium-grain partitioning strategy:
+   Daniel M. Pelt and Rob H. Bisseling
+   "A medium-grain method for fast 2D bipartitioning of sparse matrices",
+   submitted for publication (2013).
+   
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser Public License
+(see file COPYING.LESSER) and the GNU General Public License (see file COPYING)
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

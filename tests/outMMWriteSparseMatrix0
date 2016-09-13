@@ -1,0 +1,18 @@
+%%MatrixMarket distributed-matrix coordinate real general
+% This is a 5 x 6 matrix
+% with 10 nonzeros
+5 6 10 2
+0
+5
+10
+1 1 0
+1 6 1
+2 1 2
+2 6 3
+3 1 4
+3 6 5
+4 1 6
+4 6 7
+5 1 8
+5 6 9
+and with 2 processors

@@ -1,0 +1,11 @@
+
+Mondriaan version 2.0.
+Usage: test_PrintHelp [matrix] [P] [eps] <options>
+
+ [matrix] - the matrix to partition
+ [P]      - the number of processors
+ [eps]    - the maximum allowed load imbalance
+
+ <options>: for details, see the User's Guide at
+            http://www.math.uu.nl/people/bisseling/Mondriaan/users_guide.html
+

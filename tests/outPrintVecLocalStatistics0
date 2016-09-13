@@ -1,0 +1,10 @@
+Test PrintVecLocalStatistics: 
+*** Statistics for processor q should be
+    Ns = q, Nr = 2q, Ls = 3q, Lr = 4q, Un = q+1 
+  Proc[0]: Ns = 0, Nr = 0, Ls = 0, Lr = 0, Un = 1
+  Proc[1]: Ns = 1, Nr = 2, Ls = 3, Lr = 4, Un = 2
+  Proc[2]: Ns = 2, Nr = 4, Ls = 6, Lr = 8, Un = 3
+  Proc[3]: Ns = 3, Nr = 6, Ls = 9, Lr = 12, Un = 4
+  Proc[4]: Ns = 4, Nr = 8, Ls = 12, Lr = 16, Un = 5
+  Proc[5]: Ns = 5, Nr = 10, Ls = 15, Lr = 20, Un = 6
+OK

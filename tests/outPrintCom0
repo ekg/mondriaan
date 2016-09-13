@@ -1,0 +1,10 @@
+Test PrintCom:
+Communication for vector v (after vector distribution):
+  vol           : 1000 (2.5)
+  avg = vol/P   : 125 (0.3125)
+  max sent      : 250 (0.625)
+  max recd      : 125 (0.3125)
+Nr components for vector v (after vector distribution):
+  avg           : 50 (0.125) 
+  max           : 100 (0.25)
+OK

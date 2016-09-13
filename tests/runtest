@@ -1,0 +1,231 @@
+#!/bin/bash
+
+PATH=$PATH:.
+
+# Test of Mondriaan.c 
+# This is a very weak test, since it only checks 
+# that Mondriaan terminates correctly, and creates output files
+# with the right number of lines.
+../tools/Mondriaan test_Mondriaan.mtx 2 0.1
+wc test_Mondriaan.mtx-P2 > outMondriaan
+wc test_Mondriaan.mtx-u2 >> outMondriaan
+wc test_Mondriaan.mtx-v2 >> outMondriaan
+grep -v 21 outMondriaan  |grep -v 6
+rm test_Mondriaan.mtx-*
+rm outMondriaan
+echo Test Mondriaan: OK
+
+# Do a Mondriaan regression test with version 2.01 of the library.
+# This verifies that arc130 is processed correctly by the current
+# version.
+../tools/Mondriaan arc130.mtx 8 0.03
+
+if cmp arc130.mtx-C8 m300_arc130.mtx-C8
+then
+    if cmp arc130.mtx-P8 m300_arc130.mtx-P8
+    then
+        if cmp arc130.mtx-u8 m300_arc130.mtx-u8
+        then
+            if cmp arc130.mtx-v8 m300_arc130.mtx-v8
+            then
+                if cmp arc130.mtx-I8 m300_arc130.mtx-I8
+                then
+                    echo Test Mondriaan regression: OK
+                else
+                    echo Test Mondriaan regression: Error for I8, maybe different rand implementation.
+                fi
+            else
+                echo Test Mondriaan regression: Error for v8, maybe different rand implementation.
+            fi
+        else
+            echo Test Mondriaan regression: Error for u8, maybe different rand implementation.
+        fi
+    else
+        echo Test Mondriaan regression: Error for P8, maybe different rand implementation.
+    fi
+else
+    echo Test Mondriaan regression: Error for C8, maybe different rand implementation.
+fi
+
+rm arc130.mtx-*
+
+# Test of Sort.c
+test_QSort
+test_quicksort
+test_CSort
+test_RandomPermute
+test_Random1
+test_SetRandomSeed
+test_SwapLong
+test_SwapDouble
+
+# Test of Gainbucket.c
+test_BucketInsert
+test_BucketMove
+test_BucketDeleteMax
+test_GainBucketGetMaxVal
+test_ClearGainBucket
+ 
+# Test of DistributeVecLib.c
+test_InitNprocs
+test_InitProcindex
+test_AssignColumnToProc
+test_RemoveColumnFromProc
+test_AssignRemainingColumns
+test_AssignRemainingNonemptyColumns
+test_CalcCom
+test_CalcLocalLowerBound
+test_GenerateHistogram
+test_WriteVectorDistribution
+rm outWriteVectorDistribution
+
+test_PrintVecStatistics>outPrintVecStatistics
+diff outPrintVecStatistics0 outPrintVecStatistics
+echo Test PrintVecStatistics: OK
+rm outPrintVecStatistics
+
+test_PrintHistogram>outPrintHistogram
+diff outPrintHistogram0 outPrintHistogram
+rm outPrintHistogram
+echo Test PrintHistogram: OK
+
+test_PrintCom>outPrintCom
+diff outPrintCom0 outPrintCom
+rm outPrintCom
+echo Test PrintCom: OK
+
+# Test of Matalloc.c
+test_matallocl
+test_matfreel
+
+# Test of DistributeVecOpt2.c
+test_FirstNzInRow
+test_DistributeVecOpt2
+
+# Test of DistributeVecLocal.c
+test_DistributeVecLocal
+test_PrintVecLocalStatistics>outPrintVecLocalStatistics
+diff outPrintVecLocalStatistics0 outPrintVecLocalStatistics
+rm outPrintVecLocalStatistics
+echo Test PrintVecLocalStatistics: OK
+
+# Test of DistributeVecGreedyImprove
+test_DistributeVecGreedyImprove
+
+# Test of DistributeVecOrig.c
+test_DistributeVecOrig
+test_InitSums
+
+# Test of DistributeVecOrigEq.c
+test_InitIntersection
+test_FindProcLowestSum
+test_DistributeVecOrigEq
+
+# Test of DistributeVec
+test_DistributeVec
+
+# Test of DistributeMat
+test_ComputeWeight
+test_BalanceParts
+test_DetermineSplit
+test_logb2
+test_SplitMatrixSimple
+test_SplitMatrixKLFM
+test_DistributeMatrixMondriaan
+
+# Test of Graph
+test_CreateNewBiPartHyperGraph
+test_DeleteBiPartHyperGraph
+test_SparseMatrix2BiPartHyperGraph
+test_BiPartHyperGraph2SparseMatrix
+
+# Test of SparseMatrix 
+test_SparseMatrixSymmetric2Full
+test_SparseMatrixSymmetricLower2Random
+test_SparseMatrixSymmetricRandom2Lower
+test_AddDummiesToSparseMatrix
+test_RemoveDummiesFromSparseMatrix
+test_MMSparseMatrixInit
+test_MMDeleteSparseMatrix
+test_MMSparseMatrixAllocateMemory
+test_MMSparseMatrixFreeMemory
+test_MMSparseMatrixReadEntries
+test_MMSparseMatrixReadPstart
+test_MMSparseMatrixReadWeights
+test_MMSparseMatrixReadTail
+test_MMSparseMatrixReadHeader
+test_MMReadSparseMatrix
+
+test_MMSparseMatrixPrintHeader>outMMSparseMatrixPrintHeader
+diff outMMSparseMatrixPrintHeader0 outMMSparseMatrixPrintHeader
+rm outMMSparseMatrixPrintHeader
+echo Test MMSparseMatrixPrintHeader: OK
+
+test_MMSparseMatrixPrintTail>outMMSparseMatrixPrintTail
+diff outMMSparseMatrixPrintTail0 outMMSparseMatrixPrintTail
+rm outMMSparseMatrixPrintTail
+echo Test MMSparseMatrixPrintTail: OK
+
+test_MMSparseMatrixPrintEntries>outMMSparseMatrixPrintEntries
+diff outMMSparseMatrixPrintEntries0 outMMSparseMatrixPrintEntries
+rm outMMSparseMatrixPrintEntries
+echo Test MMSparseMatrixPrintEntries: OK
+
+test_MMSparseMatrixPrintPstart>outMMSparseMatrixPrintPstart
+diff outMMSparseMatrixPrintPstart0 outMMSparseMatrixPrintPstart
+rm outMMSparseMatrixPrintPstart
+echo Test MMSparseMatrixPrintPstart: OK
+
+test_MMSparseMatrixPrintWeights>outMMSparseMatrixPrintWeights
+diff outMMSparseMatrixPrintWeights0 outMMSparseMatrixPrintWeights
+rm outMMSparseMatrixPrintWeights
+echo Test MMSparseMatrixPrintWeights: OK
+
+test_MMWriteSparseMatrix>outMMWriteSparseMatrix
+diff outMMWriteSparseMatrix0 outMMWriteSparseMatrix
+rm outMMWriteSparseMatrix
+echo Test MMWriteSparseMatrix: OK
+
+test_MMSparseMatrixGetTypeCode
+test_MMSparseMatrixSetTypeCode
+test_SparseMatrixRemoveDuplicates
+test_SparseMatrixStructurallySymmetric
+
+# Test of Cartesian
+test_CRS2CCS
+
+test_MMWriteCartesianSubmatrices>outMMWriteCartesianSubmatrices
+diff outMMWriteCartesianSubmatrices0 outMMWriteCartesianSubmatrices
+rm outMMWriteCartesianSubmatrices
+echo Test MMWriteCartesianSubmatrices: OK
+
+# Test of Match  
+test_MoveVtxInNetAdjncy
+test_FindMatchArbitrary
+test_FindMatchInprod
+
+# Test of HKLFM
+test_CreateInitialBalancedPartition
+test_ComputeInitialGains
+test_ClearMoveLog
+test_MoveVertex
+test_UpdateGains
+test_HKLFM
+test_RunHKLFM
+test_CoarsenGraph
+test_RunMLGraphPart
+
+# Test of Options
+test_GetParameters pi.mtx 4 0.25 -SplitStrategy=onedimrow -SplitMethod simple
+test_SetDefaultOptions
+test_SetOption
+
+# Test of Metrics
+test_LambdaLambdaMinusOneMetric
+
+# Test of hybrid matching
+test_FindOptimalPathMatching
+test_MatchATA
+
+# The PrintHelp() test was removed because it is invalidated at every version update.
+

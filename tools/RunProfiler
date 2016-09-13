@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Mondriaan profile script.
+# 
+# Usage:
+# 
+#     ./RunProfiler <nr. matrices> <nr. processors> <imbalance> <nr. runs>
+# 
+# Executes the Mondriaan profiler for all settings (*.def) and the specified number of matrix (*.mtx) files (sorted by filesize) found in the current directory.
+#
+
+for SETTINGS in *.def
+do
+	echo $SETTINGS
+	cp $SETTINGS Mondriaan.defaults
+	ls -S *.mtx | tail -n $1 | xargs -t -n $1 ./Profile $2 $3 $4 > $SETTINGS.tex && pdflatex $SETTINGS.tex && pdflatex $SETTINGS.tex && pdflatex $SETTINGS.tex
+done
+echo Done.
+

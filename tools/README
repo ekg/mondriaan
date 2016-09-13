@@ -1,0 +1,7 @@
+The MATLAB files
+
+mminfo.m
+mmread.m
+mmwrite.m
+
+have been retrieved from the Matrix Market (http://math.nist.gov/MatrixMarket/mmio/matlab/mmiomatlab.html) and are provided for convenience.

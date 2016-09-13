@@ -1,0 +1,30 @@
+# test_SetDefaults default settings: 
+LoadbalanceStrategy                            constant 
+LoadbalanceAdjust                              no
+# some empty lines to test the inputting format
+
+
+# indenting to test removal of initial blanks
+           SplitStrategy                                  alternate 
+Alternate_FirstDirection                       row 
+SplitMethod                                    simple
+SquareMatrix_DistributeVectorsEqual            no 
+SquareMatrix_DistributeVectorsEqual_AddDummies no
+SymmetricMatrix_UseSingleEntry                 no 
+SymmetricMatrix_SingleEntryType                lower 
+Coarsening_NrVertices                          1
+Coarsening_MaxNrVtxInMatch                     2 
+Coarsening_StopRatio                           0.25 
+Coarsening_VtxMaxFractionOfWeight              0.25 
+Coarsening_MatchingStrategy                    random
+Coarsening_InprodMatchingOrder                 random
+Coarsening_FineSwitchLevel                     2
+KLFM_InitPart_NrRestarts                       10
+KLFM_InitPart_MaxNrLoops                       10
+KLFM_InitPart_MaxNrNoGainMoves                 10
+KLFM_Refine_MaxNrLoops                         10
+KLFM_Refine_MaxNrNoGainMoves                   10
+VectorPartition_Step3                          increase
+VectorPartition_MaxNrLoops                     10
+VectorPartition_MaxNrGreedyImproves            10 
+Seed                                           random

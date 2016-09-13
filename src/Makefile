@@ -1,0 +1,62 @@
+# Mondriaan Library Makefile
+
+include ../mondriaan.mk
+
+#scrap default rule:
+% :: %.c ;
+
+#Dependencies data
+OPTIONS=Options
+REMEMBRANCE=Remembrance
+SORT=Sort ${OPTIONS}
+SPARSEMATRIX=SparseMatrix ${OPTIONS} ${SORT}
+PERMUTE=Permute ${SPARSEMATRIX} ${REMEMBRANCE}
+DISTR_DEPS=${OPTIONS} ${SORT} ${SPARSEMATRIX}
+GAINBUCKET=GainBucket ${OPTIONS}
+GRAPH=Graph ${GAINBUCKET} ${DISTR_DEPS}
+MATCHMATCHERS=MatchMatchers ${OPTIONS} ${MATCH} ${GRAPH}
+MATCHINPRODUCT=MatchInproduct ${OPTIONS} ${MATCH} ${GRAPH}
+MATCHSTAIRWAY=MatchStairway ${OPTIONS} ${MATCH} ${GRAPH} ${SORT}
+MATCH=Match ${OPTIONS} ${GRAPH}
+HKLFM=HKLFM ${OPTIONS} ${GRAPH} ${GAINBUCKET} ${MATCH} ${MATCHMATCHERS} ${MATCHSTAIRWAY} ${MATCHINPRODUCT}
+DISTRIBUTEMAT=DistributeMat ${GRAPH} ${HKLFM} ${PERMUTE} ${DISTR_DEPS}
+DISTRIBUTEVECLIB=DistributeVecLib ${OPTIONS} ${SPARSEMATRIX}
+DISTRIBUTEVECGREEDY=DistributeVecGreedy ${OPTIONS} ${SORT} ${DISTRIBUTEVECLIB}
+MATALLOC=Matalloc ${OPTIONS}
+DISTRIBUTEVECLOCAL=DistributeVecLocal ${SORT} ${MATALLOC} ${DISTRIBUTEVECLIB}
+DISTRIBUTEVECOPT2=DistributeVecOpt2 ${OPTIONS} ${MATALLOC} ${DISTRIBUTEVECLIB}
+DISTRIBUTEVECORIG=DistributeVecOrig ${OPTIONS} ${DISTRIBUTEVECLIB}
+DISTRIBUTEVEC=DistributeVec ${DISTR_DEPS} ${DISTRIBUTEVECGREEDY} \
+    ${DISTRIBUTEVECLOCAL} ${DISTRIBUTEVECOPT2} ${DISTRIBUTEVECORIG} \
+    ${DISTRIBUTEVECLIB}
+DISTRIBUTEVECORIGEQ=DistributeVecOrigEq ${DISTRIBUTEVECORIG}
+DISTRIBUTE=${DISTRIBUTEMAT} ${DISTRIBUTEVEC} ${DISTRIBUTEVECORIGEQ}
+CARTESIAN=Cartesian ${DISTRIBUTEVECLIB} ${SPARSEMATRIX}
+MONDRIAANLIBRARY=${DISTRIBUTE} ${CARTESIAN}
+
+#targets
+lib/libMondriaan${MONDRIAANMAJORVERSION}.a: ${MONDRIAANLIBRARY:%=%.c} ${MONDRIAANLIBRARY:%=%.o} Mondriaan.h
+	make -r OBJDEPS='${filter %.o,$^}' libMondriaan.target
+
+all: lib/libMondriaan${MONDRIAANMAJORVERSION}.a
+
+%.target: ${OBJDEPS}
+	mkdir -p include
+	mkdir -p lib
+	cp *.h include/
+	ar rcs libMondriaan${MONDRIAANMAJORVERSION}.a $^
+	mv libMondriaan${MONDRIAANMAJORVERSION}.a lib/
+
+%.o: %.c %.h
+	${CC} ${CFLAGS} -c -o $@ ${filter %.c,$^}
+
+%.cstub:
+	rm -f ${@:%.cstub=%}.o
+
+veryclean: clean
+	rm -rf lib
+	rm -rf include
+
+clean: ${MONDRIAANLIBRARY:%=%.cstub}
+	rm -f `find . -name 'core'`
+
