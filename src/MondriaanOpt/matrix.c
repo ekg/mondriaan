@@ -33,10 +33,12 @@ char readmatrixfromfile(struct mat *in, const char *fn){
     /* Sparse matrix in Mondriaan format */
     struct sparsematrix A;
 
-    /* Open file and return FALSE if there is an error */
+    /* Open file and read matrix */
     fp = fopen(fn,"r");
-    if(fp==NULL)
-        return FALSE;
+    if(fp==NULL) {
+        fprintf(stderr, "Could not read matrix!\n");
+        exit(EXIT_FAILURE);
+    }
 
     if (!MMReadSparseMatrix(fp, &A)) {
         fprintf(stderr, "Could not read matrix!\n");
