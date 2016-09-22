@@ -9,7 +9,7 @@ include ../mondriaan.mk
 TARGETS := Mondriaan MondriaanPlot Profile
 LIB = ${MONDRIAANLIBDIR}/libMondriaan${MONDRIAANMAJORVERSION}.a
 ifdef MATLABHOMEDIR
-TARGETS := ${TARGETS} MatlabMondriaan
+TARGETS := ${TARGETS} MatlabMondriaan MatlabMondriaanOpt
 endif
 
 all: ${TARGETS}
@@ -52,4 +52,7 @@ MondriaanPlot: MondriaanPlot.o ${LIB}
 
 MatlabMondriaan: MatlabMondriaan.mex.o MatlabHelper.mex.o ${LIB}
 	make -r OBJDEPS='${^:%.a=}' $@.${MEXSUFFIX}
+
+MatlabMondriaanOpt: MatlabMondriaanOpt.mex.o MatlabHelper.mex.o ${LIB} ${MONDRIAANLIBDIR}/libMondriaan${MONDRIAANMAJORVERSION}Opt.a
+	make -r OBJDEPS='${^:%.a=}' LIBS='${LIBS} -lMondriaan4Opt' $@.${MEXSUFFIX}
 

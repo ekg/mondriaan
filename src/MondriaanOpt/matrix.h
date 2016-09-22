@@ -2,6 +2,7 @@
 
 #define MATRIX_H_DONE
 
+#include "../include/Mondriaan.h"
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -28,5 +29,6 @@ struct mat {
 };
 
 char readmatrixfromfile(struct mat *in, const char *fn);
+char convertSparsematrixToMat(struct mat *in, struct sparsematrix *A);
 
 #endif
