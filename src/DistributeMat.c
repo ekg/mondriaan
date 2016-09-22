@@ -313,6 +313,11 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
     int i, j, k, dir=ROW, done;
    
     Nets = NULL;
+
+    if (pT == NULL || pOptions == NULL) {
+        fprintf(stderr, "DistributeMatrixMondriaan(): Null arguments!\n");
+        return FALSE;
+    }
  
     /* Use full PaToH partitioning if so desired. */
     if (pOptions->Partitioner == FullPaToH) return DistributeMatrixPaToH(pT, P, eps, pOptions);
@@ -323,11 +328,6 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
              fprintf(stderr, "DistributeMatrixMondriaan(): error during initialisation of Pstart!\n");
              return FALSE;
         }
-    }
-
-    if (pT == NULL || pOptions == NULL) {
-        fprintf(stderr, "DistributeMatrixMondriaan(): Null arguments!\n");
-        return FALSE;
     }
     
     if ((totweight = ComputeWeight(pT, 0, pT->NrNzElts-1, NULL, pOptions)) < 0) {

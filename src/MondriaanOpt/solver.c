@@ -385,7 +385,7 @@ void setCut(struct mat *a, struct solution *sol, unsigned int idx, unsigned char
     /* For set=TRUE, this function sets row/column idx to CUT,
        increments the communication volume, and updates the partial counters
        where 0 <= idx < m for dir=ROW, and 0 <= idx < n for dir=COL.
-       Fot set=FALSE, this function undoes the setting and
+       For set=FALSE, this function undoes the setting and
        restores the solution value of row/column to oldval */
 
     /* The following three operations can be done in any order */ 

@@ -297,7 +297,7 @@ void printToMM(const char *fn, struct solution *s, const struct mat *a){
         return ;
 
     /* Print the Matrix Market header */
-    fprintf(fp,"%%MatrixMarket matrix coordinate integer general\n");
+    fprintf(fp,"%%%%MatrixMarket matrix coordinate integer general\n");
     
     /* Print the number of rows, columns, nonzeros */
     fprintf(fp,"%d %d %d\n", a->m, a->n, a->nnz);

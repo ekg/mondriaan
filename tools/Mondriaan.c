@@ -8,7 +8,7 @@ int main(int argc, char **argv) {
 
        The function tries to minimise the total communication volume
        by suitably partitioning the matrix, while keeping the computation
-       load imbalance withing a user-specified fraction epsilon.
+       load imbalance within a user-specified fraction epsilon.
        For the resulting communication volume, it tries to balance
        the communication work among the processors by suitably
        partitioning the vectors. The partitioning of the input and output
