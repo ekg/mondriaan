@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+<link href="style.css" rel="stylesheet" type="text/css">
+<title>User's guide MondriaanOpt</title>
+</head>
+
+<body>
+
+<h2>User's guide MondriaanOpt</h2>
+
+<div id="top">
+<div><a href="#inst">Installing</a></div>
+<div><a href="#outp">Output</a></div>
+<div><a href="#opts">Options</a></div>
+<div><a href="#matl">MATLAB</a></div>
+</div>
+
+<hr>
+<p>
+This page is continuously being improved and updated;
+therefore, a more recent version may be obtained 
+<a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/Docs/USERS_GUIDE_OPT.html">
+online</a>.
+This offline version is bundled with the software for your convenience.
+</p>
+<hr>
+
+<h3><a name="inst">How to install MondriaanOpt</a></h3>
+<p>
+MondriaanOpt comes packaged with the Mondriaan software. Refer to <a href="./USERS_GUIDE.html">this page</a> for
+instructions on using Mondriaan. MondriaanOpt is automatically compiled when you compile Mondriaan. The executable
+is then available at <tt>tools/MondriaanOpt</tt>.
+</p>
+<p>
+Whereas Mondriaan uses heuristics to obtain good partitionings for sparse matrix-vector multiplication for any number of processors,
+MondriaanOpt will calculate an actual optimal solution for this partitioning problem with 2 processors. More precisely, it will
+calculate a partitioning with minimum volume among all solutions that obey the imbalance constraint.
+</p>
+
+<h3><a name="run">How to run MondriaanOpt</a></h3>
+<p>
+Go inside the directory <tt>Mondriaan4</tt> and type
+</p>
+<ul>
+<li><tt>% cd tools</tt></li>
+<li><tt>% ./MondriaanOpt -m ../tests/arc130.mtx -e 0.03 -v 20</tt></li>
+</ul>
+<p>
+if you want to partition the <tt>arc130.mtx</tt> matrix (Matrix Market file format)
+for 2 processors with at most 3% load imbalance, knowing that solutions must exist with
+volume at most 20. The matrix should be the full relative path; <em>in the above example 
+output is saved in the Mondriaan tests folder</em> (<tt>../tests/</tt>).
+</p>
+
+<h3><a name="outp">Output</a></h3>
+
+<p>The <tt>MondriaanOpt</tt> tool yields, after a successful run on an input matrix,
+various output files. All possible output files are described below. Typically,
+the output filenames are that of the input matrix filename, modified with a small
+descriptor and the number of parts <i>x(=2)</i>.</p>
+
+<h4>Processor indices (<tt>_P2.mtx</tt>)</h4>
+<p> The <tt>MondriaanOpt</tt> program also writes the processor indices of each
+nonzero to the Matrix Market file <tt>input_P2.mtx</tt> where the value of each
+nonzero is replaced by the processor index to which the nonzero has been assigned.
+</p>
+
+<h4>Graphical output</h4>
+<p>Besides textual output, also an SVG graphic is written to the file <tt>input_P2.svg</tt>,
+containing a visualisation of the partitioning.
+</p>
+
+<h4><i>(Optional)</i> Distributed matrix (<tt>-Px</tt>)</h4>
+<p> When the <tt>convert</tt> flag is passed, the <tt>MondriaanOpt</tt> program
+writes the distributed matrix to a file called <tt>input-Px</tt>,
+where <tt>input</tt> is the name of the input matrix, where x equals 3 when the
+distribution includes free nonzeros, and x equals 2 otherwise.
+
+We use an adapted Matrix Market format, with this structure: 
+<br>
+<tt>%%MatrixMarket distributed-matrix coordinate real general<br>
+m n nnz P<br>
+Pstart[0]</tt> ( this should be 0 )<br>
+...<br>
+...<br>
+...<br>
+<tt>Pstart[P]</tt>( this should be nnz )<br>
+<tt>A.i[0] A.j[0] A.value[0]</tt>
+...<br>
+...<br>
+...<br>
+<tt>A.i[nnz-1] A.j[nnz-1] A.value[nnz-1]</tt>
+<br>
+Here, <tt>Pstart[k]</tt> points to the start of the nonzeroes
+of processor k.
+</p>
+
+<h4><i>(Optional)</i> Processor indices (<tt>-Ix</tt>)</h4>
+<p> When the <tt>convert</tt> flag is passed, the <tt>MondriaanOpt</tt> program
+also writes the processor indices of each nonzero to the Matrix Market file <tt>input-Ix</tt>
+where the value of each nonzero is replaced by the processor index to which
+the nonzero has been assigned. The order of the nonzeroes is exactly that of the distributed matrix (<tt>-Px</tt>).
+</p>
+
+<h4><i>(Optional)</i> Cartesian submatrices (<tt>-Cx</tt>)</h4>
+<p>When the <tt>convert</tt> flag is passed, the program writes the row index sets I(q) 
+and column index sets J(q) of the Cartesian submatrix I(q) x J(q)
+for the processors q=1,...,P to the file called <tt>input-Cx</tt>.
+This file is additional information, useful e.g. for visualisation,
+and you may not need it.
+</p>
+
+
+<h3><a name="opts">Program options</a></h3>
+<p>
+The MondriaanOpt options can be passed in the command line.
+An overview of the options is given below.
+</p>
+<table>
+	<thead>
+		<tr>
+			<th>Option</th>
+			<th>Value</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>-m</td>
+			<td>Matrix file</td>
+			<td><i>Required.</i> The input matrix file in Matrix Market (.mtx) format</td>
+		</tr>
+		<tr>
+			<td>-v</td>
+			<td>Volume</td>
+			<td><i>Required.</i> The starting upper bound volume</td>
+		</tr>
+		<tr>
+			<td>-e</td>
+			<td>Load imbalance</td>
+			<td><i>Required if -k is not passed.</i> The allowed load imbalance</td>
+		</tr>
+		<tr>
+			<td>-k</td>
+			<td>Number of nonzeros</td>
+			<td><i>Required if -e is not passed.</i> The maximum allowed number of nonzeros per part</td>
+		</tr>
+		<tr>
+			<td>-t</td>
+			<td>Seconds</td>
+			<td>Max running time in seconds</td>
+		</tr>
+		<tr>
+			<td>-r</td>
+			<td>Dumpfile</td>
+			<td>Resume with given dumpfile</td>
+		</tr>
+		<tr>
+			<td>-h</td>
+			<td><i>None</i></td>
+			<td>Show help</td>
+		</tr>
+		<tr>
+			<td>-c</td>
+			<td><i>None</i></td>
+			<td>After computation is complete, convert results to Mondriaan output.</td>
+		</tr>
+		<tr>
+			<td>-C</td>
+			<td><i>None</i></td>
+			<td>Do not compute anything; convert previously obtained results to Mondriaan output.
+			(When passed, only -m is required.)</td>
+		</tr>
+	</tbody>
+</table>
+
+
+<h3><a name="matl">Using MondriaanOpt in MATLAB</a></h3>
+
+<p>
+For more information about MATLAB usage, please see the <a href="MATLAB.html">Mondriaan MATLAB guide</a>.
+MondriaanOpt is available in Matlab using the <tt>MatlabMondriaanOpt</tt> MEX routine. Example matlab files
+are given as <tt>mondriaanOpt.m</tt> and <tt>mondriaanOptPlot.m</tt>.
+</p>
+
+
+<h3>References</h3>
+<p>
+[<a name="cite1" href="http://doi.org/10.1016/j.jpdc.2015.06.005">1</a>]
+<em>An exact algorithm for sparse matrix bipartitioning</em>,
+Daniel M. Pelt and Rob H. Bisseling, <i>Journal of Parallel and Distributed Computing</i>, <b>85</b> (2015) pp. 79-90.
+</p>
+
+<hr>
+<p>
+Last updated: September 27, 2016.<br><br>
+September 27, 2016 by Marco van Oort.<br><br>
+To <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan">
+the Mondriaan package home page</a>.</p>
+
+<p>
+<a href="http://validator.w3.org/check?uri=referer">
+<img style="border:0;width:88px;height:31px" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01 Strict">
+</a>
+<a href="http://jigsaw.w3.org/css-validator/check/referer">
+<img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!">
+</a>
+</p>
+
+<hr>
+
+</body>
+
+</html>
+
