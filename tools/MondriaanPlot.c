@@ -357,6 +357,16 @@ int main(int argc, char **argv) {
 	/* Remove dummies.
 	if (A.m == A.n && Options.SquareMatrix_DistributeVectorsEqual == EqVecYes && Options.SquareMatrix_DistributeVectorsEqual_AddDummies == DumYes) RemoveDummiesFromSparseMatrix(&A);
 	*/
+
+	/* Write SVG virtualisation to file */
+	char output[MAX_WORD_LENGTH]; /* filename of the output */
+	sprintf(output, "%s-%d.svg", Options.matrix, A.NrProcs);
+	File = fopen(output, "w");
+	if (!File) fprintf(stderr, "main(): Unable to open '%s' for writing!\n", output);
+	else {
+		SparseMatrixExportSVG(&A, File);
+		fclose(File);
+	}
 	
 	/* Free memory. */
 	MMDeleteSparseMatrix(&A);

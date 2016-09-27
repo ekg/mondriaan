@@ -1612,7 +1612,71 @@ int MMSparseMatrixPrintTail(struct sparsematrix *pM, FILE *stream) {
 
     return TRUE;
 } /* end MMSparseMatrixPrintTail */
-  
+
+int SparseMatrixExportSVG(struct sparsematrix *pM, FILE *stream){
+
+    /* 
+     * This function prints a visualisation of the partitioning of sparse matrix M to stream.
+     * The format is Scalable Vector Graphics (SVG).
+     */
+
+    long i, j, p, t;
+    if(stream==NULL)
+        return FALSE;
+    
+    if (pM->MMTypeCode[0] != 'D') {
+        return FALSE;
+    }
+    
+    if(pM->NrProcs > 12)
+        return FALSE;
+    
+    const char * const colors[12] = {
+        "ff0000",
+        "0000ff",
+        "ffff00",
+        "00ff00",
+        "ff00ff",
+        "00ffff",
+        "ff7f00",
+        "ff007f",
+        "7f00ff",
+        "007fff",
+        "9f3f00",
+        "7faf00"
+    };
+
+    /* Output standard SVG file intro */
+    fprintf(stream,"<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n");
+    fprintf(stream,"<svg xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\"\n");
+
+    /* Plot has width 10*n and height 10*m, where m = number of rows and n = number of columns */
+    fprintf(stream,"width=\"%ld\"\nheight=\"%ld\"\nid=\"svg2\">",10*pM->n,10*pM->m);
+    fprintf(stream,"<g>\n");
+
+    /* Plot white background box */
+    fprintf(stream,"<rect width=\"%ld\" height=\"%ld\" x=\"0\" y=\"0\" id=\"bkg\" style=\"fill:#ffffff;fill-opacity:1;\" />\n",10*pM->n,10*pM->m);
+    
+    for (p = 0; p < pM->NrProcs; p++ ) {
+        for (t = pM->Pstart[p]; t < pM->Pstart[p+1]; t++) {
+            
+            i = pM->i[t];
+            j = pM->j[t];
+            /* Plot nonzero M(i,j) as a 10 by 10 box at position
+                    x = 10*j (from the left margin),
+                    y = 10*i (from the top margin) */
+            fprintf(stream,"<rect width=\"10\" height=\"10\" x=\"%ld\" y=\"%ld\" id=\"r%ld-%ld\" style=\"fill:#%s;fill-opacity:1;\" />\n",10*j,10*i,i,j, colors[p]);
+
+        }
+    }
+
+    fprintf(stream,"</g>\n</svg>\n");
+    
+    return TRUE;
+    
+} /* end SparseMatrixExportSVG */
+
+
 int AddDummiesToSparseMatrix(struct sparsematrix *pM)  {
   
     /* This function adds dummies to a square matrix to make its diagonal 

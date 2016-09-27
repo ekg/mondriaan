@@ -71,7 +71,7 @@ Go inside the directory <tt>Mondriaan4</tt> and type
 </ul>
 <p>
 This will compile the Mondriaan library, tools included with
-the Mondriaan library, and all 99 unit tests of the library
+the Mondriaan library, and all 102 unit tests of the library
 with the default options as given in <tt>mondriaan.mk</tt>.
 
 After compilation the include files are located in <tt>Mondriaan4/src/include</tt>,
@@ -85,7 +85,7 @@ program is provided by <tt>Mondriaan4/docs/example.c</tt> and
 
 <p>
 For more information about MATLAB usage, please see the <a href="MATLAB.html">Mondriaan MATLAB guide</a>.
-To enable <em>MATLAB support</em> for Mondriaan, edit the file
+To enable <em>MATLAB support</em> for Mondriaan and MondriaanOpt, edit the file
 <tt>mondriaan.mk</tt> and change the line containing the variable
 <tt>MATLABHOMEDIR</tt> to your current MATLAB install directory and
 remove the '<tt>#</tt>' in front of the line to uncomment it.
@@ -107,7 +107,7 @@ please try to identify the relevant error message, and inform me
 (R . H . Bisseling @ NOSPAM uu . nl ) about the problem. I will try to help you 
 solve it. The tests called can be found in the script <tt>runtest</tt> 
 residing in the <tt>tests/</tt> subdirectory.
-To compile and run all 99 <em>unit tests</em>, type
+To compile and run all 102 <em>unit tests</em>, type
 </p>
 <ul>
 <li><tt>% make test</tt></li>
@@ -386,6 +386,11 @@ GIF of the partitioning process:
 </ul>
 <p>
 This will create <tt>../tests/arc130.mtx.gif</tt>.
+</p>
+<p>
+When creating images with <tt>MondriaanPlot</tt>, also an SVG file is generated.
+Just as the <tt>.tga</tt> files, the <tt>.svg</tt> file also contains a visualisation of the partitioning.
+In the above examples, the svg file created will be <tt>../tests/arc130.mtx-8.svg</tt>.
 </p>
 
 <h3><a name="opts">Program options</a></h3>

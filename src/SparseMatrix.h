@@ -102,6 +102,8 @@ int MMSparseMatrixPrintWeights(struct sparsematrix *pM, FILE *stream);
 int MMSparseMatrixPrintEntries(struct sparsematrix *pM, FILE *stream);
 int MMSparseMatrixPrintTail(struct sparsematrix *pM, FILE *stream);
 
+int SparseMatrixExportSVG(struct sparsematrix *pM, FILE *stream);
+
 /* Function declarations for input functions for other sparse matrix storage schemes */
 int CRSSparseMatrixInit(struct sparsematrix *pM, const long m, const long n, const long nnz,
 			const int *col, const int *row_start, const double *values,
