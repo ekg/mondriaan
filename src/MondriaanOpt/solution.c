@@ -343,7 +343,7 @@ void printConverted(const char *fn) {
     sprintf(fnI,"%s_P2.mtx",fn0);
     
     /* Combine values & distribution A */
-    if(!MMReadSparseMatrixFromIndexAndValueMatrixFiles(fn, fnI, &A)) {
+    if(!SpMatReadIndexAndValueMatrixFiles(fn, fnI, &A)) {
         exit(-1);
     }
     
@@ -351,7 +351,7 @@ void printConverted(const char *fn) {
     char output[MAX_WORD_LENGTH];
     sprintf(output, "%s-P%d", fn, A.NrProcs);
     File = fopen(output, "w");
-    if (!File) fprintf(stderr, "MMWriteSparseMatrixFromProcessorIndexMatrix(): Unable to open '%s' for writing!\n", output);
+    if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
         MMWriteSparseMatrix(&A, File, NULL, &Options);
         fclose(File);
@@ -359,7 +359,7 @@ void printConverted(const char *fn) {
     
     /* Write out matrix the entries of which are processor indices. */
     if (!MMInsertProcessorIndices(&A)) {
-        fprintf(stderr, "main(): Unable to write processor indices!\n");
+        fprintf(stderr, "printConverted(): Unable to write processor indices!\n");
         exit(-1);
     }
 
@@ -368,7 +368,7 @@ void printConverted(const char *fn) {
 
     File = fopen(output, "w");
 
-    if (!File) fprintf(stderr, "main(): Unable to open '%s' for writing!\n", output);
+    if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
         MMWriteSparseMatrix(&A, File, NULL, &Options);
         fclose(File);
@@ -378,7 +378,7 @@ void printConverted(const char *fn) {
     /* Write the index sets of the Cartesian submatrices to file */
     sprintf(output, "%s-C%d", fn, A.NrProcs);
     File = fopen(output, "w");
-    if (!File) fprintf(stderr, "main(): Unable to open '%s' for writing!\n", output);
+    if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
         MMWriteCartesianSubmatrices(&A, File);
         fclose(File);

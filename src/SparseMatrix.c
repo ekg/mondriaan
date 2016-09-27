@@ -782,7 +782,7 @@ int MMInsertProcessorIndices(struct sparsematrix *pM) {
     return TRUE;
 }
 
-int MMValuesToProcessorIndices(struct sparsematrix *pM) {
+int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     /* 
         This function writes the (real) value of each non-zero, assuming it to contain the processor number to which that
         non-zero should be assigned, to the processor number of that non-zero.
@@ -795,7 +795,7 @@ int MMValuesToProcessorIndices(struct sparsematrix *pM) {
     pM->j = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
     
     if (pM->i == NULL || pM->j == NULL) {
-        fprintf(stderr, "MMValuesToProcessorIndices(): Not enough memory for i and j!\n");
+        fprintf(stderr, "SpMatValuesToProcessorIndices(): Not enough memory for i and j!\n");
         return FALSE;
     }
     
@@ -814,7 +814,7 @@ int MMValuesToProcessorIndices(struct sparsematrix *pM) {
     pM->Pstart    = (long *) malloc((pM->NrProcs+1) * sizeof(long));
     long * Pindex = (long *) malloc((pM->NrProcs+1) * sizeof(long));
     if (pM->Pstart == NULL) {
-        fprintf(stderr, "MMValuesToProcessorIndices(): Not enough memory for Pstart!\n");
+        fprintf(stderr, "SpMatValuesToProcessorIndices(): Not enough memory for Pstart!\n");
         return FALSE;
     }
     
@@ -849,7 +849,7 @@ int MMValuesToProcessorIndices(struct sparsematrix *pM) {
     
     /* Sanity check */
     if (pM->Pstart[0] != 0 || pM->Pstart[pM->NrProcs] != pM->NrNzElts) {
-        fprintf(stderr, "MMValuesToProcessorIndices(): Pstart: Read Error!\n");
+        fprintf(stderr, "SpMatValuesToProcessorIndices(): Pstart: Read Error!\n");
         return FALSE;
     }
     
@@ -869,7 +869,7 @@ int NonzeroSort_compare( const void *one, const void *two ) {
     if( a[2]<b[2] ) return -1;
     return 0;
 }
-int MMSortNonzeros(struct sparsematrix *pM, char perProcessor) {
+int SpMatSortNonzeros(struct sparsematrix *pM, char perProcessor) {
     long t, p;
     
     long * indices = (long *) malloc((pM->NrNzElts+1) * 3 * sizeof(long));
@@ -894,7 +894,7 @@ int MMSortNonzeros(struct sparsematrix *pM, char perProcessor) {
     pM->ReValue = (double *) malloc((pM->NrNzElts+1) * sizeof(double));
     
     if (pM->ReValue == NULL) {
-        fprintf(stderr, "MMSortNonzeros(): Not enough memory for dummies!\n");
+        fprintf(stderr, "SpMatSortNonzeros(): Not enough memory for dummies!\n");
         return FALSE;
     }
     
@@ -915,7 +915,7 @@ int MMSortNonzeros(struct sparsematrix *pM, char perProcessor) {
  * representing the processor numbers of the nonzero elements, while A should hold the original numerical values of the matrix.
  * The resulting matrix contains the nonzeros of A, assigned to processors as given in I.
  */
-int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct sparsematrix *pI) {
+int SpMatReadIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct sparsematrix *pI) {
     
     struct sparsematrix A;
     FILE *File = NULL;
@@ -924,12 +924,12 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
     File = fopen(fnI, "r");
 
     if (!File) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnI);
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnI);
         return FALSE;
     }
     
     if (!MMReadSparseMatrix(File, pI)) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not read matrix!\n");
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Could not read matrix!\n");
         return FALSE;
     }
     
@@ -939,12 +939,12 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
     File = fopen(fnA, "r");
 
     if (!File) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnA);
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnA);
         return FALSE;
     }
     
     if (!MMReadSparseMatrix(File, &A)) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not read matrix!\n");
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Could not read matrix!\n");
         return FALSE;
     }
     
@@ -952,18 +952,18 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
     
     /* Check sizes */
     if(pI->NrNzElts != A.NrNzElts || pI->m != A.m || pI->n != A.n) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Incompatible input files!\n");
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Incompatible input files!\n");
         return FALSE;
     }
     
     /* Use values as processor numbers */
-    if (!MMValuesToProcessorIndices(pI)) {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Error while reading processor indices!\n");
+    if (!SpMatValuesToProcessorIndices(pI)) {
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Error while reading processor indices!\n");
         return FALSE;
     }
     
     if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
-        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
         return FALSE;
     }
     
@@ -976,14 +976,14 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
         /* We have values available, now assign them */
         
         /* Sort the non-zeros per processor */
-        if (!MMSortNonzeros(pI, 1)) {
-            fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not sort the entries!\n");
+        if (!SpMatSortNonzeros(pI, 1)) {
+            fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Could not sort the entries!\n");
             return FALSE;
         }
         
         /* Sort non-zeros of original matrix */
-        if (!MMSortNonzeros(&A, 0)) {
-            fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not sort the entries!\n");
+        if (!SpMatSortNonzeros(&A, 0)) {
+            fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Could not sort the entries!\n");
             return FALSE;
         }
         
@@ -993,7 +993,7 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
         if(pI->MMTypeCode[2] == 'C') {
             pI->ImValue = (double *) malloc((pI->NrNzElts+1) * sizeof(double));
             if (pI->ImValue == NULL) {
-                fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Not enough memory for matrix values!\n");
+                fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Not enough memory for matrix values!\n");
                 return FALSE;
             }
         }
@@ -1014,7 +1014,7 @@ int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *
                 
                 /* We should have found it; if not, the input matrices are not structurally the same */
                 if(pI->i[t] != A.i[s] || pI->j[t] != A.j[s]) {
-                    fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Incompatible input files!\n");
+                    fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Incompatible input files!\n");
                     return FALSE;
                 }
                 
@@ -1630,7 +1630,7 @@ int SparseMatrixExportSVG(struct sparsematrix *pM, FILE *stream){
     
     if(pM->NrProcs > 12)
         return FALSE;
-    
+
     const char * const colors[12] = {
         "ff0000",
         "0000ff",
@@ -1639,11 +1639,11 @@ int SparseMatrixExportSVG(struct sparsematrix *pM, FILE *stream){
         "ff00ff",
         "00ffff",
         "ff7f00",
-        "ff007f",
+        "7f7f7f",
         "7f00ff",
         "007fff",
         "9f3f00",
-        "7faf00"
+        "4f7f00"
     };
 
     /* Output standard SVG file intro */

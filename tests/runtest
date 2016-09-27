@@ -188,9 +188,9 @@ echo Test MMWriteSparseMatrix: OK
 
 test_MMSparseMatrixGetTypeCode
 test_MMSparseMatrixSetTypeCode
-test_MMValuesToProcessorIndices
-test_MMSortNonzeros
-test_MMReadSparseMatrixFromIndexAndValueMatrixFiles
+test_SpMatValuesToProcessorIndices
+test_SpMatSortNonzeros
+test_SpMatReadIndexAndValueMatrixFiles
 test_SparseMatrixRemoveDuplicates
 test_SparseMatrixStructurallySymmetric
 

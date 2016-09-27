@@ -7,16 +7,16 @@ int main(int argc, char **argv) {
     long nz, s, t, p, P, *usedI, *usedA, matchI, matchA, found;
     FILE *fp;
 
-    printf("Test MMReadSparseMatrixFromIndexAndValueMatrixFiles: ");
+    printf("Test SpMatReadIndexAndValueMatrixFiles: ");
     
     /* Check sorting in general */
     
-    strcpy(filenameA,"test_MMReadSparseMatrixFromIndexAndValueMatrixFilesA.inp");
+    strcpy(filenameA,"test_SpMatReadIndexAndValueMatrixFilesA.inp");
     fp = fopen(filenameA, "r");
     MMReadSparseMatrix(fp, &A);
     fclose(fp);
     
-    strcpy(filenameI,"test_MMReadSparseMatrixFromIndexAndValueMatrixFilesI.inp");
+    strcpy(filenameI,"test_SpMatReadIndexAndValueMatrixFilesI.inp");
     fp = fopen(filenameI, "r");
     MMReadSparseMatrix(fp, &I);
     fclose(fp);
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     
     
     /* Use values as processor numbers */
-    if (!MMReadSparseMatrixFromIndexAndValueMatrixFiles(filenameA, filenameI, &M)) {
+    if (!SpMatReadIndexAndValueMatrixFiles(filenameA, filenameI, &M)) {
         printf("Error!\n");
         exit(1);
     }

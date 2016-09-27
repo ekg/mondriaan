@@ -84,10 +84,10 @@ int MMSparseMatrixFreeMemory(struct sparsematrix *pM);
 
 int MMInsertProcessorIndices(struct sparsematrix *pM);
 
-int MMValuesToProcessorIndices(struct sparsematrix *pM);
+int SpMatValuesToProcessorIndices(struct sparsematrix *pM);
 int NonzeroSort_compare( const void *one, const void *two );
-int MMSortNonzeros(struct sparsematrix *pM, char perProcessor);
-int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct sparsematrix *pI);
+int SpMatSortNonzeros(struct sparsematrix *pM, char perProcessor);
+int SpMatReadIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct sparsematrix *pI);
 
 int MMSparseMatrixReadHeader(struct sparsematrix *pM, FILE *fp);
 int MMSparseMatrixReadPstart(struct sparsematrix *pM, FILE *fp);

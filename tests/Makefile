@@ -35,8 +35,8 @@ test_MMSparseMatrixPrintHeader test_MMSparseMatrixPrintTail \
 test_MMSparseMatrixPrintPstart test_MMSparseMatrixPrintWeights \
 test_MMSparseMatrixPrintEntries test_MMWriteSparseMatrix \
 test_MMSparseMatrixGetTypeCode test_MMSparseMatrixSetTypeCode \
-test_MMValuesToProcessorIndices test_MMSortNonzeros \
-test_MMReadSparseMatrixFromIndexAndValueMatrixFiles \
+test_SpMatValuesToProcessorIndices test_SpMatSortNonzeros \
+test_SpMatReadIndexAndValueMatrixFiles \
 test_MMReadSparseMatrix test_SparseMatrixRemoveDuplicates \
 test_SparseMatrixStructurallySymmetric test_CRS2CCS \
 test_MMWriteCartesianSubmatrices test_GetParameters test_SetDefaultOptions \
@@ -336,13 +336,13 @@ test_MMSparseMatrixGetTypeCode: test_MMSparseMatrixGetTypeCode.o ${SPARSEMATRIX:
 test_MMSparseMatrixSetTypeCode: test_MMSparseMatrixSetTypeCode.o ${SPARSEMATRIX:%=%.o} ${MATALLOC:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
-test_MMValuesToProcessorIndices: test_MMValuesToProcessorIndices.o ${SPARSEMATRIX:%=%.o}
+test_SpMatValuesToProcessorIndices: test_SpMatValuesToProcessorIndices.o ${SPARSEMATRIX:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
-test_MMSortNonzeros: test_MMSortNonzeros.o ${SPARSEMATRIX:%=%.o}
+test_SpMatSortNonzeros: test_SpMatSortNonzeros.o ${SPARSEMATRIX:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
-test_MMReadSparseMatrixFromIndexAndValueMatrixFiles: test_MMReadSparseMatrixFromIndexAndValueMatrixFiles.o ${SPARSEMATRIX:%=%.o}
+test_SpMatReadIndexAndValueMatrixFiles: test_SpMatReadIndexAndValueMatrixFiles.o ${SPARSEMATRIX:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_SparseMatrixRemoveDuplicates: test_SparseMatrixRemoveDuplicates.o ${SPARSEMATRIX:%=%.o} ${MATALLOC:%=%.o}

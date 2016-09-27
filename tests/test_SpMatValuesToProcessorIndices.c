@@ -7,9 +7,9 @@ int main(int argc, char **argv) {
     long nz, P, s, t, p, *used, match, found;
     FILE *fp;
 
-    printf("Test MMValuesToProcessorIndices: ");
+    printf("Test SpMatValuesToProcessorIndices: ");
 
-    strcpy(filename,"test_MMValuesToProcessorIndices.inp");
+    strcpy(filename,"test_SpMatValuesToProcessorIndices.inp");
 
     nz = 13;
     P = 3;
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
     fclose(fp);
     
     /* Use values as processor numbers */
-    if (!MMValuesToProcessorIndices(&A_dist)) {
+    if (!SpMatValuesToProcessorIndices(&A_dist)) {
         printf("Error!\n");
         exit(1);
     }

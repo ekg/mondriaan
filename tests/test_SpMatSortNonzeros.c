@@ -7,11 +7,11 @@ int main(int argc, char **argv) {
     long nz, s, t, p, P, *used, match;
     FILE *fp;
 
-    printf("Test MMSortNonzeros: ");
+    printf("Test SpMatSortNonzeros: ");
     
     /* Check sorting in general */
     
-    strcpy(filename,"test_MMSortNonzeros1.inp");
+    strcpy(filename,"test_SpMatSortNonzeros1.inp");
 
     nz = 12;
     
@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     fclose(fp);
     
     /* Use values as processor numbers */
-    if (!MMSortNonzeros(&A_sort, 0)) {
+    if (!SpMatSortNonzeros(&A_sort, 0)) {
         printf("Error!\n");
         exit(1);
     }
@@ -69,7 +69,7 @@ int main(int argc, char **argv) {
     
     /* Check sorting per part/processor */
     
-    strcpy(filename,"test_MMSortNonzeros2.inp");
+    strcpy(filename,"test_SpMatSortNonzeros2.inp");
 
     nz = 13;
     P = 3;
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     fclose(fp);
     
     /* Use values as processor numbers */
-    if (!MMSortNonzeros(&A_sort, 1)) {
+    if (!SpMatSortNonzeros(&A_sort, 1)) {
         printf("Error!\n");
         exit(1);
     }
