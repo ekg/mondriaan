@@ -781,6 +781,266 @@ int MMInsertProcessorIndices(struct sparsematrix *pM) {
     
     return TRUE;
 }
+
+int MMValuesToProcessorIndices(struct sparsematrix *pM) {
+    /* 
+        This function writes the (real) value of each non-zero, assuming it to contain the processor number to which that
+        non-zero should be assigned, to the processor number of that non-zero.
+    */
+    long t, p;
+    long * i_orig = pM->i;
+    long * j_orig = pM->j;
+    
+    pM->i = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
+    pM->j = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
+    
+    if (pM->i == NULL || pM->j == NULL) {
+        fprintf(stderr, "MMValuesToProcessorIndices(): Not enough memory for i and j!\n");
+        return FALSE;
+    }
+    
+    /* Determine number of processors */
+    pM->NrProcs = 0;
+    for (t = 0; t < pM->NrNzElts; t++) {
+        if(((long)pM->ReValue[t]+1) > pM->NrProcs) {
+            pM->NrProcs = (long)pM->ReValue[t]+1;
+        }
+    }
+    
+    /* Reserve space for Pstart */
+    if (pM->Pstart != NULL)
+        free(pM->Pstart);
+    
+    pM->Pstart    = (long *) malloc((pM->NrProcs+1) * sizeof(long));
+    long * Pindex = (long *) malloc((pM->NrProcs+1) * sizeof(long));
+    if (pM->Pstart == NULL) {
+        fprintf(stderr, "MMValuesToProcessorIndices(): Not enough memory for Pstart!\n");
+        return FALSE;
+    }
+    
+    /* Determine partitioning of processors */
+    for (p = 0; p <= pM->NrProcs; p++ ) {
+        pM->Pstart[p] = 0;
+        Pindex[p] = 0;
+    }
+    for (t = 0; t < pM->NrNzElts; t++) {
+        p = (long) pM->ReValue[t]+1;
+        pM->Pstart[p]++;
+    }
+    for (p = 1; p <= pM->NrProcs; p++ ) {
+        pM->Pstart[p] += pM->Pstart[p-1];
+    }
+    
+    /* Assign nonzeros to the processors */
+    for (t = 0; t < pM->NrNzElts; t++) {
+        p = (long) pM->ReValue[t]+1;
+        pM->i[pM->Pstart[p-1]+Pindex[p-1]] = i_orig[t];
+        pM->j[pM->Pstart[p-1]+Pindex[p-1]] = j_orig[t];
+        
+        ++Pindex[p-1];
+    }
+    
+    /* Make sure the values are correctly re-assigned */
+    for (p = 1; p <= pM->NrProcs; p++ ) {
+        for (t = pM->Pstart[p-1]; t < pM->Pstart[p]; t++) {
+            pM->ReValue[t] = p;
+        }
+    }
+    
+    /* Sanity check */
+    if (pM->Pstart[0] != 0 || pM->Pstart[pM->NrProcs] != pM->NrNzElts) {
+        fprintf(stderr, "MMValuesToProcessorIndices(): Pstart: Read Error!\n");
+        return FALSE;
+    }
+    
+    free(i_orig);
+    free(j_orig);
+    free(Pindex);
+    
+    return TRUE;
+}
+
+int NonzeroSort_compare( const void *one, const void *two ) {
+    const long * a = (long *) one;
+    const long * b = (long *) two;
+    if( a[1]>b[1] ) return  1;
+    if( a[1]<b[1] ) return -1;
+    if( a[2]>b[2] ) return  1;
+    if( a[2]<b[2] ) return -1;
+    return 0;
+}
+int MMSortNonzeros(struct sparsematrix *pM, char perProcessor) {
+    long t, p;
+    
+    long * indices = (long *) malloc((pM->NrNzElts+1) * 3 * sizeof(long));
+    
+    for (t = 0; t < pM->NrNzElts; t++) {
+        indices[3*t+0] = t;
+        indices[3*t+1] = pM->i[t];
+        indices[3*t+2] = pM->j[t];
+    }
+    
+    if(perProcessor == 1) {
+        for (p = 0; p < pM->NrProcs; p++ ) {
+            qsort( &indices[3*pM->Pstart[p]], pM->Pstart[p+1] - pM->Pstart[p], 3 * sizeof(long), &NonzeroSort_compare );
+        }
+    }
+    else {
+        qsort( indices, pM->NrNzElts, 3 * sizeof(long), &NonzeroSort_compare );
+    }
+    
+    double * ReValue_orig = pM->ReValue;
+    
+    pM->ReValue = (double *) malloc((pM->NrNzElts+1) * sizeof(double));
+    
+    if (pM->ReValue == NULL) {
+        fprintf(stderr, "MMSortNonzeros(): Not enough memory for dummies!\n");
+        return FALSE;
+    }
+    
+    for (t = 0; t < pM->NrNzElts; t++) {
+        pM->ReValue[t] = ReValue_orig[indices[3*t+0]];
+        pM->i[t]       = indices[3*t+1];
+        pM->j[t]       = indices[3*t+2];
+    }
+    
+    free(indices);
+    free(ReValue_orig);
+    return TRUE;
+    
+}
+
+/**
+ * Combine two sparse matrices I and A, both with nonzeros at the same positions. The matrix I should contain integer values
+ * representing the processor numbers of the nonzero elements, while A should hold the original numerical values of the matrix.
+ * The resulting matrix contains the nonzeros of A, assigned to processors as given in I.
+ */
+int MMReadSparseMatrixFromIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct sparsematrix *pI) {
+    
+    struct sparsematrix A;
+    FILE *File = NULL;
+
+    /* Read solution as sparse integer matrix */    
+    File = fopen(fnI, "r");
+
+    if (!File) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnI);
+        return FALSE;
+    }
+    
+    if (!MMReadSparseMatrix(File, pI)) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not read matrix!\n");
+        return FALSE;
+    }
+    
+    fclose(File);
+    
+    /* Read original matrix as sparse matrix */
+    File = fopen(fnA, "r");
+
+    if (!File) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unable to open '%s' for reading!\n", fnA);
+        return FALSE;
+    }
+    
+    if (!MMReadSparseMatrix(File, &A)) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not read matrix!\n");
+        return FALSE;
+    }
+    
+    fclose(File);
+    
+    /* Check sizes */
+    if(pI->NrNzElts != A.NrNzElts || pI->m != A.m || pI->n != A.n) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Incompatible input files!\n");
+        return FALSE;
+    }
+    
+    /* Use values as processor numbers */
+    if (!MMValuesToProcessorIndices(pI)) {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Error while reading processor indices!\n");
+        return FALSE;
+    }
+    
+    if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
+        fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+        return FALSE;
+    }
+    
+    if(A.MMTypeCode[2] == 'P') {
+        /* We have no values available */
+        pI->MMTypeCode[2] = 'P';
+        free(pI->ReValue);
+    }
+    else {
+        /* We have values available, now assign them */
+        
+        /* Sort the non-zeros per processor */
+        if (!MMSortNonzeros(pI, 1)) {
+            fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not sort the entries!\n");
+            return FALSE;
+        }
+        
+        /* Sort non-zeros of original matrix */
+        if (!MMSortNonzeros(&A, 0)) {
+            fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Could not sort the entries!\n");
+            return FALSE;
+        }
+        
+        /* Make sure that the field is set correctly, and update matrix accordingly */
+        pI->MMTypeCode[2] = A.MMTypeCode[2];
+        
+        if(pI->MMTypeCode[2] == 'C') {
+            pI->ImValue = (double *) malloc((pI->NrNzElts+1) * sizeof(double));
+            if (pI->ImValue == NULL) {
+                fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Not enough memory for matrix values!\n");
+                return FALSE;
+            }
+        }
+        
+        /*
+        * For each processor, walk both through the list of nonzeros belonging to that processor and the list of all nonzeros
+        * and their numerical values. As they are both sorted, we only (in the worst case) need to walk through all
+        * nonzeros NrProcs times, instead of NrNzElts times when using more direct approach. Downside is that we
+        * have had to sort both lists, taking O(NrNzElts * log(NrNzElts)) time, but also this is better than O(NrNzElts^2).
+        */
+        long t, s, p;
+        for (p = 0; p < pI->NrProcs; p++ ) {
+            s = 0;
+            for (t = pI->Pstart[p]; t < pI->Pstart[p+1]; t++) {
+                
+                /* Search for the corresponding nonzero in A */
+                for(;pI->i[t] != A.i[s] || pI->j[t] != A.j[s];s++);
+                
+                /* We should have found it; if not, the input matrices are not structurally the same */
+                if(pI->i[t] != A.i[s] || pI->j[t] != A.j[s]) {
+                    fprintf(stderr, "MMReadSparseMatrixFromIndexAndValueMatrixFiles(): Incompatible input files!\n");
+                    return FALSE;
+                }
+                
+                /* Copy matrix value */
+                pI->ReValue[t] = A.ReValue[s];
+                
+                if(pI->MMTypeCode[2] == 'C') {
+                    pI->ImValue[t] = A.ImValue[s];
+                }
+            }
+        }
+    }
+    
+    pI->MMTypeCode[0] = 'D';
+    pI->MMTypeCode[3] = A.MMTypeCode[3];
+    
+    /* Copy header */
+    if(A.header != NULL && strlen(A.header) > 0) {
+        pI->header = (char *) realloc(pI->header, (strlen(A.header)+1)*sizeof(char));
+        strcpy(pI->header, A.header);
+    }
+    
+    MMDeleteSparseMatrix(&A);
+
+    return TRUE;
+}
  
   
 int MMSparseMatrixReadHeader(struct sparsematrix *pM, FILE *fp) {

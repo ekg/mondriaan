@@ -323,3 +323,65 @@ void printToMM(const char *fn, struct solution *s, const struct mat *a){
     return ;
 
 } /* end printToMM */
+
+void printConverted(const char *fn) {
+    
+    struct opts Options; /* The Mondriaan options */
+    struct sparsematrix A;
+    FILE *File = NULL;
+    
+    SetDefaultOptions(&Options);
+    
+    /* Remove ".mtx" from matrix name */
+    char fn0[MAXFNSIZE], fnI[MAXFNSIZE];
+    int len;
+    len = strlen(fn);
+    memcpy(fn0, fn, len-3);
+    fn0[len-4] = 0;
+
+    /* Construct processor number file name */
+    sprintf(fnI,"%s_P2.mtx",fn0);
+    
+    /* Combine values & distribution A */
+    if(!MMReadSparseMatrixFromIndexAndValueMatrixFiles(fn, fnI, &A)) {
+        exit(-1);
+    }
+    
+    /* Write the distributed matrix to file */
+    char output[MAX_WORD_LENGTH];
+    sprintf(output, "%s-P%d", fn, A.NrProcs);
+    File = fopen(output, "w");
+    if (!File) fprintf(stderr, "MMWriteSparseMatrixFromProcessorIndexMatrix(): Unable to open '%s' for writing!\n", output);
+    else {
+        MMWriteSparseMatrix(&A, File, NULL, &Options);
+        fclose(File);
+    }
+    
+    /* Write out matrix the entries of which are processor indices. */
+    if (!MMInsertProcessorIndices(&A)) {
+        fprintf(stderr, "main(): Unable to write processor indices!\n");
+        exit(-1);
+    }
+
+    A.MMTypeCode[0] = 'M';
+    sprintf(output, "%s-I%d", fn, A.NrProcs);
+
+    File = fopen(output, "w");
+
+    if (!File) fprintf(stderr, "main(): Unable to open '%s' for writing!\n", output);
+    else {
+        MMWriteSparseMatrix(&A, File, NULL, &Options);
+        fclose(File);
+    }
+    A.MMTypeCode[0] = 'D';
+    
+    /* Write the index sets of the Cartesian submatrices to file */
+    sprintf(output, "%s-C%d", fn, A.NrProcs);
+    File = fopen(output, "w");
+    if (!File) fprintf(stderr, "main(): Unable to open '%s' for writing!\n", output);
+    else {
+        MMWriteCartesianSubmatrices(&A, File);
+        fclose(File);
+    }
+    
+}

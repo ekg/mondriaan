@@ -41,7 +41,7 @@ char readmatrixfromfile(struct mat *in, const char *fn){
     fclose(fp);
     
     return convertSparsematrixToMat(in, &A);
-}
+} /* end readmatrixfromfile */
 
 char convertSparsematrixToMat(struct mat *in, struct sparsematrix *A) {
 
@@ -73,9 +73,6 @@ char convertSparsematrixToMat(struct mat *in, struct sparsematrix *A) {
         fprintf(stderr, "Not enough memory!\n");
         exit(EXIT_FAILURE);
     }
-
-
-    printf("%ld %ld %ld ",A->m,A->n,A->NrNzElts);
 
     /* Fill starts array */
     for(i=0;i<=A->m;i++)
@@ -145,4 +142,4 @@ char convertSparsematrixToMat(struct mat *in, struct sparsematrix *A) {
 
     return TRUE;
 
-} /* end readmatrixfromfile */
+} /* end convertSparsematrixToMat */

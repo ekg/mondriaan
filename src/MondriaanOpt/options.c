@@ -27,6 +27,7 @@ char readoptions(struct options *o, int c, char **v){
     o->time=0.;
     o->maxruntime=0.;
     o->nbranches=0; /* number of branches traversed */
+    o->convert=0;
 
     /* Read while there are options left */
     while(i<c){
@@ -35,27 +36,32 @@ char readoptions(struct options *o, int c, char **v){
             if(i==c-1) exitwitherror(0);
             sprintf(o->fn,"%s",v[i+1]);
             req[0]=TRUE;
+            i++;
         }else if(strcmp(v[i],"-t")==0){
             /* Max running time in seconds */
             if(i==c-1) exitwitherror(0);
             o->maxruntime = atof(v[i+1]);
+            i++;
         }else if(strcmp(v[i],"-e")==0){
             /* Load imbalance */
             if(i==c-1) exitwitherror(0);
             o->eps = atof(v[i+1]);
             o->epsset = TRUE;
             req[1]=TRUE;
+            i++;
         }else if(strcmp(v[i],"-k")==0){
             /* Number of nonzeros */
             if(i==c-1) exitwitherror(0);
             o->k = atoi(v[i+1]);
             o->epsset = FALSE;
             req[1]=TRUE;
+            i++;
         }else if(strcmp(v[i],"-v")==0){
             /* Starting upper bound on volume, e.g. MIN(m,n)+1 for an m by n matrix  */
             if(i==c-1) exitwitherror(0);
             o->maxvol = atoi(v[i+1]);
             req[2]=TRUE;
+            i++;
         }else if(strcmp(v[i],"-h")==0){
             /* Get help */
             exitwitherror(1);
@@ -64,16 +70,27 @@ char readoptions(struct options *o, int c, char **v){
             if(i==c-1) exitwitherror(0);
             o->resume=TRUE;
             sprintf(o->resfn,"%s",v[i+1]);
+            i++;
+        }else if(strcmp(v[i],"-c")==0){
+            o->convert=1;
+        }else if(strcmp(v[i],"-C")==0){
+            o->convert=2;
         }
-        i+=2;
+        i++;
     }
     
     /* Check if required options are given */
-    for(i=0; i<CUR_REQ_OPTIONS; i++){
-        if(!req[i])
+    if(o->convert == 2) {
+        if(!req[0])
             exitwitherror(0);
     }
-
+    else {
+        for(i=0; i<CUR_REQ_OPTIONS; i++){
+            if(!req[i])
+                exitwitherror(0);
+        }
+    }
+    
     /* Everything ok */
     return TRUE;
 

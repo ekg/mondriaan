@@ -16,7 +16,7 @@ MONDRIAANMAJORVERSION := 4
 # To enable Matlab support, please uncomment the following line and insert the correct (global) Matlab home directory and the correct suffix to Matlab MEX files for your architecture.
 #
 
-#MATLABHOMEDIR := /usr/local/matlab
+MATLABHOMEDIR := /home/marco/bin/MATLAB/R2016a
 MEXSUFFIX := mexa64
 
 # ==== PaToH support ====

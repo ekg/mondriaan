@@ -54,5 +54,5 @@ MatlabMondriaan: MatlabMondriaan.mex.o MatlabHelper.mex.o ${LIB}
 	make -r OBJDEPS='${^:%.a=}' $@.${MEXSUFFIX}
 
 MatlabMondriaanOpt: MatlabMondriaanOpt.mex.o MatlabHelper.mex.o ${LIB} ${MONDRIAANLIBDIR}/libMondriaan${MONDRIAANMAJORVERSION}Opt.a
-	make -r OBJDEPS='${^:%.a=}' LIBS='${LIBS} -lMondriaan4Opt' $@.${MEXSUFFIX}
+	make -r OBJDEPS='${^:%.a=}' LIBS='-lMondriaan4Opt ${LIBS}' $@.${MEXSUFFIX}
 
