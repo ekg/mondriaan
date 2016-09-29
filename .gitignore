@@ -1,0 +1,11 @@
+*
+!/**/
+!*.*
+
+*.tga
+*.mtx*
+*.o
+*.svg
+*.mex*
+src/include/
+src/lib/
