@@ -26,7 +26,7 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
                The function returns maxcom = max(sends,recvs)
                over all processors. */
 
-    int P, Pact, q,  useOpt2= FALSE, useMond, *Xbest, *Nprocs;
+    int P, Pact, q,  useOpt2= FALSE, *Xbest, *Nprocs;
     long int *XC;
     long total, LB, actbound, bestbound, 
          ComVol, MaxOut, MaxIn, MaxCompnts, TotCompnts,
@@ -280,10 +280,11 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
 
             bestcom = LONG_MAX;
 
-
+#ifdef INFO2
             /* useMond registers whether best solution is obtained by
                original Mondriaan method */
-            useMond = FALSE; 
+            int useMond = FALSE;
+#endif
 
             for (k=0; k<pOptions->VectorPartition_MaxNrLoops &&
                        bestbound < bestcom; k++) {
@@ -318,7 +319,9 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
                     for (j=0; j<lC; j++)
                         Xbest[j] = XC[J[j]];
                     bestcom = maxcom;
+#ifdef INFO2
                     useMond = TRUE;
+#endif
                 }
 
                 /* Improve greedily */
@@ -335,7 +338,9 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
                         for (j=0; j<lC; j++)
                             Xbest[j] = XC[J[j]];
                         bestcom = maxcom;
-                        useMond = TRUE; 
+#ifdef INFO2
+                        useMond = TRUE;
+#endif
                     }
                 }
                 if (bestcom == bestbound)
@@ -360,7 +365,9 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
                     for (j=0; j<lC; j++)
                         Xbest[j] = XC[J[j]];
                     bestcom = maxcom;
-                    useMond = FALSE; 
+#ifdef INFO2
+                    useMond = FALSE;
+#endif
                 }
             
                 /* Improve greedily */
@@ -377,7 +384,9 @@ long DistributeVec(const struct sparsematrix *pM, long int *X, int dir, const st
                         for (j=0; j<lC; j++)
                            Xbest[j] = XC[J[j]];
                         bestcom = maxcom;
-                        useMond = FALSE; 
+#ifdef INFO2
+                        useMond = FALSE;
+#endif
                     }
                 }   
                 if (k>0) {

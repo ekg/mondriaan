@@ -1378,7 +1378,6 @@ int UncoarsenGraph(struct biparthypergraph *pCHG, struct contraction *pC, struct
         long *Weights, *Indices, *Order;
         long NumFreeVertices = 0;
         long totwgt;
-        float oldratio;
         
         /* Calculate part weights for non-free vertices. */
         for (t = 0; t < pHG->NrVertices; ++t) {
@@ -1409,8 +1408,8 @@ int UncoarsenGraph(struct biparthypergraph *pCHG, struct contraction *pC, struct
 
 #ifdef INFO2
         printf("    Reassigning %ld free vertices with total weight %ld.\n", NumFreeVertices, totwgt);
+        float oldratio = (float)pHG->WeightP[0]/(float)(pHG->WeightP[0] + pHG->WeightP[1]);
 #endif
-        oldratio = (float)pHG->WeightP[0]/(float)(pHG->WeightP[0] + pHG->WeightP[1]);
         
         if ((Order = QSort(Weights, NumFreeVertices)) == NULL) {
             fprintf(stderr, "UncoarsenGraph(): Unable to quicksort!\n");

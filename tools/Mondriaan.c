@@ -61,10 +61,8 @@ int main(int argc, char **argv) {
 
     long MinNrNzElts, MaxNrNzElts; /* minimum, maximum number of nonzero elements 
                                        per processor */
-    double AvgNrNzElts; /* average number of nonzero matrix elements per processor */
 
-    long MinWeight, MaxWeight, TotWeight; /* minimum, maximum, total column weight */
-    double AvgWeight;                    /* average column weight */
+    long MinWeight, MaxWeight; /* minimum, maximum column weight */
     long weight, i, j;
     unsigned long int ui;
     long int *temp;
@@ -86,10 +84,17 @@ int main(int argc, char **argv) {
     char stdinName[] = "stdin";
     
     /* Timing variables */
+#ifdef TIME
     clock_t starttime, endtime;
     double cputime;
+#endif
 #ifdef UNIX
     struct timeval starttime1, endtime1;
+#endif
+#ifdef INFO
+    double AvgNrNzElts;  /* average number of nonzero matrix elements per processor */
+    double AvgWeight;    /* average column weight */
+    long TotWeight;      /* total column weight */
 #endif
 
     /* Get the parameters from the command line and initialise Options */
@@ -271,7 +276,9 @@ int main(int argc, char **argv) {
         A.Pstart[q] = A.NrNzElts;
   
     /**** Distribute the matrix (and time it) ****/
+#ifdef TIME
     starttime = clock();
+#endif
 #ifdef UNIX
     gettimeofday(&starttime1, NULL);
 #endif
@@ -281,19 +288,19 @@ int main(int argc, char **argv) {
         exit(-1);
     }
     
-    endtime = clock();
 #ifdef UNIX
     gettimeofday(&endtime1, NULL);
 #endif
-    cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
   
 #ifdef TIME
+    endtime = clock();
+    cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
     printf("  matrix distribution CPU-time    : %f seconds\n", cputime); 
 #ifdef UNIX 
     printf("  matrix distribution elapsed time: %f seconds\n",
              (endtime1.tv_sec - starttime1.tv_sec) +
              (endtime1.tv_usec - starttime1.tv_usec) / 1000000.0); 
-#endif 
+#endif
     fflush(stdout);
 #endif 
   
@@ -304,7 +311,6 @@ int main(int argc, char **argv) {
         RemoveDummiesFromSparseMatrix(&A);
   
     /* Print information about the number of matrix elements */
-    AvgNrNzElts = (double) A.NrNzElts / A.NrProcs;
     MinNrNzElts = LONG_MAX;
     MaxNrNzElts = LONG_MIN;
     for (q = 0; q < A.NrProcs; q++) {
@@ -316,6 +322,7 @@ int main(int argc, char **argv) {
     }
 
 #ifdef INFO
+    AvgNrNzElts = (double) A.NrNzElts / A.NrProcs;
     printf("  Nr nonzero matrix elements:\n");
     printf("    tot         : %ld \n", A.NrNzElts);
     printf("    avg = tot/P : %g  \n", AvgNrNzElts);
@@ -327,8 +334,6 @@ int main(int argc, char **argv) {
 
     if (weighted){
         A.MMTypeCode[0] = 'W'; /* temporarily, needed for computing weights */
-        TotWeight = ComputeWeight(&A, 0, A.NrNzElts-1, NULL, &Options);
-        AvgWeight = (double) TotWeight / A.NrProcs;
         MinWeight = LONG_MAX;
         MaxWeight = LONG_MIN;
         for (q = 0; q < A.NrProcs; q++) {
@@ -341,6 +346,8 @@ int main(int argc, char **argv) {
         A.MMTypeCode[0] = 'D'; /* back to distributed matrix */
 
 #ifdef INFO
+        TotWeight = ComputeWeight(&A, 0, A.NrNzElts-1, NULL, &Options);
+        AvgWeight = (double) TotWeight / A.NrProcs;
         printf("  Vertex (column) weight:\n");
         printf("    tot         : %ld \n", TotWeight);
         printf("    avg = tot/P : %g  \n", AvgWeight);
@@ -656,7 +663,6 @@ int main(int argc, char **argv) {
         SparseMatrixSymmetric2Full(&A); /* now A.MMTypeCode[3]='G' */
         
         /* Print information about the number of matrix elements */
-        AvgNrNzElts = (double) A.NrNzElts / A.NrProcs;
         MinNrNzElts = LONG_MAX;
         MaxNrNzElts = LONG_MIN;
         for (q = 0; q < A.NrProcs; q++) {
@@ -668,6 +674,7 @@ int main(int argc, char **argv) {
         }
 
 #ifdef INFO
+        AvgNrNzElts = (double) A.NrNzElts / A.NrProcs;
         printf("  After conversion of distributed symmetric matrix to"
                "  distributed full matrix\n");
         printf("  Nr matrix elements:\n");
@@ -697,7 +704,9 @@ int main(int argc, char **argv) {
     }
       
     /**** Distribute the vector (and time it) ****/
+#ifdef TIME
     starttime = clock();
+#endif
 #ifdef UNIX
     gettimeofday(&starttime1, NULL);
 #endif
@@ -748,13 +757,13 @@ int main(int argc, char **argv) {
         }
     }
   
-    endtime = clock();
 #ifdef UNIX
     gettimeofday(&endtime1, NULL);
 #endif
-    cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
   
 #ifdef TIME
+    endtime = clock();
+    cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
     printf("  vector distribution CPU-time      : %f seconds\n", cputime);
 #ifdef UNIX  
     printf("  vector distribution elapsed time  : %f seconds\n",

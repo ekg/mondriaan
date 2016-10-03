@@ -32,9 +32,12 @@ long DistributeVecOrigEq(const struct sparsematrix *pM, long int *U, long int *V
                 The function returns maxcom = max(sends,recvs) and a value < 0 on failure. */
  
     int P, Pact, q, r, proc;
-    long l, j, total, LB, actbound, bestbound, 
+    long l, j, total, LB, 
          ComVol, MaxOut, MaxIn, MaxCompnts, TotCompnts, maxcom,
          *ProcHistogramU, *ProcHistogramV , *ProcHistogramUV;
+#ifdef INFO
+    long actbound, bestbound;
+#endif
     
     /* Arrays of length pM->n for vector v */
     int *NprocsV;   /* NprocsV[j] is the number of processors
@@ -205,14 +208,14 @@ long DistributeVecOrigEq(const struct sparsematrix *pM, long int *U, long int *V
         return -1;
     }
     
+
+#ifdef INFO
     if (Pact > 0)
         actbound= (ComVol%Pact == 0 ? ComVol/Pact : ComVol/Pact +1);
     else
         actbound= 0;
     
     bestbound= MAX(LB,actbound);
-
-#ifdef INFO
     printf("\nNr matrix columns owned by p processors:\n");
     PrintHistogram(0, P, ProcHistogramV);
     printf("Communication for vector v (after matrix distribution):\n");
@@ -235,14 +238,14 @@ long DistributeVecOrigEq(const struct sparsematrix *pM, long int *U, long int *V
         return -1;
     }
     
+
+#ifdef INFO
     if (Pact > 0) 
         actbound= (ComVol%Pact == 0 ? ComVol/Pact : ComVol/Pact +1); 
     else 
         actbound= 0;
     
-    bestbound= MAX(LB,actbound); 
-
-#ifdef INFO
+    bestbound= MAX(LB,actbound);
     printf("\nNr matrix rows owned by p processors:\n");
     PrintHistogram(0, P, ProcHistogramU); 
     printf("Communication for vector u (after matrix distribution):\n");
