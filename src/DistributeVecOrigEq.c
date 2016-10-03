@@ -222,11 +222,11 @@ long DistributeVecOrigEq(const struct sparsematrix *pM, long int *U, long int *V
     printf("  vol           : %ld \n", ComVol);
     printf("  active procs  : %d \n", Pact);
     printf("  best bound    : %ld \n", bestbound);
-#endif
 #ifdef INFO2
     printf("    active bound: %ld \n", actbound);
     printf("    local bound : %ld \n", LB);
 #endif 
+#endif
   
     /* Calculate and print communication statistics for vector u */  
     if (!CalcCom(pM, NULL, COL, &ComVol, &MaxOut, &MaxIn, &MaxCompnts, &TotCompnts)) {
@@ -252,10 +252,10 @@ long DistributeVecOrigEq(const struct sparsematrix *pM, long int *U, long int *V
     printf("  vol           : %ld \n", ComVol); 
     printf("  active procs  : %d \n", Pact); 
     printf("  best bound    : %ld \n", bestbound);
-#endif 
 #ifdef INFO2 
     printf("    active bound: %ld \n", actbound); 
     printf("    local bound : %ld \n", LB); 
+#endif 
 #endif 
 
 /* Print statistics for intersection of vectors u and v */

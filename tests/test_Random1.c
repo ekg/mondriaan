@@ -13,18 +13,18 @@ int main(int argc, char **argv) {
     */
 
     long X, i, m, r, r1, r2 ;
-    double d, eps, factor, Prob;
+    double d, eps;
 
     printf("Test Random1: ");
     m=256 ; /* Keep this fixed. Chances of succes are about
                1 in a million.  */
     d = 0.5 ;
     eps = 0.5 ;
-    factor = exp(eps) / pow(1+eps,1+eps) ;
-    Prob = pow (factor, m*d) ;
 
 #ifdef INFO2
     printf("RAND_MAX = %ld\n", (long)(RAND_MAX) );
+    double factor = exp(eps) / pow(1+eps,1+eps) ;
+    double Prob = pow (factor, m*d);
     printf("Probability = %g\n", Prob );
 #endif
 

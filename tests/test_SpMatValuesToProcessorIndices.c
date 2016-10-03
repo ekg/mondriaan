@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         
         for(p=1; p<=P; p++) {
             for(s=A_dist.Pstart[p-1]; s<A_dist.Pstart[p]; s++) {
-                if(used[s] == 0 && A_orig.i[t] == A_dist.i[s] && A_orig.j[t] == A_dist.j[s] && (long)A_orig.ReValue[t]+1 == p) {
+                if(used[s] == 0 && A_orig.i[t] == A_dist.i[s] && A_orig.j[t] == A_dist.j[s] && (long)A_orig.ReValue[t] == p) {
                     match++;
                     used[s] = 1;
                     found = 1;

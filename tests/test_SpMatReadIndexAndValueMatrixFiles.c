@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             found = 0;
         
             for(s=0; s<nz; s++) {
-                if(usedI[s] == 0 && M.i[t] == I.i[s] && M.j[t] == I.j[s] && (long)I.ReValue[s]+1 == p) {
+                if(usedI[s] == 0 && M.i[t] == I.i[s] && M.j[t] == I.j[s] && (long)I.ReValue[s] == p) {
                     matchI++;
                     usedI[s] = 1;
                     found++;

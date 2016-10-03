@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
 
     Options.VectorPartition_Step3 = VecRandom;
     maxcom = DistributeVecOrig(&A, X, ROW, &Options);
-    if (!maxcom < 0) {
+    if (maxcom < 0) {
         printf("Error\n");
         exit(1);
     }
