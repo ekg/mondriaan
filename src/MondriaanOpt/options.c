@@ -27,7 +27,6 @@ char readoptions(struct options *o, int c, char **v){
     o->time=0.;
     o->maxruntime=0.;
     o->nbranches=0; /* number of branches traversed */
-    o->convert=0;
 
     /* Read while there are options left */
     while(i<c){
@@ -71,24 +70,14 @@ char readoptions(struct options *o, int c, char **v){
             o->resume=TRUE;
             sprintf(o->resfn,"%s",v[i+1]);
             i++;
-        }else if(strcmp(v[i],"-c")==0){
-            o->convert=1;
-        }else if(strcmp(v[i],"-C")==0){
-            o->convert=2;
         }
         i++;
     }
     
     /* Check if required options are given */
-    if(o->convert == 2) {
-        if(!req[0])
+    for(i=0; i<CUR_REQ_OPTIONS; i++){
+        if(!req[i])
             exitwitherror(0);
-    }
-    else {
-        for(i=0; i<CUR_REQ_OPTIONS; i++){
-            if(!req[i])
-                exitwitherror(0);
-        }
     }
     
     /* Everything ok */

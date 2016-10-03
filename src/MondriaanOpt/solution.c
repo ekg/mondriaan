@@ -308,11 +308,11 @@ void printToMM(const char *fn, struct solution *s, const struct mat *a){
             j = a->indices[ROW][k];
             if(s->vals[ROW][i]==TO0 || s->vals[COL][j]==TO0){
                 /* Add 1 to the indices, because Matrix Market is 1-based */
-                fprintf(fp,"%d %d %d\n", i+1, j+1, 0);
-            }else if(s->vals[ROW][i]==TO1 || s->vals[COL][j]==TO1){
                 fprintf(fp,"%d %d %d\n", i+1, j+1, 1);
-            }else if(s->vals[ROW][i]==CUT && s->vals[COL][j]==CUT){
+            }else if(s->vals[ROW][i]==TO1 || s->vals[COL][j]==TO1){
                 fprintf(fp,"%d %d %d\n", i+1, j+1, 2);
+            }else if(s->vals[ROW][i]==CUT && s->vals[COL][j]==CUT){
+                fprintf(fp,"%d %d %d\n", i+1, j+1, 3);
             }
         }
     }
@@ -333,19 +333,27 @@ void printConverted(const char *fn) {
     SetDefaultOptions(&Options);
     
     /* Remove ".mtx" from matrix name */
-    char fn0[MAXFNSIZE], fnI[MAXFNSIZE];
-    int len;
-    len = strlen(fn);
-    memcpy(fn0, fn, len-3);
-    fn0[len-4] = 0;
+    char fnI[MAXFNSIZE];
 
     /* Construct processor number file name */
-    sprintf(fnI,"%s_P2.mtx",fn0);
+    sprintf(fnI,"%s-I2f",fn);
     
-    /* Combine values & distribution A */
+    /**
+     * Combine values & distribution A
+     * If there are free nonzeros present, they will populate a fictional third
+     * part/processor, which we will take care of in fillFreeNonzeros().
+     */
     if(!SpMatReadIndexAndValueMatrixFiles(fn, fnI, &A)) {
         exit(-1);
     }
+    
+    if(A.NrProcs > 3) {
+        fprintf(stderr, "printConverted(): Invalid number of processors!\n");
+        exit(-1);
+    }
+    
+    /* Make the processor indices for all nonzeros explicit */
+    fillFreeNonzeros(&A);
     
     /* Write the distributed matrix to file */
     char output[MAX_WORD_LENGTH];
@@ -365,9 +373,7 @@ void printConverted(const char *fn) {
 
     A.MMTypeCode[0] = 'M';
     sprintf(output, "%s-I%d", fn, A.NrProcs);
-
     File = fopen(output, "w");
-
     if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
         MMWriteSparseMatrix(&A, File, NULL, &Options);
@@ -385,3 +391,72 @@ void printConverted(const char *fn) {
     }
     
 }
+
+/**
+ * fillFreeNonzeros()
+ * Assign free nonzeros to arbitrary processors, in such a way load is balanced.
+ * This function breaks any sorting within the element-list.
+ */
+
+void fillFreeNonzeros(struct sparsematrix *pA){
+    
+    if(pA->NrProcs == 2) {
+        return;
+    }
+    
+    long tot[2] = {0,0};
+    long t, i, j, newEl0, newEl1;
+    double re = 0.0, im = 0.0;
+    
+    tot[0] = pA->Pstart[1];
+    tot[1] = pA->Pstart[2]-pA->Pstart[1];
+    
+    for(t=pA->Pstart[2]; t < pA->NrNzElts; t++) {
+        if(tot[0] < tot[1]) {
+            // Part 0 has less load than part 1, hence add an element to part 0
+            // We interchange the currently first element of P1 for the element that
+            // will be assigned to P0. By increasing both boundaries after the swap,
+            // the assignment is complete.
+            newEl0 = pA->Pstart[1];
+            newEl1 = pA->Pstart[2];
+            
+            i = pA->i[newEl0];
+            j = pA->j[newEl0];
+            if(pA->MMTypeCode[2] != 'P')
+                re = pA->ReValue[newEl0];
+            if(pA->MMTypeCode[2] == 'C')
+                im = pA->ImValue[newEl0];
+            
+            pA->i[newEl0] = pA->i[newEl1];
+            pA->j[newEl0] = pA->j[newEl1];
+            if(pA->MMTypeCode[2] != 'P')
+                pA->ReValue[newEl0] = pA->ReValue[newEl1];
+            if(pA->MMTypeCode[2] == 'C')
+                pA->ImValue[newEl0] = pA->ImValue[newEl1];
+            
+            pA->i[newEl1] = i;
+            pA->j[newEl1] = j;
+            if(pA->MMTypeCode[2] != 'P')
+                pA->ReValue[newEl1] = re;
+            if(pA->MMTypeCode[2] == 'C')
+                pA->ImValue[newEl1] = im;
+            
+            pA->Pstart[1]++;
+            pA->Pstart[2]++;
+            
+        }
+        else {
+            // Part 1 has less (or equal) load than part 0, hence add an element to part 1.
+            // Just increasing the bound will suffice
+            pA->Pstart[2]++;
+            
+        }
+    }
+    
+    pA->NrProcs = 2;
+    
+    pA->Pstart = (long *) realloc(pA->Pstart,  (pA->NrProcs+1) * sizeof(long) );
+    
+    
+} /* end fillFreeNonzeros */
+

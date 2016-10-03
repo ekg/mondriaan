@@ -495,20 +495,14 @@ void assign(struct mat *a, struct solution *sol, unsigned int idx, unsigned char
             unsigned int newvol = sol->vol;
             fprintf(stderr,"NEW SOLUTION FOUND! (vol: %d)\n", newvol);
             sol->maxvol = newvol;
-
-            /* Remove ".mtx" from matrix name */
-            char fn0[MAXFNSIZE], fn[MAXFNSIZE];
-            int len;
-            len = strlen(sol->matname);
-            memcpy(fn0, sol->matname, len-3);
-            fn0[len-4] = 0;
+            char fn[MAXFNSIZE];
 
             /* Output solution as SVG picture */
-            sprintf(fn,"%s_P2.svg",fn0);
+            sprintf(fn,"%s-2f.svg",sol->matname);
             printToSVG(fn,sol,a);
 
             /* Output solution as sparse integer matrix in Matrix Market format */
-            sprintf(fn,"%s_P2.mtx",fn0);
+            sprintf(fn,"%s-I2f",sol->matname);
             printToMM(fn,sol,a);
         }else{
             /* Preserve old state of next */

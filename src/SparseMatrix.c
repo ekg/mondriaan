@@ -802,8 +802,8 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     /* Determine number of processors */
     pM->NrProcs = 0;
     for (t = 0; t < pM->NrNzElts; t++) {
-        if(((long)pM->ReValue[t]+1) > pM->NrProcs) {
-            pM->NrProcs = (long)pM->ReValue[t]+1;
+        if(((long)pM->ReValue[t]) > pM->NrProcs) {
+            pM->NrProcs = (long)pM->ReValue[t];
         }
     }
     
@@ -824,7 +824,7 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
         Pindex[p] = 0;
     }
     for (t = 0; t < pM->NrNzElts; t++) {
-        p = (long) pM->ReValue[t]+1;
+        p = (long) pM->ReValue[t];
         pM->Pstart[p]++;
     }
     for (p = 1; p <= pM->NrProcs; p++ ) {
@@ -833,7 +833,7 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     
     /* Assign nonzeros to the processors */
     for (t = 0; t < pM->NrNzElts; t++) {
-        p = (long) pM->ReValue[t]+1;
+        p = (long) pM->ReValue[t];
         pM->i[pM->Pstart[p-1]+Pindex[p-1]] = i_orig[t];
         pM->j[pM->Pstart[p-1]+Pindex[p-1]] = j_orig[t];
         
