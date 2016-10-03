@@ -1,0 +1,668 @@
+
+\documentclass[final]{amsart}
+
+\usepackage[english]{babel}
+\usepackage{fullpage}
+\usepackage{url}
+
+\title{Extended Matrix-Market file format --\\
+an extension to the standard scheme}
+
+\author{A.N. Yzelman \and R.H. Bisseling}
+
+\date{First version, November 2010}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+In this white paper, the Matrix--Market format is extended so that it can store distributed sparse matrices,
+and other related information which may be of interest during 
+(for example but not limited to):
+\begin{itemize}
+\item parallel sparse matrix--vector (SpMV) multiplication,
+\item matrix reordering into (doubly) bordered block diagonal (BBD) or separated block diagonal (SBD) form,
+\item solving (linear) systems in parallel,
+\item matrix nonzero clustering.
+\end{itemize}
+
+This Extended-Matrix-Market (EMM) format is currently applied
+in the setting of a sparse matrix partitioner (Mondriaan),
+which reads in a (Matrix-Market) matrix file,
+partitions and/or reorders the corresponding matrix,
+and stores this information in EMM format.
+This file can then be used by e.g. parallel solvers,
+which previously would need several input files as input.
+There is no reason this scheme should be limited to a partioner-related setting,
+however; see Section~\ref{sec:complete}
+
+\section{Basic format}
+
+The basics are derived from the basic Matrix Market file definition \cite{boisvert1,boisvert2}.
+Additions follow per file section.
+
+\subsection{Header}
+
+The original header is extended from\\
+\verb|%%MatrixMarket object format field symmetry|\\
+to\\
+\verb|%%Extended-MatrixMarket object format field symmetry view|.
+
+Originally, \verb|object| could be one of \verb|matrix| or \verb|vector|.
+A new addition is \verb|distributed-matrix| to indicate the file contains a matrix as well as an indication which nonzero should go to which processor.
+Also newly defined is the similar \verb|distributed-vector|, and the \verb|vector-collection|.
+This latter format stores a collection of vectors, which can be of varying lengths (as opposed to a matrix);
+this will be discussed in more detail in the following subsections.
+For brevity, \verb|Extended-MatrixMarket| may be abbreviated to \verb|EMM|.
+
+The \verb|format|, \verb|field|, and \verb|symmetry| fields remain unchanged.
+Their possible values are included here for completeness:
+\begin{itemize}
+\item \verb|format|: \verb|coordinate| or \verb|array|;
+\item \verb|field|: \verb|real|, \verb|double|, \verb|complex|, \verb|integer|, or \verb|pattern|;
+\item \verb|symmetry|: \verb|general|, \verb|symmetric|, \verb|skew-symmetric|, or \verb|hermitian|.
+\end{itemize}
+
+A new field has been introduced: \verb|view|.
+Its possible values are \verb|original|, \verb|global| or \verb|local|,
+and they refer to the indices of the matrices stored
+and how to relate these to a parallel distribution.
+In \verb|original| mode,
+the indices of nonzeroes are exactly equal to those in the original,
+non-distributed, matrix.
+The \verb|global| mode adds after each data element (nonzero)
+the number of the processor that the nonzero is distributed to;
+see Section~\ref{sec:view-orig}.
+In \verb|local| mode,
+the indices are adapted so that they correspond to the matrix originating from looking only at locally distributed nonzeroes,
+with any empty rows and columns removed from it.
+
+For example,
+take the following $4\times 3$ sparse matrix:
+$$\left(\begin{tabular}{ccc}x& &x\\ & x & \\ &x&x\\x&x& \end{tabular}\right).$$
+The nonzeroes, denoted by a single mark ``x",
+can be distributed over two processors ``0" and ``1":
+$$\left(\begin{tabular}{ccc}1& &1\\ & 0 & \\ &1&0\\1&0& \end{tabular}\right).$$
+In original mode,
+the matrix would be stored as is;
+in local mode,
+the following two matrices would be stored \emph{instead}:
+$$\left(\begin{tabular}{cc}0 & \\ &0\\0& \end{tabular}\right)\text{ and }\left(\begin{tabular}{ccc}1& &1\\ &1& \\1& & \end{tabular}\right).$$
+
+After the header line follow the size line,
+the distributed information lines,
+and the values lines;
+as described in the following three subsections.
+After the last value, a new header line may signal an additionally stored object.
+This is described in detail in Section~\ref{sec:more-objects}.
+In between the header line and the following size line,
+commentary lines may be inserted,
+where each such comment line is preceded by a \verb|%|.
+These lines may be used to describe where the stored matrix (or other object) originates from,
+along with author and contact information.
+It is also recommended (but not required) that each additional object is mentioned in these comments,
+along with a suitable description.
+
+\subsection{Size line}
+
+If the format is \verb|array|, stored is:\\
+\verb|m n P|,\\
+or if the format is \verb|coordinate|:\\
+\verb|m n nz P|.\\
+The parameter \verb|P| is added only when the object is distributed.
+The integers $m,n$ refer to the matrix size, whereas $P$ refers to the number of processors the matrix is distributed over.
+The dimension $n$ is not stored when the object type is a (distributed) vector.
+It is also not given in the case of a \verb|vector-collection| object;
+$m$ then corresponds to the number of variable-length vectors which will follow.
+In the above example, the following would be the size line:
+\verb|4 3 7 2| (in the case of distributed-matrix, coordinate).
+
+\subsection{Distributed information}
+
+Next, in the case of a distributed object (that is, \verb|distributed-matrix| or \verb|distributed-vector|) in \verb|original| or \verb|local| view,
+a Pstart vector is expected,
+signifying which nonzeroes are distributed to which processor.
+This data is \emph{not} expected while in the \verb|global| view.
+The vector is of size $P+1$.
+Its first value is always $1$,
+and its last value is always $nz+1$
+(or $m\cdot n$ or $m$ in the appropiate cases of \verb|array| and \verb|distributed-vector|).
+The bounds of the $i$th partition is
+Pstart[i] (lower, inclusive)
+to Pstart[i+1] (higher, exclusive),
+where Pstart$=(\text{Pstart}_1,\text{Pstart}_2,\dots,\text{Pstart}_{P+1})$;
+that is, we start counting from $1$.
+Using the above example, the following would be in file (assuming parts are stored in increasing part IDs):
+\begin{verbatim}
+1
+4
+8
+\end{verbatim}
+
+\subsection{Values}\label{sec:view-orig}
+Next follow the matrix values.
+In case of \verb|array|,
+exactly $m\cdot n$ values are expected.
+This is only recommended for dense matrices, or vectors.
+In the case of \verb|coordinate|, expected are \verb|nz| triplets of the form\\
+\verb|i j v|,\\
+where \verb|i| gives the row index of the nonzero, \verb|j| its column index, and \verb|v| its value.
+\emph{All index values are,
+like in the original Matrix-Market,
+expected to be $1$ based}.
+Multiple triplets for the same coordinates $(i,j)$ \emph{are} allowed;
+in such a case the values are taken added cumulatively.
+In the case of a \verb|vector-collection|,
+the data consists of multiple vectors;
+for each of these vectors,
+the vector data is preceded by its own size line.
+
+Recall that in the case of the \verb|global| view,
+a processor number is added after the numerical values;
+in the case of the coordinate scheme and the array scheme,
+this will look as follows:\\
+\verb|i j v p|, or \verb|v p|.
+
+\subsection{Example: vector-collection}
+
+Since the \verb|vector-collection| type is new,
+we review this object type in more detail here.
+\begin{verbatim}
+%%Extended-MatrixMarket vector-collection array integer general original
+3
+2
+6
+2
+3
+9
+12
+4
+2
+9
+7
+\end{verbatim}
+The above vector-collection yields a vector containing $3$ other vectors (first size line, line 2).
+The first vector contains $2$ elements (first size line of the first vector element, line 3); which are $(6,2)$.
+Line 6 gives the size of the second vector, $3$,
+followed by the data $(9,12,4)$.
+Similary, a vector of length $2$ follows,
+yielding the following ``matrix":
+$$\left(
+\begin{tabular}{ccc}
+$6$ & $2$ \\
+$9$ & $12$ & $4$ \\
+$9$ & $7$
+\end{tabular}\right).
+$$
+
+
+\section{Adding extra information}
+\label{sec:more-objects}
+
+When the objective of the matrix distribution is a SpMV multiplication,
+input and output vectors have to be distributed as well.
+These distributions can be stored as follows.
+First, to signal more information follows, the following additive header is defined:\\
+\verb|%%name object format field symmetry view|.\\
+This is followed by size and value information as defined above.
+
+\subsection{Complete problem descriptions}
+\label{sec:complete}
+
+Not related to distributed programming a priori,
+the scheme described here extends to more general problem descriptions as well.
+For example,
+a problem may consist of finding a vector $x$ such that $(A+C)x=Mb;$:
+the matrices $C,M$ and the vector $b$ can be stored in the same file describing the matrix $A$ by use of the method described above:
+\begin{verbatim}
+%%EMM matrix pattern general coordinate original
+(dimensions, data for A)
+%%C matrix real general coordinate original
+(dimensions, data for C)
+%%M matrix real symmetric coordinate original
+(dimensions, data for M)
+%%b vector real general array original
+(length, data for b)
+\end{verbatim}
+This method allows a single file to represent an entire problem.
+
+\section{Mondriaan-related information}
+
+This section will describe all information the Mondriaan package \cite{mondriaan} writes in Extended-MatrixMarket format after partitioning an input matrix.
+The main object will be the \verb|distributed-matrix| in \verb|original| view.
+Other information,
+such as a local view or corresponding vector distributions,
+are found within the same file as described in the following.
+Information on permutations of course is \emph{not} found in the output when
+the permute option is turned off.
+
+\subsection{Local view of distributed matrix}
+
+Usually,
+a sparse matrix--vector multiplication (SpMV) algorithm requires that 
+processor-local matrices are indeed local;
+it is wasteful and memory-wise not scalable to store $m\times n$ matrices
+at each of the $p$ processors during SpMV
+(with $m,n$ the size of the original input matrix $A$).
+Hence, parallel SpMV usually transformed the distributed matrix in original
+view to a local view, and, while calculating, also derived other useful
+index arrays to be used during parallel SpMV.
+Now, Mondriaan does this translation itself. A local view is written to the
+matrix object \verb|Local-A|, for which its full header is:\\
+\verb|%%Local-A distributed-matrix coordinate real general local|
+
+The original Mondriaan also gave this information in the Cartesian submatrices file,
+in a format alike the original Matrix-Market form. The local view described here 
+supersedes that file format. Mondriaan additionally produced another ``kind of" global 
+view; in one of the output files the nonzero entries were replaced with the processor 
+numbers. To be complete and potentially downwards compatible with applications using 
+Mondriaan, this information is also saved under the name \verb|Global-A|
+(in \verb|original| view, since the processor indices \emph{replace} the nonzero values
+instead of appending them after the nonzeroes as would have been the case in true
+\verb|global| view).
+
+\subsection{Mapping local matrix entries to the original indices}
+
+Intuitively,
+the biggest requirement when having access to local representations of a
+distributed matrix, is to be able to map the local entries to the locations
+in the original matrix.
+However,
+the locally stored submatrices do not have to be of the same size;
+generally, they vary around the optimal size $m/p\times n/p$.
+Moreover,
+a single row or column can be mapped to multiple processors through different
+nonzeroes;
+adding up all local submatrix sizes is likely to exceed $m\times n$.
+This entails that the local-row-to-original-row
+(and local-column-to-original-column)
+index translations cannot be intuitively stored in a $p\times m/p$
+($p\times n/p$) dense matrix,
+nor in a distributed vector of size $m$.
+
+The newly defined \verb|vector-collection| object provides relief;
+$p$ vectors of variable size can be stored this way.
+Two of these objects are stored under the following headers:\\
+\verb|%%LocalRow2Global vector-collection array integer general original|\\
+\verb|%%LocalCol2Global vector-collection array integer general original|
+
+These two collections of index translation vectors give full information
+regarding the correspondence of local matrix entries with respect to 
+their location in the original, nondistributed, matrix.
+
+\subsection{Vector distributions}
+
+In the case of the input and output vector distribution,
+see, for example, \cite{vector},
+we have the following object:\\
+\verb|%%Input-vector distributed-vector array integer general global|\\
+\verb|1 n|\\
+followed by the (line-separated) distribution vector,
+indicating which entry is distributed where.
+Note that Mondriaan does not read in any vector information;
+the input vector distribution thus only maps \emph{indices} to processors
+(and not the actual input vector elements to processors).
+Similarly for the output distribution, but then with the following header:\\
+\verb|%%Output-vector vector array integer general global|.
+
+The global view does not immediately make clear how many elements from the
+input or output vector are distributed to a given processor.
+For convenience,
+this data is written to file as well;
+the relevant size vectors (of length $p$) are available under the names
+\verb|InputVectorLengths| and \verb|OutputVectorLengths|.
+
+\subsection{Required translations during parallel SpMV}
+
+Looking from the perspective of a single processor out of the $p$ available,
+each processor requires,
+apart from a local representation of the distributed matrix,
+information on the nonzeroes distributed to its fellow processors.
+To be precise,
+for each local matrix column,
+information is required whether the corresponding element from the input vector
+is local, and if not, at which processor it resides.
+Furthermore, for all local matrix columns,
+the index of the corresponding element from the input vector at the processor the element resides at, must be known.
+Two similar translation arrays must be known for the local matrix rows
+in relation to the output vector distribution.
+Mondriaan now writes this information in Extended-MatrixMarket format,
+using again the \verb|vector-collection| object types,
+under the following headers:\\
+\verb|%%LocalRow2Processor vector-collection array integer general original|\\
+\verb|%%LocalRow2Index vector-collection array integer general original|\\
+\verb|%%LocalCol2Processor vector-collection array integer general original|\\
+\verb|%%LocalCol2Index vector-collection array integer general original|.
+
+\subsection{Permutation vectors}
+
+To permute the input matrix into, e.g., doubly SBD form \cite{co1,co2},
+information on which row (column) should be first in the permuted form is stored in the \emph{permutation vectors}.
+Similarly to the vector distributions,
+these can be stored after the additive header\\
+\verb|%%Row-permutation vector array integer general original|,\\
+or,\\
+\verb|%%Column-permutation vector array integer general original|,\\
+respectively.
+
+%Sometimes,
+%the inverse --``where does the $i$th row end up after permutation?"--
+%permutation is more useable.
+%The additive header line names are then defined to be \verb|Inverse-row-permutation| and, similarly,\\
+%\verb|Inverse-column-permutation|.
+
+\subsection{Permuted matrix}
+The above row and column permutations yield the possibility of permuting the
+input matrix $A$ according to $PAQ$, where $P,Q$ are permutation matrices
+derived from the row and column permutations, respectively.
+This matrix can also be directly stored under the name \verb|PAQ|,
+as a \verb|matrix| object in \verb|original| view, with the remaining flags
+identical to those of the original matrix.
+
+In its permuted form,
+matrix separator blocks may be seen in-between two partition blocks 
+(in SBD mode)
+or before or after those partition blocks
+(reverseBBD or BBD).
+The starting index of each separator block and partition block is stored in the
+\verb|Row-boundaries| and \verb|Column-boundaries| integer vectors.
+Since Mondriaan partitions by using recursive bipartitioning,
+a hierarchy of (separator) blocks can be derived,
+in the form of a binary tree. See also \cite{co2}.
+Each block of nonzeroes in the permuted matrix
+thus has a single parent, and each element (except for the very last one)
+from the boundaries vector defined above corresponds to a single such block.
+The tree therefore can be stored by setting a vector of integers pointing to
+parent block indices as they appear in the boundary vectors, or $0$ if the
+current block corresponds to the root of the tree. We thus end up with an
+additional two integer vectors: \verb|Row-hierarchy| and
+\verb|Column-hierarchy|.
+
+\begin{thebibliography}{10}
+
+\bibitem{vector}
+{\sc R.~H. Bisseling and W. Meesen}, {\em Communication balancing in 
+  parallel sparse matrix-vector multiplication},
+  Electronic Transactions on Numerical Analysis, 21 (2005), pp.~47--65.
+
+\bibitem{boisvert1}
+{\sc Ronald~F.~Boisvert, Roldan~Pozo, Karen~A.~Remington, Richard~F.~Barrett, and Jack~J.~Dongarra},
+  {\em Matrix market: a web resource for test matrix collections},
+  Proceedings of the IFIP TC2 (1997), pp.~125--137.
+
+\bibitem{boisvert2}
+{\sc Ronald~F.~Boisvert, Roldan~Pozo, and Karin~A.~Remington},
+  {\em The Matrix Market Exchange Formats: Initial Design},
+  NISTIR, 5935 (1996).
+
+\bibitem{mondriaan}
+{\sc B.~Vastenhouw and R.~H. Bisseling}, {\em A two-dimensional data
+  distribution method for parallel sparse matrix-vector multiplication}, SIAM
+  Rev., 47 (2005), pp.~67--95.
+
+\bibitem{co1}
+{\sc A.~N. Yzelman and Rob~H. Bisseling}, {\em Cache-oblivious sparse
+  matrix--vector multiplication by using sparse matrix partitioning methods},
+  SIAM Journal on Scientific Computing, 31 (2009), pp.~3128--3154.
+
+\bibitem{co2}
+{\sc A.~N. Yzelman and Rob~H. Bisseling}, {\em Two-dimensional cache-oblivious
+  sparse matrix--vector multiplication}, Pre-print, October 2010.
+  URL:~\url{http://www.math.uu.nl/people/bisseling/}
+
+\end{thebibliography}
+
+\clearpage
+
+\begin{appendix}
+\section{Example Extended Matrix-Market files}
+Here we give listings of a very small example Extended Matrix-Market matrix.
+Both the original form and a distributed form (after processing by Mondriaan) are given.
+
+\vspace{1em}
+\noindent\textbf{Original (Matrix-Market)}
+\begin{verbatim}
+%%MatrixMarket matrix coordinate real general
+% This is the example matrix from Fig. 4.4 (p. 177) in:
+% Parallel Scientific Computation: A structured approach using BSP and MPI
+% by Rob H. Bisseling (Oxford University Press 2004)
+5 5 13
+1 2 3.0
+1 5 1.0
+2 1 4.0
+2 2 1.0
+3 2 5.0
+3 3 9.0
+3 4 2.0
+4 1 6.0
+4 4 5.0
+4 5 3.0
+5 3 5.0
+5 4 8.0
+5 5 9.0
+\end{verbatim}
+
+\vspace{1em}
+\noindent\textbf{Original (EMM)}
+\begin{verbatim}
+%%Extended-MatrixMarket matrix coordinate real general original
+% This is the example matrix from Fig. 4.4 (p. 177) in:
+% Parallel Scientific Computation: A structured approach using BSP and MPI
+% by Rob H. Bisseling (Oxford University Press 2004)
+5 5 13
+1 2 3.0
+1 5 1.0
+2 1 4.0
+2 2 1.0
+3 2 5.0
+3 3 9.0
+3 4 2.0
+4 1 6.0
+4 4 5.0
+4 5 3.0
+5 3 5.0
+5 4 8.0
+5 5 9.0
+\end{verbatim}
+
+\vspace{1em}
+\noindent\textbf{Mondriaan output}
+\begin{verbatim}
+%%Extended-MatrixMarket distributed-matrix coordinate real general original
+% This is the example matrix from Fig. 4.4 (p. 177) in:
+% Parallel Scientific Computation: A structured approach using BSP and MPI
+% by Rob H. Bisseling (Oxford University Press 2004)
+% File generated by running Mondriaan on A=../tests/test_Mondriaan.mtx with p=2 and \epsilon=0.2
+5 5 13 2
+1
+8
+14
+1 2 3
+1 5 1
+2 1 4
+2 2 1
+4 1 6
+4 4 5
+4 5 3
+5 5 9
+5 4 8
+5 3 5
+3 4 2
+3 3 9
+3 2 5
+%%PAQ matrix coordinate real general original
+5 5 13
+1 2 3
+1 3 1
+2 1 4
+2 2 1
+3 1 6
+3 4 5
+3 3 3
+4 3 9
+4 4 8
+4 5 5
+5 4 2
+5 5 9
+5 2 5
+%%Row-boundaries vector array integer general original
+4
+1
+4
+4
+6
+%%Row-hierarchy vector array integer general original
+3
+2
+0
+2
+%%Col-boundaries vector array integer general original
+4
+1
+2
+5
+6
+%%Col-hierarchy vector array integer general original
+3
+2
+0
+2
+%%Local-A distributed-matrix coordinate real general local
+5 5 13 2
+1
+8
+14
+1 1 3
+1 2 1
+2 3 4
+2 1 1
+3 3 6
+3 4 5
+3 2 3
+1 1 9
+1 2 8
+1 3 5
+2 2 2
+2 3 9
+2 4 5
+%%LocalRow2Global vector-collection array integer general original
+2
+3
+1
+2
+4
+2
+5
+3
+%%LocalCol2Global vector-collection array integer general original
+2
+4
+2
+5
+1
+4
+4
+5
+4
+3
+2
+%%Global-A matrix coordinate integer general original
+5 5 13
+1 2 1
+1 5 1
+2 1 1
+2 2 1
+4 1 1
+4 4 1
+4 5 1
+5 5 2
+5 4 2
+5 3 2
+3 4 2
+3 3 2
+3 2 2
+%%Row-permutation vector array integer general original
+5
+1
+2
+4
+5
+3
+%%Column-permutation vector array integer general original
+5
+1
+2
+5
+4
+3
+%%Input-vector distributed-vector array integer general global
+5 2
+1 1
+2 2
+3 2
+4 1
+5 1
+%%Output-vector distributed-vector array integer general global
+5 2
+1 1
+2 1
+3 2
+4 1
+5 2
+%%OutputVectorLengths vector array integer general original
+2
+4
+3
+%%LocalRow2Processor vector-collection array integer general original
+2
+3
+1
+1
+1
+2
+2
+2
+%%LocalRow2Index vector-collection array integer general original
+2
+3
+1
+2
+3
+2
+2
+1
+%%InputVectorLengths vector array integer general original
+2
+4
+3
+%%LocalCol2Processor vector-collection array integer general original
+2
+4
+2
+1
+1
+1
+4
+1
+1
+2
+2
+%%LocalCol2Index vector-collection array integer general original
+2
+4
+1
+3
+1
+2
+4
+3
+2
+2
+1
+\end{verbatim}
+\end{appendix}
+
+\end{document}
+
