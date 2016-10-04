@@ -860,52 +860,91 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     return TRUE;
 }
 
-int NonzeroSort_compare( const void *one, const void *two ) {
-    const long * a = (long *) one;
-    const long * b = (long *) two;
-    if( a[1]>b[1] ) return  1;
-    if( a[1]<b[1] ) return -1;
-    if( a[2]>b[2] ) return  1;
-    if( a[2]<b[2] ) return -1;
-    return 0;
-}
+/**
+ * Sort the nonzeros in a sparsematrix struct. The nonzeros are sorted by
+ * increasing row index, and within the same row by increasing column index.
+ * This function invalidates the pointers pM->i, pM->j, pM->ReValue and pM->ImValue,
+ * as new memory blocks are assigned to them.
+ * Parameters:
+ *  pM           : The sparse matrix
+ *  perProcessor : 1/0 whether the matrix should be sorted per processor/part
+ * When perProcessor equals 0, this method runs in O(max(n,nz)), when perProcessor
+ * equals 1, it runs in O(max(p*n,nz)).
+ */
 int SpMatSortNonzeros(struct sparsematrix *pM, char perProcessor) {
-    long t, p;
+    long t, p, *K, *i_orig, *j_orig;
+    double *ReValue_orig, *ImValue_orig;
     
-    long * indices = (long *) malloc((pM->NrNzElts+1) * 3 * sizeof(long));
+    long nz = pM->NrNzElts;
     
-    for (t = 0; t < pM->NrNzElts; t++) {
-        indices[3*t+0] = t;
-        indices[3*t+1] = pM->i[t];
-        indices[3*t+2] = pM->j[t];
+    /* Allocate memory for nonzero index array (permutation array) */   
+    K = (long *) malloc(nz * sizeof(long));
+    
+    if (K == NULL) {
+        fprintf(stderr, "SpMatSortNonzeros(): Not enough memory!\n");
+        return FALSE;
     }
     
+    /* Initialise permutation with identity */
+    for (t = 0; t < nz; t++)
+        K[t] = t;
+    
+    /* Sort nonzero indices stably, first by column index, then by row index.
+       As a result, the indices K[t] give the order of the nonzeros
+       by increasing row index, and within the same row by increasing column index */
     if(perProcessor == 1) {
         for (p = 0; p < pM->NrProcs; p++ ) {
-            qsort( &indices[3*pM->Pstart[p]], pM->Pstart[p+1] - pM->Pstart[p], 3 * sizeof(long), &NonzeroSort_compare );
+            CSort(K, pM->j, pM->n-1, pM->Pstart[p], pM->Pstart[p+1]-1);
+            CSort(K, pM->i, pM->m-1, pM->Pstart[p], pM->Pstart[p+1]-1);
         }
     }
     else {
-        qsort( indices, pM->NrNzElts, 3 * sizeof(long), &NonzeroSort_compare );
+        CSort(K, pM->j, pM->n-1, 0, nz-1);
+        CSort(K, pM->i, pM->m-1, 0, nz-1);
     }
     
-    double * ReValue_orig = pM->ReValue;
+    /* Copy the values in the right order to the new arrays */
+    ReValue_orig = pM->ReValue;
+    ImValue_orig = pM->ImValue;
+    i_orig = pM->i;
+    j_orig = pM->j;
     
-    pM->ReValue = (double *) malloc((pM->NrNzElts+1) * sizeof(double));
+    if(pM->MMTypeCode[2] != 'P') {
+        pM->ReValue = (double *) malloc((nz+1) * sizeof(double));
+    }
+    if(pM->MMTypeCode[2] == 'C') {
+        pM->ImValue = (double *) malloc((nz+1) * sizeof(double));
+    }
+    pM->i = (long *) malloc((nz+1) * sizeof(long));
+    pM->j = (long *) malloc((nz+1) * sizeof(long));
     
-    if (pM->ReValue == NULL) {
+    if (pM->i == NULL || pM->j == NULL ||
+        (pM->MMTypeCode[2] != 'P' && pM->ReValue == NULL) || 
+        (pM->MMTypeCode[2] == 'C' && pM->ImValue == NULL)) {
         fprintf(stderr, "SpMatSortNonzeros(): Not enough memory for dummies!\n");
         return FALSE;
     }
     
-    for (t = 0; t < pM->NrNzElts; t++) {
-        pM->ReValue[t] = ReValue_orig[indices[3*t+0]];
-        pM->i[t]       = indices[3*t+1];
-        pM->j[t]       = indices[3*t+2];
+    for (t = 0; t < nz; t++) {
+        if(pM->MMTypeCode[2] != 'P') {
+            pM->ReValue[t] = ReValue_orig[K[t]];
+        }
+        if(pM->MMTypeCode[2] == 'C') {
+            pM->ImValue[t] = ImValue_orig[K[t]];
+        }
+        pM->i[t]       = i_orig[K[t]];
+        pM->j[t]       = j_orig[K[t]];
     }
     
-    free(indices);
-    free(ReValue_orig);
+    if(pM->MMTypeCode[2] != 'P') {
+        free(ReValue_orig);
+    }
+    if(pM->MMTypeCode[2] == 'C') {
+        free(ImValue_orig);
+    }
+    free(i_orig);
+    free(j_orig);
+    free(K);
     return TRUE;
     
 }
@@ -1001,8 +1040,7 @@ int SpMatReadIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct s
         /*
         * For each processor, walk both through the list of nonzeros belonging to that processor and the list of all nonzeros
         * and their numerical values. As they are both sorted, we only (in the worst case) need to walk through all
-        * nonzeros NrProcs times, instead of NrNzElts times when using more direct approach. Downside is that we
-        * have had to sort both lists, taking O(NrNzElts * log(NrNzElts)) time, but also this is better than O(NrNzElts^2).
+        * nonzeros NrProcs times, instead of NrNzElts times when using more direct approach.
         */
         long t, s, p;
         for (p = 0; p < pI->NrProcs; p++ ) {
