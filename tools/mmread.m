@@ -18,6 +18,8 @@ function  [A,rows,cols,entries,rep,field,symm] = mmread(filename)
 %      using the optional return values rep (representation), field,
 %      and symm (symmetry).
 %
+%      Modified 13-10-2016: Add support for 'integer' format
+%
 
 mmfile = fopen(filename,'r');
 if ( mmfile == -1 )
@@ -87,7 +89,7 @@ if ( strcmp(rep,'coordinate')) %  read matrix given in sparse
   cols = sizeinfo(2);
   entries = sizeinfo(3);
   
-  if  ( strcmp(field,'real') )               % real valued entries:
+  if  ( strcmp(field,'real') || strcmp(field,'integer') ) % real valued entries:
   
     [T,count] = fscanf(mmfile,'%f',3);
     T = [T; fscanf(mmfile,'%f')];
@@ -148,7 +150,7 @@ elseif ( strcmp(rep,'array') ) %  read matrix given in dense
   rows = sizeinfo(1);
   cols = sizeinfo(2);
   entries = rows*cols;
-  if  ( strcmp(field,'real') )               % real valued entries:
+  if  ( strcmp(field,'real') || strcmp(field,'integer') ) % real valued entries:
     A = fscanf(mmfile,'%f',1);
     A = [A; fscanf(mmfile,'%f')];
     if ( strcmp(symm,'symmetric') | strcmp(symm,'hermitian') | strcmp(symm,'skew-symmetric') ) 
