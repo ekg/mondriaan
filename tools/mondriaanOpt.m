@@ -40,7 +40,7 @@ function [I, s] = mondriaanOpt(A, Imbalance, Volume)
     
     % Run MondriaanOpt
     tic;
-    MatlabMondriaanOpt(A, Imbalance, Volume);
+    comVol = MatlabMondriaanOpt(A, Imbalance, Volume);
     elapsedTime = toc;
     
     % Read computed partitioning from disk
@@ -52,15 +52,19 @@ function [I, s] = mondriaanOpt(A, Imbalance, Volume)
     loadP2  = sum(sum(I==2));
     
     % Distribute the cut elements evenly
-    loadP1 = loadP1 + floor(loadCUT/2);
-    loadP2 = loadP2 + floor(loadCUT/2);
-    if mod(loadCUT, 2) == 1
-       if(loadP1 < loadP2)
-           loadP1 = loadP1 + 1;
-       elseif(loadP2 < loadP1)
-           loadP2 = loadP1 + 1;
-       end
+    % First, make both parts even
+    if(loadP1 < loadP2)
+        add = min(loadCUT, loadP2-loadP1);
+        loadP1 = loadP1 + add;
+        loadCUT = loadCUT - add;
+    elseif(loadP2 < loadP1)
+        add = min(loadCUT, loadP1-loadP2);
+        loadP2 = loadP2 + add;
+        loadCUT = loadCUT - add;
     end
+    % Now cut the rest in two
+    loadP1 = loadP1 + floor(loadCUT/2);
+    loadP2 = loadP2 + ceil(loadCUT/2);
     
     % Determine the best max load we can achieve
     maxLoad = max(loadP1,loadP2);
@@ -73,9 +77,5 @@ function [I, s] = mondriaanOpt(A, Imbalance, Volume)
         epsilon = 2*maxLoad/(nonz+1) - 1;
     end
     
-    % Compute communication volume
-    comVol = sum((sum(I == 1, 1)>0)+(sum(I == 2, 1)>0) > 1) + ...
-             sum((sum(I == 1, 2)>0)+(sum(I == 2, 2)>0) > 1);
-    
-    s = [elapsedTime; epsilon; full(comVol)];
+    s = [elapsedTime; epsilon; comVol];
 

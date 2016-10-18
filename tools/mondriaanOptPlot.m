@@ -52,12 +52,23 @@ function mondriaanOptPlot(A, Imbalance, Volume)
     [m,n] = size(A);
     for i=1:m
         c = (sum(I(i,:)==1)>0)*1 + (sum(I(i,:)==2)>0)*2;
+        if(sum(I(i,:)==3)>0)
+            c = 3; % Force c to be three.
+            % It can happen that I(i,.)==3 while there is only one
+            % processor represented in the row, and all other nonzeros are
+            % free. This happens whenever MondriaanOpt cannot distribute
+            % these free nonzeros to a single processor while also staying
+            % within load imbalance limits.
+        end
         if c > 0
             rectangle('Position',[0 i-0.5 0.5 1], 'FaceColor', Colours(c,:));
         end
     end
     for j=1:n
         c = (sum(I(:,j)==1)>0)*1 + (sum(I(:,j)==2)>0)*2;
+        if(sum(I(:,j)==3)>0)
+            c = 3; % Force c to be three. (See above)
+        end
         if c > 0
             rectangle('Position',[j-0.5 0 1 0.5], 'FaceColor', Colours(c,:));
         end

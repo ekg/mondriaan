@@ -9,7 +9,7 @@ same matrix, but with all non-zero entries replaced by the corresponding process
 assigned by the MondriaanOpt algorithm.
 It requires the library file MatlabHelper.c which contains all the methods for a proper integration between Mondriaan and Matlab.
 
-Usage:  MatlabMondriaan(A, epsilon, vol)
+Usage:  [newVol] = MatlabMondriaan(A, epsilon, vol)
   
   Distributes the non-zero entries of A among 2 processors for use when calculating u=Av in parallel.
   The distribution resulting from the MondriaanOpt algorithm has lowest communication volume among all distributions that have imbalance at most epsilon.
@@ -18,8 +18,11 @@ Usage:  MatlabMondriaan(A, epsilon, vol)
    A       : The matrix
    epsilon : Load imbalance parameter
    vol     : Initial upper bound for the communication volume
+
+  Output:
+   newVol  : The communication volume of the computed partitioning
   
-  Output is written to MatlabMex.mtx and MatlabMex.svg
+  Resulting partitioning is written to MatlabMex.mtx-I2f and MatlabMex.mtx-2f.svg
   
 */
 
@@ -42,7 +45,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	
 	/* Check that the input parameters are valid. */
 	if (nrhs != 3) mexErrMsgTxt("We require three input variables: the sparse matrix, the imbalance factor and the starting upper bound volume!");
-	else if (nlhs != 0) mexErrMsgTxt("We require zero output variables!");
+	else if (nlhs < 0 || nlhs > 1) mexErrMsgTxt("We require zero or one output variables!");
 	else if (!mxIsSparse(prhs[0])) mexErrMsgTxt("The matrix on which we work needs to be sparse!");
 	
 	/* Extract the number of processors and imbalance and verify their values. */
@@ -58,6 +61,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 
 	/* Run the MondriaanOpt algorithm. */
 	if (!DoMondriaanOpt(MondriaanMatrix, &sol, &a, Imbalance, Volume)) mexErrMsgTxt("Unable to run the MondriaanOpt algorithm!");
+	
+	if(nlhs > 0) {
+		plhs[0] = mxCreateDoubleMatrix(1, 1, mxREAL);
+		if (plhs[0] == NULL) mexErrMsgTxt("Unable to allocate Matlab vector!");
+		
+		double *wp = mxGetPr(plhs[0]);
+		wp[0] = sol.maxvol;
+	}
 	
 	/* Free the Mondriaan matrix. */
 	MMDeleteSparseMatrix(MondriaanMatrix);

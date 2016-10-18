@@ -443,12 +443,14 @@ void fillFreeNonzeros(struct sparsematrix *pA){
             
             pA->Pstart[1]++;
             pA->Pstart[2]++;
+            tot[0]++;
             
         }
         else {
             // Part 1 has less (or equal) load than part 0, hence add an element to part 1.
             // Just increasing the bound will suffice
             pA->Pstart[2]++;
+            tot[1]++;
             
         }
     }

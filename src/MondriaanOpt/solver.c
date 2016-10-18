@@ -493,7 +493,7 @@ void assign(struct mat *a, struct solution *sol, unsigned int idx, unsigned char
         if(next == a->m+a->n){
             /* all rows and columns have been assigned and a better solution was found */
             unsigned int newvol = sol->vol;
-            fprintf(stderr,"NEW SOLUTION FOUND! (vol: %d)\n", newvol);
+            fprintf(stderr,"NEW SOLUTION FOUND! (vol: %d, load: %d, %d, %d)\n", newvol, sol->tot[0],sol->tot[1],a->nnz - sol->tot[0] - sol->tot[1]);
             sol->maxvol = newvol;
             char fn[MAXFNSIZE];
 
