@@ -132,7 +132,7 @@ void quicksort(long *item, long *Index, long lo, long hi) {
     i1 = Random1(lo, hi);
     i2 = Random1(lo, hi);
  
-    /* Sort i0, i1, i2 in increasing order of item value */
+    /* Sort i0, i1, i2 in decreasing order of item value */
     if (item[i0] < item[i1]) {
         /* swap i0 and i1 */
         tmpidx = i0; i0 = i1; i1 = tmpidx;

@@ -34,8 +34,6 @@ struct options {
     double time;
 
     double maxruntime;
-    
-    char convert; /* 0 = no convert, 1 = convert after calculation, 2 = only convert */
 
 };
 
