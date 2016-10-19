@@ -130,7 +130,7 @@ void printToSVG(const char *fn, struct solution *s, const struct mat *a);
 /* Function for output of a solution as an integer sparse matrix in Matrix Market (MM) format */
 void printToMM(const char *fn, struct solution *s, const struct mat *a);
 
-void printConverted(const char *fn);
+void printConverted(struct options *o);
 void fillFreeNonzeros(struct sparsematrix *pA);
 
 #endif

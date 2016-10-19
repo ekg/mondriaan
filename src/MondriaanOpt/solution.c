@@ -215,6 +215,8 @@ void resetsolution(const struct mat *a, struct solution *s){
 
 void printToSVG(const char *fn, struct solution *s, const struct mat *a){
 
+    /* NOTE: this function is not used any more, it is replaced by SparseMatrixExportSVG(), which works on the sparsematrix struct */
+    
     /* This function plots the bipartitioning of sparse matrix a
        computed as solution s. The output is to a file with filename fn.
        The format is Scalable Vector Graphics (SVG).
@@ -324,7 +326,7 @@ void printToMM(const char *fn, struct solution *s, const struct mat *a){
 
 } /* end printToMM */
 
-void printConverted(const char *fn) {
+void printConverted(struct options *o) {
     
     struct opts Options; /* The Mondriaan options */
     struct sparsematrix A;
@@ -336,14 +338,14 @@ void printConverted(const char *fn) {
     char fnI[MAXFNSIZE];
 
     /* Construct processor number file name */
-    sprintf(fnI,"%s-I2f",fn);
+    sprintf(fnI,"%s-I2f",o->fn);
     
     /**
      * Combine values & distribution A
      * If there are free nonzeros present, they will populate a fictional third
      * part/processor, which we will take care of in fillFreeNonzeros().
      */
-    if(!SpMatReadIndexAndValueMatrixFiles(fn, fnI, &A)) {
+    if(!SpMatReadIndexAndValueMatrixFiles(o->fn, fnI, &A)) {
         exit(-1);
     }
     
@@ -352,12 +354,23 @@ void printConverted(const char *fn) {
         exit(-1);
     }
     
+    char output[MAX_WORD_LENGTH];
+    if(o->SVG == SVGYes) {
+        /* Write SVG virtualisation with free nonzeros to file */
+        sprintf(output, "%s-2f.svg", o->fn);
+        File = fopen(output, "w");
+        if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
+        else {
+            SparseMatrixExportSVG(&A, File);
+            fclose(File);
+        }
+    }
+    
     /* Make the processor indices for all nonzeros explicit */
     fillFreeNonzeros(&A);
     
     /* Write the distributed matrix to file */
-    char output[MAX_WORD_LENGTH];
-    sprintf(output, "%s-P%d", fn, A.NrProcs);
+    sprintf(output, "%s-P%d", o->fn, A.NrProcs);
     File = fopen(output, "w");
     if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
@@ -372,7 +385,7 @@ void printConverted(const char *fn) {
     }
 
     A.MMTypeCode[0] = 'M';
-    sprintf(output, "%s-I%d", fn, A.NrProcs);
+    sprintf(output, "%s-I%d", o->fn, A.NrProcs);
     File = fopen(output, "w");
     if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
@@ -382,7 +395,7 @@ void printConverted(const char *fn) {
     A.MMTypeCode[0] = 'D';
     
     /* Write the index sets of the Cartesian submatrices to file */
-    sprintf(output, "%s-C%d", fn, A.NrProcs);
+    sprintf(output, "%s-C%d", o->fn, A.NrProcs);
     File = fopen(output, "w");
     if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
     else {
@@ -390,6 +403,17 @@ void printConverted(const char *fn) {
         fclose(File);
     }
     
+    if(o->SVG == SVGYes) {
+        /* Write SVG virtualisation without free nonzeros to file */
+        sprintf(output, "%s-%d.svg", o->fn, A.NrProcs);
+        File = fopen(output, "w");
+        if (!File) fprintf(stderr, "printConverted(): Unable to open '%s' for writing!\n", output);
+        else {
+            SparseMatrixExportSVG(&A, File);
+            fclose(File);
+        }
+    }
+
 }
 
 /**

@@ -497,10 +497,6 @@ void assign(struct mat *a, struct solution *sol, unsigned int idx, unsigned char
             sol->maxvol = newvol;
             char fn[MAXFNSIZE];
 
-            /* Output solution as SVG picture */
-            sprintf(fn,"%s-2f.svg",sol->matname);
-            printToSVG(fn,sol,a);
-
             /* Output solution as sparse integer matrix in Matrix Market format */
             sprintf(fn,"%s-I2f",sol->matname);
             printToMM(fn,sol,a);

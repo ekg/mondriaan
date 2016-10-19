@@ -34,6 +34,8 @@ struct options {
     double time;
 
     double maxruntime;
+    
+    enum {SVGNo, SVGYes} SVG;
 
 };
 

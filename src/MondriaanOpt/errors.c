@@ -27,6 +27,7 @@ void exitwitherror(unsigned int err){
         printf("  -t \"seconds\"            : max running time in seconds\n");
         printf("  -r \"dumpfile\"           : resume with given dumpfile\n");
         printf("  -h                      : show this help\n");
+        printf("  -svg                    : Write visualisations of the partitioning to .svg files\n");
         printf("\n");
         exit(EXIT_SUCCESS);
     }else if(err==2){

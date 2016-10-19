@@ -45,7 +45,7 @@ int main(int argc,char **argv){
     
     if(sol.maxvol < opt.maxvol) {
         /* Convert to other file formats */
-        printConverted(opt.fn);
+        printConverted(&opt);
     }
     else {
         printf("No solution with a volume lower than %d exists!\n", opt.maxvol);

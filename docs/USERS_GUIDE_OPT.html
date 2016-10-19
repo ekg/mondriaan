@@ -62,7 +62,7 @@ output is saved in the Mondriaan tests folder</em> (<tt>../tests/</tt>).
 <p>The <tt>MondriaanOpt</tt> tool yields, after a successful run on an input matrix,
 various output files. All possible output files are described below. Typically,
 the output filenames are that of the input matrix filename, modified with a small
-descriptor and the number of parts <i>x(=2)</i>.</p>
+descriptor and the number of parts <i>(=2)</i>.</p>
 
 <h4><u>Formats with free nonzeros</u></h4>
 <p><i>
@@ -71,7 +71,7 @@ All free nonzeros will be assigned index 3.
 (Free nonzeros are nonzeros that are not assigned to a processor because assigning
 it to either one will not influence communication volume.)
 To stress the potential presence of free nonzeros, the number of processors (2) in the
-filename is followed by a suffix <tt>f</tt>
+filename is followed by a suffix <tt>f</tt>.
 </i></p>
 
 <h4>Processor indices (<tt>-I2f</tt>)</h4>
@@ -81,7 +81,7 @@ nonzero is replaced by the processor index to which the nonzero has been assigne
 </p>
 
 <h4>Graphical output (<tt>-2f.svg</tt>)</h4>
-<p>Besides textual output, also an SVG graphic is written to the file <tt>input-2f.svg</tt>,
+<p>If the option <tt>-svg</tt> is given, at the end of the algorithm an SVG graphic is written to the file <tt>input-2f.svg</tt>,
 containing a visualisation of the partitioning.
 </p>
 
@@ -90,11 +90,10 @@ containing a visualisation of the partitioning.
 Here, the free nonzeros of a partitioning are distributed among the two processors in
 such a way that load imbalance is kept at a minimum.
 </i></p>
-<h4>Distributed matrix (<tt>-Px</tt>)</h4>
+<h4>Distributed matrix (<tt>-P2</tt>)</h4>
 <p> The <tt>MondriaanOpt</tt> program
-writes the distributed matrix to a file called <tt>input-Px</tt>,
-where <tt>input</tt> is the name of the input matrix, where x equals 3 when the
-distribution includes free nonzeros, and x equals 2 otherwise.
+writes the distributed matrix to a file called <tt>input-P2</tt>,
+where <tt>input</tt> is the name of the input matrix.
 
 We use an adapted Matrix Market format, with this structure: 
 <br>
@@ -115,19 +114,24 @@ Here, <tt>Pstart[k]</tt> points to the start of the nonzeroes
 of processor k.
 </p>
 
-<h4>Processor indices (<tt>-Ix</tt>)</h4>
+<h4>Processor indices (<tt>-I2</tt>)</h4>
 <p> The <tt>MondriaanOpt</tt> program
-also writes the processor indices of each nonzero to the Matrix Market file <tt>input-Ix</tt>
+also writes the processor indices of each nonzero to the Matrix Market file <tt>input-I2</tt>
 where the value of each nonzero is replaced by the processor index to which
-the nonzero has been assigned. The order of the nonzeroes is exactly that of the distributed matrix (<tt>-Px</tt>).
+the nonzero has been assigned. The order of the nonzeroes is exactly that of the distributed matrix (<tt>-P2</tt>).
 </p>
 
-<h4>Cartesian submatrices (<tt>-Cx</tt>)</h4>
+<h4>Cartesian submatrices (<tt>-C2</tt>)</h4>
 <p> The program writes the row index sets I(q) 
 and column index sets J(q) of the Cartesian submatrix I(q) x J(q)
-for the processors q=1,...,P to the file called <tt>input-Cx</tt>.
+for the processors q=1,...,P to the file called <tt>input-C2</tt>.
 This file is additional information, useful e.g. for visualisation,
 and you may not need it.
+</p>
+
+<h4>Graphical output (<tt>-2.svg</tt>)</h4>
+<p>If the option <tt>-svg</tt> is given, at the end of the algorithm an SVG graphic is written to the file <tt>input-2.svg</tt>,
+containing a visualisation of the partitioning.
 </p>
 
 
@@ -179,6 +183,11 @@ An overview of the options is given below.
 			<td>-h</td>
 			<td><i>None</i></td>
 			<td>Show help</td>
+		</tr>
+		<tr>
+			<td>-svg</td>
+			<td><i>None</i></td>
+			<td>Write visualisations of the partitioning to <tt>.svg</tt> files</td>
 		</tr>
 	</tbody>
 </table>

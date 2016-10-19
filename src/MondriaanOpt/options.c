@@ -27,6 +27,7 @@ char readoptions(struct options *o, int c, char **v){
     o->time=0.;
     o->maxruntime=0.;
     o->nbranches=0; /* number of branches traversed */
+    o->SVG=SVGNo;
 
     /* Read while there are options left */
     while(i<c){
@@ -70,6 +71,8 @@ char readoptions(struct options *o, int c, char **v){
             o->resume=TRUE;
             sprintf(o->resfn,"%s",v[i+1]);
             i++;
+        }else if(strcmp(v[i],"-svg")==0){
+            o->SVG=SVGYes;
         }
         i++;
     }
