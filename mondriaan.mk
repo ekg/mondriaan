@@ -8,7 +8,7 @@
 # Absolute path of the directory which contains this file (included last in every Makefile in the subdirectories).
 MONDRIAANHOMEDIR:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-MONDRIAANCURRENTVERSION := 4.0
+MONDRIAANCURRENTVERSION := 4.1
 MONDRIAANMAJORVERSION := 4
 
 # ==== Matlab support ====
