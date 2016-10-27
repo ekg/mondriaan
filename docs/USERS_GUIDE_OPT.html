@@ -14,6 +14,7 @@
 <h2>User's guide MondriaanOpt</h2>
 
 <div id="top">
+<div><a href="USERS_GUIDE.html">&laquo; Mondriaan</a></div>
 <div><a href="#inst">Installing</a></div>
 <div><a href="#outp">Output</a></div>
 <div><a href="#opts">Options</a></div>
@@ -30,30 +31,44 @@ This offline version is bundled with the software for your convenience.
 </p>
 <hr>
 
-<h3><a name="inst">How to install MondriaanOpt</a></h3>
-<p>
-MondriaanOpt comes packaged with the Mondriaan software. Refer to <a href="./USERS_GUIDE.html">this page</a> for
-instructions on using Mondriaan. MondriaanOpt is automatically compiled when you compile Mondriaan. The executable
-is then available at <tt>tools/MondriaanOpt</tt>.
-</p>
 <p>
 Whereas Mondriaan uses heuristics to obtain good partitionings for sparse matrix-vector multiplication for any number of processors,
 MondriaanOpt will calculate an actual optimal solution for this partitioning problem with 2 processors. More precisely, it will
 calculate a partitioning with minimum volume among all solutions that obey the imbalance constraint.
 </p>
 
+<p>
+A database with already solved problems with use of MondriaanOpt can be found <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/Opt/">online</a>.
+</p>
+
+<h3><a name="inst">How to install MondriaanOpt</a></h3>
+<p>
+MondriaanOpt comes packaged with the Mondriaan software. Refer to <a href="./USERS_GUIDE.html">this page</a> for
+instructions on using Mondriaan. MondriaanOpt is automatically compiled when you compile Mondriaan. The executable
+is then available at <tt>tools/MondriaanOpt</tt>.
+</p>
+
 <h3><a name="run">How to run MondriaanOpt</a></h3>
 <p>
-Go inside the directory <tt>Mondriaan4</tt> and type
+The MondriaanOpt program has the following interface:
+<ul><li><tt>% ./tools/MondriaanOpt matrix [P [eps]] [options]</tt></li></ul>
+One, two or three parameters may be passed, after which further options may be given.
+Either [eps], -e or -k must be passed, and it is advised to pass -v (see <a href="#opts">options</a>).
+</p>
+
+<p>
+Some equivalent examples are:
 </p>
 <ul>
-<li><tt>% cd tools</tt></li>
-<li><tt>% ./MondriaanOpt -m ../tests/arc130.mtx -e 0.03 -v 20</tt></li>
+	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx 2 0.03 -v 17</tt></li>
+	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx -e 0.03 -v 17</tt></li>
+	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx -k 660 -v 17</tt></li>
 </ul>
+
 <p>
-if you want to partition the <tt>arc130.mtx</tt> matrix (Matrix Market file format)
+The above examples partition the <tt>arc130.mtx</tt> matrix (Matrix Market file format)
 for 2 processors with at most 3% load imbalance, knowing that solutions must exist with
-volume at most 20. The matrix should be the full relative path; <em>in the above example 
+volume at most 17. The matrix should be the full relative path; <em>in the above example 
 output is saved in the Mondriaan tests folder</em> (<tt>../tests/</tt>).
 </p>
 
@@ -89,6 +104,7 @@ containing a visualisation of the partitioning.
 <p><i>
 Here, the free nonzeros of a partitioning are distributed among the two processors in
 such a way that load imbalance is kept at a minimum.
+Note that whenever we write <tt>P</tt> for the number of processors below, it implicitly equals 2.
 </i></p>
 <h4>Distributed matrix (<tt>-P2</tt>)</h4>
 <p> The <tt>MondriaanOpt</tt> program
@@ -134,11 +150,47 @@ and you may not need it.
 containing a visualisation of the partitioning.
 </p>
 
+<h4><u>Output to <tt>stdout</tt>/<tt>stderr</tt></u></h4>
+<p>
+In a succesful run, at the end of execution general statistics are written to <tt>stdout</tt>.
+Also, during such a run, every <tt>2^23 = 8388608</tt> iterations the current depth in the tree is written to <tt>stderr</tt>, in the format <tt>`current depth`/`maximum depth`</tt>.
+Last but not least, every time a new solution is found which improves on the previous solution regarding total volume, a message is written to <tt>stderr</tt> reporting the newly found volume and load distribution in the format <tt>`load P0`, `load P1`, `load Free`</tt>.
+</p>
 
 <h3><a name="opts">Program options</a></h3>
 <p>
-The MondriaanOpt options can be passed in the command line.
-An overview of the options is given below.
+The MondriaanOpt program has the following interface:
+<ul><li><tt>% ./tools/MondriaanOpt matrix [P [eps]] [options]</tt></li></ul>
+One, two or three parameters may be passed, after which further options may be given.
+An overview of the available parameters and options is given below.
+</p>
+<h4>Parameters</h4>
+<table>
+	<thead>
+		<tr>
+			<th>Parameter</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Matrix file</td>
+			<td><i>Required.</i> The input matrix file in Matrix Market (.mtx) format</td>
+		</tr>
+		<tr>
+			<td>Number of processors</td>
+			<td>Present for consistency with other Mondriaan* commands. This parameter, if given, must be equal to 2.</td>
+		</tr>
+		<tr>
+			<td>Load imbalance</td>
+			<td>The maximum allowed load imbalance</td>
+		</tr>
+	</tbody>
+</table>
+
+<h4>Options</h4>
+<p>
+Apart from the matrix, at least one of [eps], -e or -k must be given, defining the maximum allowed load imbalance.
 </p>
 <table>
 	<thead>
@@ -150,34 +202,28 @@ An overview of the options is given below.
 	</thead>
 	<tbody>
 		<tr>
-			<td>-m</td>
-			<td>Matrix file</td>
-			<td><i>Required.</i> The input matrix file in Matrix Market (.mtx) format</td>
-		</tr>
-		<tr>
 			<td>-v</td>
 			<td>Volume</td>
-			<td><i>Required.</i> The starting upper bound volume</td>
+			<td>
+				<i>Recommended.</i> The starting upper bound volume.
+				This defaults to <tt>m+n</tt>, with <tt>m</tt> and <tt>n</tt> denoting the dimensions of the matrix to be partitioned.
+				While this is a valid upper bound, you may wish to pass a tighter upper bound to reduce computing time.
+			</td>
 		</tr>
 		<tr>
 			<td>-e</td>
 			<td>Load imbalance</td>
-			<td><i>Required if -k is not passed.</i> The allowed load imbalance</td>
+			<td>The maximum allowed load imbalance</td>
 		</tr>
 		<tr>
 			<td>-k</td>
 			<td>Number of nonzeros</td>
-			<td><i>Required if -e is not passed.</i> The maximum allowed number of nonzeros per part</td>
+			<td>The maximum allowed number of nonzeros per part</td>
 		</tr>
 		<tr>
 			<td>-t</td>
 			<td>Seconds</td>
 			<td>Max running time in seconds</td>
-		</tr>
-		<tr>
-			<td>-r</td>
-			<td>Dumpfile</td>
-			<td>Resume with given dumpfile</td>
 		</tr>
 		<tr>
 			<td>-h</td>
@@ -211,8 +257,8 @@ Daniel M. Pelt and Rob H. Bisseling, <i>Journal of Parallel and Distributed Comp
 
 <hr>
 <p>
-Last updated: October 3, 2016.<br><br>
-October 3, 2016 by Marco van Oort.<br><br>
+Last updated: October 27, 2016.<br><br>
+October 27, 2016 by Marco van Oort.<br><br>
 To <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan">
 the Mondriaan package home page</a>.</p>
 

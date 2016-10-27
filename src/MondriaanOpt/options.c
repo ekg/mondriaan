@@ -28,16 +28,32 @@ char readoptions(struct options *o, int c, char **v){
     o->maxruntime=0.;
     o->nbranches=0; /* number of branches traversed */
     o->SVG=SVGNo;
+    o->maxvol = -1;
+    
+    while(i<c && v[i][0] != '-') {
+        if(i == 1) {
+            /* Read matrix filename */
+            sprintf(o->fn,"%s",v[i]);
+            req[0]=TRUE;
+        }
+        if(i == 2) {
+            if(strcmp(v[i], "2") != 0) {
+                exitwitherror(0);
+            }
+        }
+        if(i == 3) {
+            o->eps = atof(v[i]);
+            o->epsset = TRUE;
+            req[1]=TRUE;
+        }
+        
+        i++;
+    }
+    
 
     /* Read while there are options left */
     while(i<c){
-        if(strcmp(v[i],"-m")==0){
-            /* Matrix file */
-            if(i==c-1) exitwitherror(0);
-            sprintf(o->fn,"%s",v[i+1]);
-            req[0]=TRUE;
-            i++;
-        }else if(strcmp(v[i],"-t")==0){
+        if(strcmp(v[i],"-t")==0){
             /* Max running time in seconds */
             if(i==c-1) exitwitherror(0);
             o->maxruntime = atof(v[i+1]);
@@ -59,8 +75,8 @@ char readoptions(struct options *o, int c, char **v){
         }else if(strcmp(v[i],"-v")==0){
             /* Starting upper bound on volume, e.g. MIN(m,n)+1 for an m by n matrix  */
             if(i==c-1) exitwitherror(0);
-            o->maxvol = atoi(v[i+1]);
-            req[2]=TRUE;
+            /* We add +1, to change from 'upper bound' to 'the value we want to improve upon' */
+            o->maxvol = atoi(v[i+1])+1;
             i++;
         }else if(strcmp(v[i],"-h")==0){
             /* Get help */

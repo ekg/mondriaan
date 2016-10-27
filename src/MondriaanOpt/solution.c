@@ -65,10 +65,14 @@ void initsolution(const struct mat *a, struct solution *s, struct options *o){
     s->max1 = o->k;
 
     /* Set volume upper bound */
+    if(o->maxvol == -1) {
+        o->maxvol = a->m + a->n;
+        fprintf(stderr, "Warning: With the default upper bound on the communication volume, m+n, the program may take long to complete. Consider passing a better upper bound with the -v option.\n");
+    }
     s->maxvol = o->maxvol;
 
     /* Set matrix name */
-    s->matname = basename(o->fn);
+    s->matname = o->fn; /* basename(o->fn) */
 
     /* Set start time of solution process */
     time(&(s->starttime));

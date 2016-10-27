@@ -39,16 +39,19 @@ int main(int argc,char **argv){
 
     /* Output time used */
     printf("Time taken: %lf s\n",opt.time);
-
-    /* Output final volume upper bound to stdout */
-    printf("%d\n",sol.maxvol);
     
     if(sol.maxvol < opt.maxvol) {
+        /* A solution has been found */
+        /* Output final volume upper bound to stdout */
+        printf("Final volume: %d\n",sol.maxvol);
+        
         /* Convert to other file formats */
         printConverted(&opt);
     }
     else {
-        printf("No solution with a volume lower than %d exists!\n", opt.maxvol);
+        /* No solution found. */
+        /* Subtract 1 from maxvol, as maxvol contains 'the volume we want to improve', while we want to print 'the upper bound'. */
+        printf("No solution with a volume at most %d exists!\n", opt.maxvol-1);
     }
     
     exit (EXIT_SUCCESS);

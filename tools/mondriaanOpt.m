@@ -43,6 +43,10 @@ function [I, s] = mondriaanOpt(A, Imbalance, Volume)
     comVol = MatlabMondriaanOpt(A, Imbalance, Volume);
     elapsedTime = toc;
     
+    if(comVol > Volume)
+        throw(MException('mondriaanOpt:NoSol', ['No solution with a volume at most ' num2str(Volume) ' exists!']));
+    end
+    
     % Read computed partitioning from disk
     I = mmread('MatlabMex.mtx-I2f');
     

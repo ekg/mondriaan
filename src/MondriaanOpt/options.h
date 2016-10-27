@@ -5,7 +5,7 @@
 #include <sys/time.h>
 
 #define MAXFNSIZE 64
-#define CUR_REQ_OPTIONS 3
+#define CUR_REQ_OPTIONS 2
 #define TRUE 1
 #define FALSE 0
 

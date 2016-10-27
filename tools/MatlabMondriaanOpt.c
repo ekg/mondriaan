@@ -89,7 +89,7 @@ int DoMondriaanOpt(struct sparsematrix *A, struct solution *sol, struct mat *a, 
 	sprintf(Options.fn, "MatlabMex.mtx");
 	Options.eps = Imbalance;
 	Options.epsset = TRUE;
-	Options.maxvol = Volume;
+	Options.maxvol = Volume+1; /* We add +1, to change from 'upper bound' to 'the volume we want to improve upon' */
 	
 	/* Initialise solution */
 	initsolution(a,sol,&Options);
