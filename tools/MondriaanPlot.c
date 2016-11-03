@@ -9,6 +9,7 @@ NOTA BENE: Symmetry settings are currently discarded!
 */
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdint.h>
 #include <memory.h>
 #include <math.h>
 #include <Mondriaan.h>
@@ -237,12 +238,15 @@ int main(int argc, char **argv) {
 	struct sparsematrix A;
 	int i;
 	
-	/* Check endian-ness. This may trigger a compiler warning. */
+	/* Check endian-ness. */
 	if (TRUE)
 	{
-		unsigned char Test[2] = {1, 0};
-		
-		if (*((short *)Test) != 1) {
+		union {
+			uint32_t i;
+			uint8_t c[4];
+		} testInt = {0x01020304};
+
+		if(testInt.c[0] == 1) {
 			fprintf(stderr, "main(): This is a big-endian system.\n");
 			IsLittleEndian = FALSE;
 		}
