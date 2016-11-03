@@ -54,6 +54,8 @@ The MondriaanOpt program has the following interface:
 <ul><li><tt>% ./tools/MondriaanOpt matrix [P [eps]] [options]</tt></li></ul>
 One, two or three parameters may be passed, after which further options may be given.
 Either [eps], -e or -k must be passed, and it is advised to pass -v (see <a href="#opts">options</a>).
+Take note that while MondriaanOpt may be called with the same parameters as Mondriaan, the actual problem
+being solved may be <a href="#constraint">slightly different</a>.
 </p>
 
 <p>
@@ -238,6 +240,17 @@ Apart from the matrix, at least one of [eps], -e or -k must be given, defining t
 	</tbody>
 </table>
 
+<h3><a name="constraint">Difference in imbalance constraints</a></h3>
+While the command line interface of MondriaanOpt can be used just as Mondriaan, there is a subtle difference in the problem being solved in these two.
+More precisely, with <tt>N</tt> being the total number of nonzeros, <tt>p</tt> being the total number of processors (which equals 2) and
+<tt>load</tt> the number of nonzeros assigned to a processor, compare:
+<ul>
+	<li>the imbalance constraint <tt>load &lt;= (1+epsilon) (N/p)</tt> which is used in Mondriaan (In the code, this amounts to <tt>floor( ((1+epsilon)*N)/p )</tt>.), and</li>
+	<li>the imbalance constraint <tt>load &lt;= (1+epsilon) ceil(N/p)</tt> which is used in MondriaanOpt.</li>
+</ul>
+As <tt>p=2</tt>, this difference may only be of importance whenever <tt>N</tt> is odd.
+In [<a href="#cite1">1,p.2</a>] it is explained that this different choice was made to ensure feasibility of the problem, even if <tt>epsilon=0</tt>.
+
 
 <h3><a name="matl">Using MondriaanOpt in MATLAB</a></h3>
 
@@ -257,8 +270,8 @@ Daniel M. Pelt and Rob H. Bisseling, <i>Journal of Parallel and Distributed Comp
 
 <hr>
 <p>
-Last updated: October 27, 2016.<br><br>
-October 27, 2016 by Marco van Oort.<br><br>
+Last updated: November 3, 2016.<br><br>
+November 3, 2016 by Marco van Oort.<br><br>
 To <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan">
 the Mondriaan package home page</a>.</p>
 

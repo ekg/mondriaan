@@ -244,6 +244,18 @@ This concludes this small tutorial.
 More information is available through issueing <tt>help mondriaan</tt> from within MATLAB.
 </p>
 
+<h3>MondriaanOpt</h3>
+Apart from Mondriaan itself, also MondriaanOpt is available in MATLAB through the MatlabMondriaanOpt MEX routine.
+Example matlab functions are given in mondriaanOpt.m and mondriaanOptPlot.m.
+The interface of mondriaanOpt is as follows:
+<ul>
+<li><tt>[I, s] = mondriaanOpt(A, Imbalance, Volume)</tt></li>
+</ul>
+Here, <tt>A</tt> is the sparse matrix to be partitioned, <tt>Imbalance</tt> is the maximum allowed load imbalance,
+<tt>Volume</tt> is the initial upper bound on the volume, <tt>I</tt> contains the partitioning information and
+<tt>s</tt> contains statistics about the run.
+For more information, type <tt>help mondriaanOpt</tt> or <tt>help mondriaanOptPlot</tt> in MATLAB.
+
 
 <h3>References</h3>
 <p>
@@ -263,11 +275,12 @@ Vol. 32, Issue 6, pp. 3426-3446 (2010).<br>
 </p>
 <hr>
 <p>
-Last updated: 21st of August, 2013.<br><br>
+Last updated: November 3, 2016.<br><br>
 July 27, 2010 by Bas Fagginger Auer,<br>
 December 10, 2010 by A. N. Yzelman,<br>
 March 27, 2012 by Bas Fagginger Auer,<br>
-August 29, 2013 by Rob Bisseling and Bas Fagginger Auer.<br><br>
+August 29, 2013 by Rob Bisseling and Bas Fagginger Auer.<br>
+November 3, 2016 by Marco van Oort.<br><br>
 To <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan">
 Home page Mondriaan package</a>.</p>
 
