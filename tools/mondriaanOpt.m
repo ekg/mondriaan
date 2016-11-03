@@ -29,7 +29,7 @@ function [I, s] = mondriaanOpt(A, Imbalance, Volume)
         disp 'Error: the three arguments to mondriaanOpt function are mandatory!';
         return;
     end
-    if (Imbalance <= 0)
+    if (Imbalance < 0)
         disp('Invalid value for Imbalance');
         return;
     end

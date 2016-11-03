@@ -52,7 +52,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
 	Imbalance = ExtractDouble (prhs[1]);
 	Volume = (int)ExtractDouble (prhs[2]);
 	
-	if (Imbalance <= 0.0 || Imbalance >= 1.0) mexErrMsgTxt ("The imbalance should lie between 0 and 1!");
+	if (Imbalance < 0.0 || Imbalance > 1.0) mexErrMsgTxt ("The imbalance should lie between 0 and 1!");
 	
 	/* Convert matrix to a Mondriaan friendly format. */
 	MondriaanMatrix = ConvertMatlabToMondriaan(prhs[0]);
