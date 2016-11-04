@@ -37,7 +37,7 @@ void exitwitherror(unsigned int err){
         printf("  -svg                    : Write visualisations of the partitioning to .svg files\n\n");
         
         printf("Apart from the matrix, at least one of [eps], -e or -k must be given, defining the maximum allowed load imbalance.\n");
-        printf("The default value for the initial upper bound on the communication volume is m+n (m and n being the dimensions of the matrix),\n");
+        printf("The default value for the initial upper bound on the communication volume is min(m,n)+1 (m and n being the dimensions of the matrix),\n");
         printf("but it is strongly recommended to pass a better upper bound (-v) if available, to reduce computing time.\n\n");
         
         printf("Equivalent examples:\n");

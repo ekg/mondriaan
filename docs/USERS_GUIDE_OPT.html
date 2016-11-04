@@ -208,7 +208,7 @@ Apart from the matrix, at least one of [eps], -e or -k must be given, defining t
 			<td>Volume</td>
 			<td>
 				<i>Recommended.</i> The starting upper bound volume.
-				This defaults to <tt>m+n</tt>, with <tt>m</tt> and <tt>n</tt> denoting the dimensions of the matrix to be partitioned.
+				This defaults to <tt>min(m,n)+1</tt>, with <tt>m</tt> and <tt>n</tt> denoting the dimensions of the matrix to be partitioned.
 				While this is a valid upper bound, you may wish to pass a tighter upper bound to reduce computing time.
 			</td>
 		</tr>
@@ -270,8 +270,8 @@ Daniel M. Pelt and Rob H. Bisseling, <i>Journal of Parallel and Distributed Comp
 
 <hr>
 <p>
-Last updated: November 3, 2016.<br><br>
-November 3, 2016 by Marco van Oort.<br><br>
+Last updated: November 4, 2016.<br><br>
+November 4, 2016 by Marco van Oort.<br><br>
 To <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan">
 the Mondriaan package home page</a>.</p>
 

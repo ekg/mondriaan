@@ -66,8 +66,8 @@ void initsolution(const struct mat *a, struct solution *s, struct options *o){
 
     /* Set volume upper bound */
     if(o->maxvol == -1) {
-        o->maxvol = a->m + a->n;
-        fprintf(stderr, "Warning: With the default upper bound on the communication volume, m+n, the program may take long to complete. Consider passing a better upper bound with the -v option.\n");
+        o->maxvol = ((a->m < a->n) ? a->m : a->n)+1; /* min(m,n)+1 */
+        fprintf(stderr, "Notice: Using default upper bound min(m,n)+1. If the program takes too long to complete, consider passing -v (for help, use -h).\n");
     }
     s->maxvol = o->maxvol;
 
