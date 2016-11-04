@@ -1,4 +1,4 @@
-MONDRIAAN version 4.1 (this version released October 2016):
+MONDRIAAN version 4.1 (this version released November 2016):
 ------------------------
 Copyright May 2002 (version 1.0): Brendan Vastenhouw and Rob H. Bisseling
 Copyright July 2008 (version 2.0): Rob H. Bisseling, Wouter Meesen, Tristan van Leeuwen, 
@@ -8,7 +8,7 @@ Copyright July 2010 (version 3.0): Rob H. Bisseling, Bas Fagginger Auer,
                      Prototype Matlab interface: Ken Stanley.
 Copyright August 2013 (version 4.0): Rob H. Bisseling, Bas Fagginger Auer,
                      Daniel Pelt, Albert-Jan Yzelman.
-Copyright October 2016 (version 4.1): Rob H. Bisseling, Bas Fagginger Auer,
+Copyright November 2016 (version 4.1): Rob H. Bisseling, Bas Fagginger Auer,
                      Marco van Oort, Daniel Pelt, Albert-Jan Yzelman,
 
 Extensive documentation is found in the `docs' directory.
