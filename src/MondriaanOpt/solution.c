@@ -68,6 +68,9 @@ void initsolution(const struct mat *a, struct solution *s, struct options *o){
     if(o->maxvol == -1) {
         o->maxvol = ((a->m < a->n) ? a->m : a->n)+1; /* min(m,n)+1 */
         fprintf(stderr, "Notice: Using default upper bound min(m,n)+1. If the program takes too long to complete, consider passing -v (for help, use -h).\n");
+        
+        /* We add +1, to change from 'upper bound' to 'the value we want to improve upon' */
+        o->maxvol += 1;
     }
     s->maxvol = o->maxvol;
 
