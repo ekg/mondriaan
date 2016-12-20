@@ -70,6 +70,15 @@ struct sparsematrix {
   struct remembrance *rowBoundaries, *colBoundaries;
 };
 
+struct CRCS {
+    int dir;
+    long m;
+    long n;
+    long nnz;
+    long *indices;
+    long *starts;
+};
+
 /* Function declarations for Matrix Market input/output functions */
 int MMSparseMatrixInit(struct sparsematrix *pM);
 int MMWeightsInit(struct sparsematrix *pM);
@@ -129,12 +138,17 @@ int SparseMatrixStructurallySymmetric(struct sparsematrix *pM);
 
 int SparseMatrixMarkCutRows(struct sparsematrix *pM);
 int SparseMatrixMarkCutColumns(struct sparsematrix *pM);
+long SparseMatrixComputeVolume(const struct sparsematrix *pM, const struct opts *pOptions);
 
 int SparseMatrixOriginal2Local(struct sparsematrix *pM, long int **row_perms, long int **col_perms);
 int SparseMatrixLocal2Vector(struct sparsematrix *pM, long int **local2glob, long int *vec_distr,
                              long int **count, long int ***local2proc, long int ***local2index, 
                              const char dir );
 int CreateInitialMediumGrainDistribution(struct sparsematrix *pM, long *mid);
+
+int SparseMatrixToCRS_CCS(struct sparsematrix *pM, struct CRCS *pCCS, struct CRCS *pCRS);
+int initCRCS(struct CRCS *pCRCS, int dir, long m, long n, long nnz);
+void freeCRCS(struct CRCS *pCRCS);
 
 #endif /* __SparseMatrix_h__ */
 

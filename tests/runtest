@@ -132,6 +132,11 @@ test_logb2
 test_SplitMatrixSimple
 test_SplitMatrixKLFM
 test_DistributeMatrixMondriaan
+test_DetectConnectedComponents
+test_Heap
+test_TwoColorTree
+test_SubsetSum
+test_ZeroVolumeSearch
 
 # Test of Graph
 test_CreateNewBiPartHyperGraph
@@ -193,6 +198,8 @@ test_SpMatSortNonzeros
 test_SpMatReadIndexAndValueMatrixFiles
 test_SparseMatrixRemoveDuplicates
 test_SparseMatrixStructurallySymmetric
+test_SparseMatrixComputeVolume
+test_SparseMatrixToCRS_CCS
 
 # Test of Cartesian
 test_CRS2CCS
