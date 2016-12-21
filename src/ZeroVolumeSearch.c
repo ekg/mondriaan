@@ -77,10 +77,10 @@ int ZeroVolumeSearch(struct sparsematrix *pM, long weightlo, long weighthi, long
         long lo = 0, hi = pM->NrNzElts-1;
         do {
             
-            while(componentToPartition[rowToComponent[pM->i[lo]]] == 0) {
+            while(componentToPartition[rowToComponent[pM->i[lo]]] == 0 && lo <= hi) {
                 ++lo;
             }
-            while(componentToPartition[rowToComponent[pM->i[hi]]] == 1) {
+            while(componentToPartition[rowToComponent[pM->i[hi]]] == 1 && lo <= hi) {
                 --hi;
             }
             
