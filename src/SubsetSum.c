@@ -195,7 +195,12 @@ int KarmarkarKarp(const long * const weights, const long N, const long weightlo,
         totalWeight += weights[i];
     }
     
-    /* Compute min and max weight of smallest desired partition */
+    /* Compute min and max weight of smallest desired partition. Note that
+     * these values only make sense when considering the subset-sum problem.
+     * When considering the partition problem (with the dummy weight), their
+     * values have no meaning, apart from their difference which gives a bound
+     * on the maximal difference in the two partition weights.
+     */
     long maxWeight = weightlo;
     long minWeight = totalWeight - weighthi;
     
@@ -222,6 +227,8 @@ int KarmarkarKarp(const long * const weights, const long N, const long weightlo,
         heapItems[N].key = N;
         heapItems[N].weight = totalWeight - (minWeight + maxWeight);
     }
+    
+    /* From here, we are solving the Partition problem, which is what Karmarkar-Karp is actually designed for. */
     
     /* Create the heap */
     struct heap Heap;
@@ -261,7 +268,7 @@ int KarmarkarKarp(const long * const weights, const long N, const long weightlo,
      */
     HeapPeek(&Heap, &max1);
     
-    if(max1.weight > (maxWeight-minWeight)/2) {
+    if(max1.weight > maxWeight-minWeight) {
         HeapDestroy(&Heap); /* Also free()s heapItems */
         GraphDestroy(&Tree);
         return FALSE;
