@@ -48,8 +48,7 @@ test_LambdaLambdaMinusOneMetric \
 test_FindOptimalPathMatching \
 test_MatchATA \
 test_CoarsenGraph test_RunMLGraphPart \
-test_SparseMatrixComputeVolume test_SparseMatrixToCRS_CCS \
-test_DetectConnectedComponents \
+test_SparseMatrixToCRS_CCS test_DetectConnectedComponents \
 test_Heap test_TwoColorTree test_SubsetSum test_ZeroVolumeSearch
 
 .SECONDARY: ${TESTTARGETS:%=%.o}
@@ -360,9 +359,6 @@ test_CRS2CCS: test_CRS2CCS.o ${CARTESIAN:%=%.o}
 test_MMWriteCartesianSubmatrices: test_MMWriteCartesianSubmatrices.o ${CARTESIAN:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
-test_SparseMatrixComputeVolume: testHelper_DisconnectedMatrix.o test_SparseMatrixComputeVolume.o ${SPARSEMATRIX:%=%.o}
-	make -r OBJDEPS='$^' $@.target
-
 test_SparseMatrixToCRS_CCS: test_SparseMatrixToCRS_CCS.o ${SPARSEMATRIX:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
@@ -378,7 +374,7 @@ test_TwoColorTree: test_TwoColorTree.o ${SUBSETSUM:%=%.o}
 test_SubsetSum: test_SubsetSum.o ${SUBSETSUM:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
-test_ZeroVolumeSearch: testHelper_DisconnectedMatrix.o test_ZeroVolumeSearch.o ${SPARSEMATRIX:%=%.o} ${ZEROVOLUMESEARCH:%=%.o}
+test_ZeroVolumeSearch: testHelper_DisconnectedMatrix.o test_ZeroVolumeSearch.o ${SPARSEMATRIX:%=%.o} ${DISTRIBUTEVECLIB:%=%.o} ${ZEROVOLUMESEARCH:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_GetParameters: test_GetParameters.o ${OPTIONS:%=%.o}

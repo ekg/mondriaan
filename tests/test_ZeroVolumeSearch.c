@@ -1,6 +1,7 @@
 #include "ZeroVolumeSearch.h"
 #include "testHelper_DisconnectedMatrix.h"
 #include "DistributeMat.h"
+#include "DistributeVecLib.h"
 #include <math.h>
 
 void test_ZeroVolumeSearch(int symmetric, int dummies, int colWeights, int large, double eps);
@@ -118,7 +119,18 @@ void test_ZeroVolumeSearch(int symmetric, int dummies, int colWeights, int large
             exit(1);
         }
         
-        if(SparseMatrixComputeVolume(&A, &options) != 0) {
+        /* Calculate communication volume. Change to full matrix for CalcCom() */
+        if(symmetric) {
+            SparseMatrixSymmetric2Full(&A);
+        }
+        long tmp, ComVolV, ComVolU;
+        if (!CalcCom(&A, NULL, ROW, &ComVolV, &tmp, &tmp, &tmp, &tmp) ||
+            !CalcCom(&A, NULL, COL, &ComVolU, &tmp, &tmp, &tmp, &tmp)) {
+            printf("Error\n");
+            exit(1);
+        }
+        
+        if(ComVolV != 0 || ComVolU != 0) {
             printf("Error\n");
             exit(1);
         }

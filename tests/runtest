@@ -198,7 +198,6 @@ test_SpMatSortNonzeros
 test_SpMatReadIndexAndValueMatrixFiles
 test_SparseMatrixRemoveDuplicates
 test_SparseMatrixStructurallySymmetric
-test_SparseMatrixComputeVolume
 test_SparseMatrixToCRS_CCS
 
 # Test of Cartesian

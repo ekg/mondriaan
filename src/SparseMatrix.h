@@ -138,7 +138,6 @@ int SparseMatrixStructurallySymmetric(struct sparsematrix *pM);
 
 int SparseMatrixMarkCutRows(struct sparsematrix *pM);
 int SparseMatrixMarkCutColumns(struct sparsematrix *pM);
-long SparseMatrixComputeVolume(const struct sparsematrix *pM, const struct opts *pOptions);
 
 int SparseMatrixOriginal2Local(struct sparsematrix *pM, long int **row_perms, long int **col_perms);
 int SparseMatrixLocal2Vector(struct sparsematrix *pM, long int **local2glob, long int *vec_distr,
