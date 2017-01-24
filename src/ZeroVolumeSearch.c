@@ -40,6 +40,13 @@ int ZeroVolumeSearch(struct sparsematrix *pM, long weightlo, long weighthi, long
     if(numComponents < 2) {
         free(componentWeights);
         free(rowToComponent);
+        if(numComponents == 1) {
+            /* As DetectConnectedComponents() returned TRUE, the single component the matrix consists of has
+             * a weight lower than weighthi, which implies that we may put all nonzeros in one single partition.
+             */
+            *mid = 0;
+            return TRUE;
+        }
         return FALSE;
     }
     
