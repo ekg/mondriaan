@@ -791,6 +791,11 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     long * i_orig = pM->i;
     long * j_orig = pM->j;
     
+    if (pM->ReValue == NULL) {
+        fprintf(stderr, "SpMatValuesToProcessorIndices(): Matrix does not contain ReValue values!\n");
+        return FALSE;
+    }
+    
     pM->i = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
     pM->j = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
     
@@ -802,6 +807,10 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     /* Determine number of processors */
     pM->NrProcs = 0;
     for (t = 0; t < pM->NrNzElts; t++) {
+        if(pM->ReValue[t] < 0.0) {
+            fprintf(stderr, "SpMatValuesToProcessorIndices(): Negative values cannot be used as processor indices!\n");
+            return FALSE;
+        }
         if(((long)pM->ReValue[t]) > pM->NrProcs) {
             pM->NrProcs = (long)pM->ReValue[t];
         }
@@ -856,6 +865,8 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     free(i_orig);
     free(j_orig);
     free(Pindex);
+
+    pM->MMTypeCode[0] = 'D';
     
     return TRUE;
 }

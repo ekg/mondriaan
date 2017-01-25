@@ -6,7 +6,7 @@ include ../mondriaan.mk
 % :: %.c ;
 
 #targets
-TARGETS := Mondriaan MondriaanPlot Profile
+TARGETS := Mondriaan MondriaanPlot MondriaanStats Profile
 LIB = ${MONDRIAANLIBDIR}/libMondriaan${MONDRIAANMAJORVERSION}.a
 ifdef MATLABHOMEDIR
 TARGETS := ${TARGETS} MatlabMondriaan MatlabMondriaanOpt
@@ -48,6 +48,9 @@ Mondriaan: Mondriaan.o ${LIB}
 	make -r OBJDEPS='${^:%.a=}' $@.target
 
 MondriaanPlot: MondriaanPlot.o ${LIB}
+	make -r OBJDEPS='${^:%.a=}' $@.target
+
+MondriaanStats: MondriaanStats.o ${LIB}
 	make -r OBJDEPS='${^:%.a=}' $@.target
 
 MatlabMondriaan: MatlabMondriaan.mex.o MatlabHelper.mex.o ${LIB}
