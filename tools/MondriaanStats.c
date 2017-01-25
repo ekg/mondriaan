@@ -239,13 +239,17 @@ int main(int argc, char **argv) {
 		if(filename_u == NULL) {
 			sprintf(filename_vec, "%s-u%d", basename, A.NrProcs);
 			u = ReadVectorFile(filename_vec, COL, &A, TRUE);
-			fprintf(stderr, " -- Found %s\n", filename_vec);
+			if(u != NULL) {
+				fprintf(stderr, " -- Found %s\n", filename_vec);
+			}
 		}
 		
 		if(filename_v == NULL) {
 			sprintf(filename_vec, "%s-v%d", basename, A.NrProcs);
 			v = ReadVectorFile(filename_vec, ROW, &A, TRUE);
-			fprintf(stderr, " -- Found %s\n", filename_vec);
+			if(v != NULL) {
+				fprintf(stderr, " -- Found %s\n", filename_vec);
+			}
 		}
 	}
 	
