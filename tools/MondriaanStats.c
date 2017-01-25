@@ -131,9 +131,9 @@ int CalcImbalanceI2f(const struct sparsematrix *pM, double *Imbalance, double *I
 
 int main(int argc, char **argv) {
 	
-	if(argc < 2) {
+	if(argc < 2 || !strcmp(argv[1], "-h")) {
 		PrintStatsHelp(argc, argv);
-		exit(1);
+		exit((argc < 2)? 1 : 0);
 	}
 	
 	/* Read options */
