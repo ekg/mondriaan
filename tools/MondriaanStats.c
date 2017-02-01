@@ -333,7 +333,7 @@ int main(int argc, char **argv) {
 		long MaxRow = (MaxInRow>MaxOutRow)?MaxInRow:MaxOutRow;
 		long MaxCol = (MaxInCol>MaxOutCol)?MaxInCol:MaxOutCol;
 		double Imbalance = maxWeight/(A.NrNzElts/(double)A.NrProcs) - 1;
-		double ImbalanceOpt = maxWeight/((A.NrNzElts + (A.NrNzElts%A.NrProcs))/(double)A.NrProcs) - 1;
+		double ImbalanceOpt = maxWeight/ceil(A.NrNzElts/(double)A.NrProcs) - 1;
 		printf("Total:\n");
 		printf("  vol           : %ld\n", ComVolRow+ComVolCol);
 		printf("  avg = vol/P   : %g\n", (ComVolRow+ComVolCol)/(double)A.NrProcs);
