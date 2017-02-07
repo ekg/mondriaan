@@ -121,6 +121,7 @@ int AddDummiesToSparseMatrix(struct sparsematrix *pM);
 int RemoveDummiesFromSparseMatrix(struct sparsematrix *pM);
 
 int SparseMatrixSymmetric2Full(struct sparsematrix *pM);
+int SparseMatrixFull2Symmetric(struct sparsematrix *pM, char MMTypeCode);
 int SparseMatrixSymmetricLower2Random(struct sparsematrix *pM);
 int SparseMatrixSymmetricRandom2Lower(struct sparsematrix *pM);
 

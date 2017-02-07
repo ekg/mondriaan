@@ -1,5 +1,6 @@
 #include "DistributeMat.h"
 #include "Permute.h"
+#include "FreeNonzeros.h"
 
 #ifdef USE_PATOH
 #include <patoh.h>
@@ -503,6 +504,41 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
             fprintf(stderr, "DistributeMatrixMondriaan(): Unknown SplitMethod!\n");
             return FALSE;
         }
+        
+        /* Shift weight and procs */
+        for (j = k; j > i+1; j--) {
+            weight[j] = weight[j-1];
+            procs[j] = procs[j-1];
+        }
+
+        k++; /* new number of parts */
+
+        weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
+        weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
+        
+        if (weight[i] < 0 || weight[i + 1] < 0) {
+            fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute weights!\n");
+            return FALSE;
+        }
+        
+        procslo = procs[i]/2;
+        procshi = (procs[i]%2==0 ? procslo : procslo+1);
+        
+        if (weight[i] <= weight[i+1]) {
+            procs[i] = procslo;
+            procs[i+1] = procshi;
+        } else {
+            procs[i] = procshi;
+            procs[i+1] = procslo;
+        }
+        
+        if(pOptions->ImproveFreeNonzeros == FreeNonzerosLocal) {
+            ImproveFreeNonzerosLocal(pT, pOptions, k, procs, i, i+1);
+        }
+        else if(pOptions->ImproveFreeNonzeros == FreeNonzerosGlobal) {
+            ImproveFreeNonzerosGlobal(pT, pOptions, k, procs);
+        }
+        
 #ifdef INFO2
         printf("  Pstart[%d] = %ld ", i,  pT->Pstart[i]);
         printf("Pstart[%d] = %ld ", i+1,  pT->Pstart[i+1]);
@@ -584,34 +620,6 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
                 }
             }
         }
-        
-        /* Shift weight and procs */
-        for (j = k; j > i+1; j--) {
-            weight[j] = weight[j-1];
-            procs[j] = procs[j-1];
-        }
-
-        k++; /* new number of parts */
-
-        weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
-        weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
-        
-        if (weight[i] < 0 || weight[i + 1] < 0) {
-            fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute weights!\n");
-            return FALSE;
-        }
-        
-        procslo = procs[i]/2;
-        procshi = (procs[i]%2==0 ? procslo : procslo+1);
-        
-        if (weight[i] <= weight[i+1]) {
-            procs[i] = procslo;
-            procs[i+1] = procshi;
-        } else { 
-            procs[i] = procshi;
-            procs[i+1] = procslo;
-        }
-
 
         /* Check if there is a part that is too large */
         done = TRUE;

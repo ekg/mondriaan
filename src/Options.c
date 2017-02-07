@@ -130,6 +130,7 @@ char* GetDefaultOptionText() {
 "Partitioner                                    mondriaan \n"
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
+"Improve_Free_Nonzeros                          no \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
 "SquareMatrix_DistributeVectorsEqual_AddDummies yes \n"
 "SymmetricMatrix_UseSingleEntry                 no \n"
@@ -242,6 +243,13 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Discard_Free_Nets ");
     if (Opts->DiscardFreeNets == FreeNetYes) fprintf(Out, "yes");
     else if (Opts->DiscardFreeNets == FreeNetNo) fprintf(Out, "no");
+    else return FALSE;
+    fprintf(Out, "\n");
+    
+    fprintf(Out, "Improve_Free_Nonzeros ");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosGlobal) fprintf(Out, "global");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosLocal) fprintf(Out, "local");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else return FALSE;
     fprintf(Out, "\n");
     
@@ -455,6 +463,13 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Discard-Free-Nets & ");
     if (Opts->DiscardFreeNets == FreeNetYes) fprintf(Out, "yes");
     else if (Opts->DiscardFreeNets == FreeNetNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
+    
+    fprintf(Out, "Improve-Free-Nonzeros & ");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosGlobal) fprintf(Out, "global");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosLocal) fprintf(Out, "local");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
     
@@ -834,6 +849,17 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
             pOptions->DiscardFreeNets = FreeNetNo;
         } else {
             fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            return FALSE;
+        }
+    } else if (!strcmp(option, "Improve_Free_Nonzeros")) {
+        if (!strcmp(value, "no") || !strcmp(value, "0"))
+            pOptions->ImproveFreeNonzeros = FreeNonzerosNo;
+        else if (!strcmp(value, "local") || ! strcmp(value, "1"))
+            pOptions->ImproveFreeNonzeros = FreeNonzerosLocal;
+        else if (!strcmp(value, "global") || ! strcmp(value, "2"))
+            pOptions->ImproveFreeNonzeros = FreeNonzerosGlobal;
+        else {
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
     } else if (!strcmp(option, "SquareMatrix_DistributeVectorsEqual")) {
