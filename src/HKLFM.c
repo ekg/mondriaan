@@ -528,6 +528,22 @@ int HKLFM(struct biparthypergraph *pHG, long weightlo, long weighthi,
         return FALSE;
     }
     
+#ifdef GAINBUCKET_ARRAY
+    /* Compute maximum number of nets per vertex. */
+    long NrNets, MaxNrNets = 0;
+    for (v = 0; v < pHG->NrVertices; v++) {
+        NrNets = pHG->V[v].iEnd-pHG->V[v].iStart;
+        if(NrNets > MaxNrNets) {
+            MaxNrNets = NrNets;
+        }
+    }
+    if ( !InitGainBucket(&(pHG->GBVtx[0]), MaxNrNets) ||
+         !InitGainBucket(&(pHG->GBVtx[1]), MaxNrNets) ) {
+        fprintf(stderr, "HKLFM(): Could not initialize gain buckets!\n");
+        return FALSE;
+    }
+#endif
+    
     /* Main loop */
     iter = 0;
     while (iter < MaxNrLoops && (iter == 0 || pHG->MinComm != LastComm)) {
@@ -669,6 +685,14 @@ int HKLFM(struct biparthypergraph *pHG, long weightlo, long weighthi,
         iter++;
     } /* end main loop */
 
+#ifdef GAINBUCKET_ARRAY
+    if ( !DeleteGainBucket(&(pHG->GBVtx[0])) ||
+         !DeleteGainBucket(&(pHG->GBVtx[1])) ) {
+        fprintf(stderr, "HKLFM(): Could not initialize gain buckets!\n");
+        return FALSE;
+    }
+#endif
+    
     return TRUE;
 } /* end HKLFM */
 
