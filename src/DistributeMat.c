@@ -276,6 +276,11 @@ void VerifyLambdas(const int *lambdas, const long n, const int P) {
     free(hist);
 }
 
+int isPowerOfTwo (unsigned int x)
+{
+    return ((x != 0) && ((x & (~x + 1)) == x));
+}
+
 int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const struct opts *pOptions, int (*Callback)(int, int, const struct sparsematrix *)) {
     /* This function partitions the nonzeros of the matrix T
        into P parts, allowing a load imbalance of a fraction eps.
@@ -532,11 +537,21 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
             procs[i+1] = procslo;
         }
         
-        if(pOptions->ImproveFreeNonzeros == FreeNonzerosLocal) {
-            ImproveFreeNonzerosLocal(pT, pOptions, k, procs, i, i+1);
-        }
-        else if(pOptions->ImproveFreeNonzeros == FreeNonzerosGlobal) {
-            ImproveFreeNonzerosGlobal(pT, pOptions, k, procs);
+        if(pOptions->ImproveFreeNonzeros != FreeNonzerosNo) {
+            if(pOptions->ImproveFreeNonzeros == FreeNonzerosLocal) {
+                ImproveFreeNonzerosLocal(pT, pOptions, k, procs, i, i+1);
+                
+                weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
+                weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
+            }
+            else if(pOptions->ImproveFreeNonzeros == FreeNonzerosGlobal && (isPowerOfTwo(k) || k == P)) {
+                ImproveFreeNonzerosGlobal(pT, pOptions, k, procs);
+                
+                for(j=0; j<k; j++) {
+                    weight[j] = ComputeWeight(pT, pT->Pstart[j], pT->Pstart[j+1]-1, NULL, pOptions);
+                }
+            }
+            
         }
         
 #ifdef INFO2
