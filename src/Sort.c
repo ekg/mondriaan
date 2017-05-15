@@ -110,7 +110,7 @@ long *QSort(long *X, long LengthX) {
     for (t = 0; t < LengthX; t++)
         I[t] = t;
   
-    quicksort(X, I, 0, LengthX - 1);
+    quicksort3way(X, I, LengthX);
   
     return I;
 }   /* end Qsort */
@@ -285,5 +285,288 @@ void RandomPermute(long *X, long *Y, double *D, double *E, long lo, long hi) {
     }      
 
 } /* end RandomPermute */
+
+
+
+
+/**
+ * Below, an implementation of 3-way quicksort is included.
+ * This implementation combines the code from
+ * https://sourceware.org/git/?p=glibc.git;a=blob;f=stdlib/qsort.c;h=12a5a7506a3337ecbebc6b1778425208ef8439c3;hb=HEAD
+ * with knowledge taken from
+ *     Engineering a sort function; Jon Bentley and M. Douglas McIlroy;
+ *     Software - Practice and Experience; Vol. 23 (11), 1249-1265, 1993.
+ *
+ * In essence, the implementation below is an altered version of the glibc implementation, specialized for long values,
+ * with additional logic to provide 3-way sorting functionality. Furthermore, pivots are chosen at random instead of
+ * the median of 3 values at fixed positions, to provide better randomization of equal elements.
+ * Random numbers are generated directly useing rand() instead of Random1(), to reduce the number of function calls.
+ */
+
+
+#define LT_GT >
+
+/* Swap two items. */
+#define SWAP(A, B)		{const long C = *(A); *(A) = *(B); *(B) = C; const long D = indices[A-list]; indices[A-list] = indices[B-list]; indices[B-list] = D;}
+
+/* Stack node declarations used to store unfulfilled partition obligations. */
+typedef struct
+{
+	long *lo;
+	long *hi;
+} stack_node;
+
+/* The next 4 #defines implement a very fast in-line stack abstraction. */
+/* The stack needs log (total_elements) entries.
+ * Since total_elements has type size_t, we get as
+ * upper bound for log (total_elements):
+ * bits per byte (CHAR_BIT) * sizeof(size_t).
+ */
+#define STACK_SIZE	(CHAR_BIT * sizeof(size_t))
+#define PUSH(low, high)	((void) ((top->lo = (low)), (top->hi = (high)), ++top))
+#define	POP(low, high)	((void) (--top, (low = top->lo), (high = top->hi)))
+#define	STACK_NOT_EMPTY	(stack < top)
+
+/**
+ * In each iteration, we execute a part of a recursion of the quicksort algorithm.
+ * The list in each iteration can be viewed as follows:
+ * +-----+-----+-----+-----+-----+
+ * [  =  [  <  [  ?  ]  >  ]  =  ]
+ * +-----+-----+-----+-----+-----+
+ * a     b     c     d     e     f
+ * 
+ * After processing [c,d], we have:
+ * +-----+-----++-----+-----+
+ * [  =  [  <  ][  >  ]  =  ]
+ * +-----+-----++-----+-----+
+ * a     b     dc     e     f
+ * 
+ * After moving the equal elements, we have:
+ * +-----+-----+-----+
+ * [  <  ]  =  [  >  ]
+ * +-----+-----+-----+
+ * b=a   d     c   f=e
+ * 
+ * Note that this (and all comments below) rely on LT_GT == < . In practice, Mondriaan
+ * chooses LT_GT to be >, so 'higher' and 'lower' should be swapped in all comments below.
+ * 
+ * Here:
+ *  - [a,b) denotes all elements equal to the pivot, as found by c,
+ *  - [b,c) denotes all elements lower than the pivot,
+ *  - [c,d] denotes all elements to be processed,
+ *  - (d,e] denotes all elements higher than the pivot,
+ *  - (e,f] denotes all elements equal to the pivot, as found by d.
+ * 
+ * In each iteration, three random elements are selected from the then to be sorted set [c,d], of which the
+ * median is determined. This element serves as pivot. Any elements equal to the pivot are sorted into
+ * [a,b[ or ]e,f], while elements lower than or higher than the pivot go into respectively [b,c[ and ]d,e].
+ * After [c,d] is empty (d < c), [a,b[ and ]e,f] are moved in between [b,d] and [c,e].
+ * 
+ */
+
+void quicksort3way (long *list, long *indices, size_t total_elems)
+{
+	if (total_elems <= 1)
+		return;
+
+	long *a, *b, *c, *d, *e, *f;
+	long n, el1, el2, el3, pivot;
+	
+	/* Initialise stack */
+	stack_node stack[STACK_SIZE];
+	stack_node *top = stack;
+	PUSH (NULL, NULL);
+	
+	/* Initialise first iteration */
+	c = list;
+	d = &list[total_elems - 1];
+
+	while (STACK_NOT_EMPTY)
+	{
+		/* Process [c,d] */
+		a = b = c;
+		f = e = d;
+		n = d-c+1;
+		
+		if(n == 2) {
+			/* Two elements are easily sorted */
+			if(*d LT_GT *c) {
+				SWAP(c, d);
+			}
+			++c;
+			--d;
+		}
+		else if(n > 2) {
+			
+			/*** DETERMINE PIVOT ***/
+			
+			el1 = b[(long)((rand() / (RAND_MAX+1.0))*n)];
+			el2 = b[(long)((rand() / (RAND_MAX+1.0))*n)];
+			el3 = b[(long)((rand() / (RAND_MAX+1.0))*n)];
+			if(el1 < el2) {
+				if(el2 < el3)
+					pivot = el2;
+				else if(el1 < el3)
+					pivot = el3;
+				else
+					pivot = el1;
+			}
+			else {
+				if(el1 < el3)
+					pivot = el1;
+				else if(el2 < el3)
+					pivot = el3;
+				else
+					pivot = el2;
+			}
+			
+			/*** PARTITION ***/
+			
+			/* Check whether the start/end contains elements equal to the pivot */
+			while(b <= e && *b == pivot) {
+				++b;
+				++c;
+			}
+			while(b <= e && *e == pivot) {
+				--d;
+				--e;
+			}
+			
+			/* The `collapse the walls' section of quicksort. */
+			while (c <= d)
+			{
+				/* Check for equals */
+				while(c <= d && pivot == *c) {
+					SWAP(b, c)
+					++b;
+					++c;
+				}
+				
+				while(c <= d && pivot == *d) {
+					SWAP(e, d)
+					--e;
+					--d;
+				}
+				
+				/* Move c and d until they have to be swapped */
+				while (c <= d && *c LT_GT pivot)
+					++c;
+				
+				while (c <= d && pivot LT_GT *d)
+					--d;
+				
+				/* With LT_GT == <, we now have *d <= pivot <= *c */
+				
+				if (c < d)
+				{
+					/* Now, *d <= pivot <= *c and c<d, hence swap. */
+					SWAP (c, d);
+					
+					/* Move elements equal to pivot */
+					if(pivot == *c) {
+						SWAP(b, c)
+						++b;
+					}
+					if(pivot == *d) {
+						SWAP(e, d)
+						--e;
+					}
+					
+					/* Mark c and d as processed */
+					++c;
+					--d;
+				}
+				else if (c == d)
+				{
+					/* By the while-loops, we have *d <= pivot <= *c.
+					 * Hence, if c == d, we have *d == *c == pivot.
+					 * As the next step will be swapping back the elements equal to the pivot,
+					 * we do not swap this element to an equal area.
+					 * We move both c and d, effectively marking this element as equal to the pivot.
+					 */
+					++c;
+					--d;
+					break;
+				}
+				/* else, c > d and the loop will break */
+			}
+			/* Now, c-d is either 1 (most of times) or 2 (if (c==d) occurred above).
+			 * Anyhow, d<c and the set of elements to be processed [c,d] is empty.
+			 */
+			
+			/* If there exists a left/right partition (i.e., [b,c) or (d,e] is non-empty),
+			 * move the left/right equal-partition (i.e., [a,b) or (e,f]) between c and d. */
+			if(b <= d) {
+				while(b > a) {
+					--b;
+					SWAP(d, b);
+					--d;
+				}
+			} /* else, there exists no left partition, so moving equal elements is unnecessary. */
+			
+			if(e >= c) {
+				while(e < f) {
+					++e;
+					SWAP(c, e);
+					++c;
+				}
+			} /* else, there exists no right partition, so moving equal elements is unnecessary. */
+		
+		}
+		else {
+			fprintf(stderr, "quicksort3way(): Single element in set\n");
+			exit(-1);
+		}
+
+		/*** RECURSION ***/
+		
+		/* Set up pointers for next iteration. First determine whether one or
+		 * both partitions are completely sorted. If so, ignore one or both.
+		 * Otherwise, push the larger partition's bounds on the stack and
+		 * continue sorting the smaller one.
+		 * The next set to be partitioned is assigned to [c,d].
+		 */
+
+		if (d <= b)
+		{
+			if (c >= e)
+				/* 'Greater than' [c,e] and 'smaller than' [b,d] partition both contain less than two elements.
+				 * These are sorted, so ignore both.
+				 */
+				POP (c, d);
+			else
+				/* 'Smaller than' partition [b,d] contains less than two elements.
+				 * It is sorted, so ignore it, and process [c,e].
+				 */
+				d = e;
+		}
+		else if (c >= e)
+			/* 'Greater than' partition [c,e] contains less than two elements.
+			 * It is sorted, so ignore it, and process [b,d].
+			 */
+			c = b;
+		else if ((d - b) > (e - c))
+		{
+			/* Push larger 'Smaller than' partition [b,d] and process [c,e]. */
+			PUSH (b, d);
+			d = e;
+		}
+		else
+		{
+			/* Push larger 'Greater than' partition [c,e] and process [b,d]. */
+			PUSH (c, e);
+			c = b;
+		}
+	}
+
+}
+
+
+#undef LT_GT
+#undef SWAP
+#undef STACK_SIZE
+#undef PUSH
+#undef POP
+#undef STACK_NOT_EMPTY
 
 
