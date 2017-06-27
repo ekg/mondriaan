@@ -646,8 +646,10 @@ int ApplyOptions(const struct opts *pOptions) {
     }
   
     if (pOptions->Coarsening_MaxNrVtxInMatch < 2) {
-        fprintf(stderr, "ApplyOptions(): Coarsening_MaxNrVtxInMatch out of range!\n");
-        return FALSE;
+        if(!(pOptions->Coarsening_MatchingATAMatcher == MatchMatcherPGA && pOptions->Coarsening_MaxNrVtxInMatch == -1)) {
+            fprintf(stderr, "ApplyOptions(): Coarsening_MaxNrVtxInMatch out of range!\n");
+            return FALSE;
+        }
     }
   
     if (pOptions->Coarsening_StopRatio < 0 || 
@@ -715,8 +717,8 @@ int ApplyOptions(const struct opts *pOptions) {
         return FALSE;
     }
     
-    if (pOptions->Coarsening_MatchingStrategy == MatchATA && pOptions->Coarsening_MaxNrVtxInMatch != 2) {
-        fprintf(stderr, "ApplyOptions(): Hybrid matching is only supported for matching groups of two vertices!\n");
+    if (pOptions->Coarsening_MatchingStrategy == MatchATA && pOptions->Coarsening_MaxNrVtxInMatch != 2 && pOptions->Coarsening_MatchingATAMatcher != MatchMatcherPGA) {
+        fprintf(stderr, "ApplyOptions(): Greedy matching is only supported for matching groups of two vertices!\n");
         return FALSE;
     }
 
