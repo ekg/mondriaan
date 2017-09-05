@@ -131,6 +131,7 @@ char* GetDefaultOptionText() {
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
 "Zero_Volume_Search                             no \n"
+"CheckUpperBound                                yes \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
 "SquareMatrix_DistributeVectorsEqual_AddDummies yes \n"
 "SymmetricMatrix_UseSingleEntry                 no \n"
@@ -249,6 +250,12 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Zero_Volume_Search ");
     if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
     else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    else return FALSE;
+    fprintf(Out, "\n");
+    
+    fprintf(Out, "CheckUpperBound ");
+    if (Opts->CheckUpperBound == CheckUpperBoundYes) fprintf(Out, "yes");
+    else if (Opts->CheckUpperBound == CheckUpperBoundNo) fprintf(Out, "no");
     else return FALSE;
     fprintf(Out, "\n");
     
@@ -468,6 +475,10 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Zero-Volume-Search & ");
     if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
     else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    
+    fprintf(Out, "CheckUpperBound & ");
+    if (Opts->CheckUpperBound == CheckUpperBoundYes) fprintf(Out, "yes");
+    else if (Opts->CheckUpperBound == CheckUpperBoundNo) fprintf(Out, "no");
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
     
@@ -854,6 +865,15 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
             pOptions->ZeroVolumeSearch = ZeroVolYes;
         } else if (!strcmp(value, "no")) {
             pOptions->ZeroVolumeSearch = ZeroVolNo;
+        } else {
+            fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            return FALSE;
+        }
+    } else if (!strcmp(option, "CheckUpperBound")) {
+        if (!strcmp(value, "yes")) {
+            pOptions->CheckUpperBound = CheckUpperBoundYes;
+        } else if (!strcmp(value, "no")) {
+            pOptions->CheckUpperBound = CheckUpperBoundNo;
         } else {
             fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
             return FALSE;

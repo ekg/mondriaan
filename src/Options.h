@@ -58,6 +58,7 @@ struct opts {
     enum {MetricLambda, MetricCut, MetricLambdaLambdaMinusOne} Metric;
     enum {FreeNetYes, FreeNetNo} DiscardFreeNets;
     enum {ZeroVolNo, ZeroVolYes} ZeroVolumeSearch;
+    enum {CheckUpperBoundNo, CheckUpperBoundYes} CheckUpperBound;
   
     /* Matrix options */
     enum {EqVecNo, EqVecYes} SquareMatrix_DistributeVectorsEqual;
