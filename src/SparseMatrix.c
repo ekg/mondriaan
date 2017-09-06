@@ -2080,6 +2080,135 @@ int SparseMatrixSymmetric2Full(struct sparsematrix *pM) {
    
     return TRUE;
 } /* end SparseMatrixSymmetric2Full */
+
+
+int SparseMatrixFull2Symmetric(struct sparsematrix *pM, char MMTypeCode) {
+
+    /* This function converts a full sparse matrix to the
+       symmetric, skew-symmetric, or hermitian representation.
+
+       This function is the 'inverse' of SparseMatrixSymmetric2Full().
+       
+       See SparseMatrixSymmetric2Full() for more information.
+    */
+  
+    long t, tt, Ndiag;
+    long start, NrNzEltsNew;
+    int q;
+    
+    if (!pM) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Null parameter!\n");
+        return FALSE;
+    }
+  
+    /* Check if matrix is general square */
+    if (pM->m != pM->n || pM->MMTypeCode[3] != 'G') {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): matrix is not general square!\n");
+        return FALSE;
+    }
+    if (MMTypeCode != 'S' && MMTypeCode != 'K' && MMTypeCode != 'H') {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): type code must equal S, K or H!\n");
+        return FALSE;
+    }
+  
+    /* Count the number of diagonal elements */
+    Ndiag = 0;
+    for (t = 0; t < pM->NrNzElts; t++)
+        if (pM->i[t] == pM->j[t])
+            Ndiag++;
+    NrNzEltsNew = (pM->NrNzElts + Ndiag)/2;
+
+    if (MMTypeCode == 'K' && Ndiag > 0) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): matrix is not skew-symmetric!\n");
+        return FALSE;
+    }
+
+    /* Update Pstart */
+    if (pM->NrProcs >= 1 && pM->Pstart != NULL) {
+        tt = 0;
+        start = pM->Pstart[0];
+        for (q = 0; q < pM->NrProcs; q++) {
+            for (t = start; t < pM->Pstart[q+1]; t++) {
+                if (pM->i[t] >= pM->j[t])
+                    tt++;
+            }
+            
+            start = pM->Pstart[q+1];
+            pM->Pstart[q+1] = tt;
+        }
+    
+        if(tt != NrNzEltsNew) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Processor weights not rearranged correctly!\n");
+            return FALSE;
+        }
+    }
+    
+    /* Copy the entries */
+    tt = 0;
+    for (t = 0; t < pM->NrNzElts; t++) {
+        /* Copy entry t into tt */
+        if (pM->i[t] < pM->j[t]) {
+            continue;
+        }
+
+        pM->i[tt] = pM->i[t];
+        pM->j[tt] = pM->j[t];
+        if (pM->MMTypeCode[2] != 'P')
+            pM->ReValue[tt] = pM->ReValue[t];
+        if (pM->MMTypeCode[2] == 'C')
+            pM->ImValue[tt] = pM->ImValue[t];
+        tt++;
+    }
+    
+    if(tt != NrNzEltsNew) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Nonzeros not rearranged correctly!\n");
+        return FALSE;
+    }
+   
+    /* Allocate memory for the entries */
+    pM->i = (long *) realloc(pM->i, (NrNzEltsNew+1) * sizeof(long));
+    pM->j = (long *) realloc(pM->j, (NrNzEltsNew+1) * sizeof(long));
+    
+    if (pM->i == NULL || pM->j == NULL) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+        return FALSE;
+    }
+    
+    if (pM->MMTypeCode[2] != 'P') {
+        pM->ReValue = (double *) realloc(pM->ReValue, (NrNzEltsNew+1)*sizeof(double));
+        
+        if (pM->ReValue == NULL) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+            return FALSE;
+        }
+    }
+    
+    if (pM->MMTypeCode[2] == 'C') {
+        pM->ImValue = (double *) realloc(pM->ImValue, (NrNzEltsNew+1)*sizeof(double));
+        
+        if (pM->ImValue == NULL) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+            return FALSE;
+        }
+    }
+  
+    /* Update the number of nonzero entries and the matrix type code */
+    pM->NrNzElts = NrNzEltsNew;
+    pM->MMTypeCode[3] = MMTypeCode;
+    switch(MMTypeCode) {
+        case 'S':
+            strcpy(pM->Symmetry, "symmetric");
+            break;
+        case 'K':
+            strcpy(pM->Symmetry, "skew-symmetric");
+            break;
+        case 'H':
+            strcpy(pM->Symmetry, "hermitian");
+            break;
+    }
+   
+    return TRUE;
+} /* end SparseMatrixFull2Symmetric */
   
 
 int SparseMatrixSymmetricLower2Random(struct sparsematrix *pM) {

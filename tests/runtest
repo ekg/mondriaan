@@ -137,6 +137,7 @@ test_Heap
 test_TwoColorTree
 test_SubsetSum
 test_ZeroVolumeSearch
+test_FreeNonzeros
 
 # Test of Graph
 test_CreateNewBiPartHyperGraph
@@ -146,6 +147,7 @@ test_BiPartHyperGraph2SparseMatrix
 
 # Test of SparseMatrix 
 test_SparseMatrixSymmetric2Full
+test_SparseMatrixFull2Symmetric
 test_SparseMatrixSymmetricLower2Random
 test_SparseMatrixSymmetricRandom2Lower
 test_AddDummiesToSparseMatrix

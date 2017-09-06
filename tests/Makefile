@@ -24,10 +24,10 @@ test_ComputeWeight test_SplitMatrixSimple test_SplitMatrixKLFM \
 test_DistributeMatrixMondriaan \
 test_CreateNewBiPartHyperGraph test_DeleteBiPartHyperGraph \
 test_SparseMatrix2BiPartHyperGraph test_BiPartHyperGraph2SparseMatrix \
-test_SparseMatrixSymmetric2Full test_SparseMatrixSymmetricLower2Random \
-test_SparseMatrixSymmetricRandom2Lower test_AddDummiesToSparseMatrix \
-test_RemoveDummiesFromSparseMatrix test_MMSparseMatrixInit \
-test_MMDeleteSparseMatrix test_MMSparseMatrixAllocateMemory \
+test_SparseMatrixSymmetric2Full test_SparseMatrixFull2Symmetric \
+test_SparseMatrixSymmetricLower2Random test_SparseMatrixSymmetricRandom2Lower \
+test_AddDummiesToSparseMatrix test_RemoveDummiesFromSparseMatrix \
+test_MMSparseMatrixInit test_MMDeleteSparseMatrix test_MMSparseMatrixAllocateMemory \
 test_MMSparseMatrixFreeMemory test_MMSparseMatrixReadEntries \
 test_MMSparseMatrixReadPstart test_MMSparseMatrixReadWeights \
 test_MMSparseMatrixReadTail test_MMSparseMatrixReadHeader \
@@ -49,7 +49,8 @@ test_FindOptimalPathMatching \
 test_MatchATA \
 test_CoarsenGraph test_RunMLGraphPart \
 test_SparseMatrixToCRS_CCS test_DetectConnectedComponents \
-test_Heap test_TwoColorTree test_SubsetSum test_ZeroVolumeSearch
+test_Heap test_TwoColorTree test_SubsetSum test_ZeroVolumeSearch \
+test_FreeNonzeros
 
 .SECONDARY: ${TESTTARGETS:%=%.o}
 
@@ -272,6 +273,9 @@ test_BiPartHyperGraph2SparseMatrix: test_BiPartHyperGraph2SparseMatrix.o ${GRAPH
 test_SparseMatrixSymmetric2Full: test_SparseMatrixSymmetric2Full.o ${SPARSEMATRIX:%=%.o} ${MATALLOC:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
+test_SparseMatrixFull2Symmetric: test_SparseMatrixFull2Symmetric.o ${SPARSEMATRIX:%=%.o}
+	make -r OBJDEPS='$^' $@.target
+
 test_SparseMatrixSymmetricLower2Random: test_SparseMatrixSymmetricLower2Random.o ${SPARSEMATRIX:%=%.o} ${MATALLOC:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
@@ -375,6 +379,9 @@ test_SubsetSum: test_SubsetSum.o ${SUBSETSUM:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_ZeroVolumeSearch: testHelper_DisconnectedMatrix.o test_ZeroVolumeSearch.o ${SPARSEMATRIX:%=%.o} ${DISTRIBUTEVECLIB:%=%.o} ${ZEROVOLUMESEARCH:%=%.o}
+	make -r OBJDEPS='$^' $@.target
+
+test_FreeNonzeros: test_FreeNonzeros.o ${SPARSEMATRIX:%=%.o} ${FREENONZEROS:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_GetParameters: test_GetParameters.o ${OPTIONS:%=%.o}
