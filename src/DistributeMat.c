@@ -1572,6 +1572,7 @@ int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
             A.ImValue = &(pT->ImValue[lo]);
         A.NrNzElts = nz;
         
+#ifdef INFO
 #ifdef TIME
         clock_t starttime, endtime;
         double cputime;
@@ -1581,22 +1582,25 @@ int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
         gettimeofday(&starttime1, NULL);
 #endif
 #endif
+#endif
         /* Run zero volume search. If a zero volume split is found, ZeroVolumeSearch()
          * will apply this split directly; we then only need to update Pstart.
          */
         int foundZeroVolumePartition = ZeroVolumeSearch(&A, weightlo, weighthi, &mid, pOptions);
         
+#ifdef INFO
 #ifdef TIME
         endtime = clock();
         cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
-        printf("  matrix distribution zeroVolumeSearch CPU-time    : %f seconds\n", cputime);
+        printf("  ZeroVolumeSearch CPU-time    : %f seconds\n", cputime);
 #ifdef UNIX
         gettimeofday(&endtime1, NULL);
-        printf("  matrix distribution zeroVolumeSearch elapsed time: %f seconds\n",
+        printf("  ZeroVolumeSearch elapsed time: %f seconds\n",
                 (endtime1.tv_sec - starttime1.tv_sec) +
                 (endtime1.tv_usec - starttime1.tv_usec) / 1000000.0);
 #endif
         fflush(stdout);
+#endif
 #endif
 
         if(!foundZeroVolumePartition) {

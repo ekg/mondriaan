@@ -2682,13 +2682,12 @@ int CreateInitialMediumGrainDistribution(struct sparsematrix *pM, long *mid){
  */
 int compareLong (const void *a, const void *b) {
 
-    
     long diff = *(long*)a - *(long*)b;
     if(diff == 0)
         return 0;
     return (diff < 0) ? -1 : 1;
 
-} /* end compare */
+} /* end compareLong */
 
 /**
  * Convert a sparse matrix to CRS and CCS forms.
@@ -2779,7 +2778,7 @@ int SparseMatrixToCRS_CCS(struct sparsematrix *pM, struct CRCS *pCCS, struct CRC
 
     return TRUE;
     
-}
+} /* end SparseMatrixToCRS_CCS */
 
 /**
  * Initialize a CRCS struct.
