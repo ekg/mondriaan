@@ -11,7 +11,7 @@ MONDRIAANHOMEDIR:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 MONDRIAANCURRENTVERSION := 4.1
 MONDRIAANMAJORVERSION := 4
 
-# Gainbucket type may be either LIST or ARRAY
+# Gainbucket type must be either LIST or ARRAY
 GAINBUCKET_TYPE := ARRAY
 
 # ==== Matlab support ====
@@ -36,7 +36,7 @@ CFLAGS := -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\" -DGAINBUCKET_${GAINB
 
 #CFLAGS := ${CFLAGS} -Wall -Wextra -Wshadow -Wno-unused-parameter -ansi -pedantic -O2 -DTIME -DUNIX -DINFO -g
 #CFLAGS := ${CFLAGS} -Wall -O2
-CFLAGS := ${CFLAGS} -Wall -O3 -ffast-math -funroll-loops -fomit-frame-pointer -std=c99 -DTIME
+CFLAGS := ${CFLAGS} -Wall -O3 -ffast-math -funroll-loops -fomit-frame-pointer -std=c99
 #CFLAGS := ${CFLAGS} -Wall -O3 -pg -ffast-math -funroll-loops -std=c99
 
 
