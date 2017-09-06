@@ -200,7 +200,7 @@ int ApplyPathMatching(struct contraction *pC, int *Matched,
         const long v = PathIndices[t];
         pC->Match[pC->Start[k+1]++] = v;
         Matched[v] = TRUE;
-        /* Do not increase t, this is done by the for loop*/
+        /* Do not increase t, this is done by the for loop */
         
     }
     
@@ -247,6 +247,17 @@ int MatchUsingPGA(struct biparthypergraph *pHG, struct contraction *pC,
     void *pData = NULL;
     
     long t, tt;
+
+    /* Check arguments */
+    if (!pHG || !pC || !iv || !Matched || !pOptions) {
+        fprintf(stderr, "MatchUsingPGA(): Null arguments!\n");
+        return FALSE;
+    }
+    
+    if (!Ip || !ScIp || !Visited || !PathWeights || !PathIndices) {
+        fprintf(stderr, "MatchUsingPGA(): Not enough memory!\n");
+        return FALSE;
+    }
     
     long MaxNrVtxInMatch = pOptions->Coarsening_MaxNrVtxInMatch;
     if(MaxNrVtxInMatch == -1) {
@@ -275,28 +286,32 @@ int MatchUsingPGA(struct biparthypergraph *pHG, struct contraction *pC,
     /* Set up PathMatchings */
     _PathMatchings = (char *)malloc((MaxCnsqEdges+1) * pHG->NrVertices * sizeof(char));
     PathMatchings = (char **)malloc(pHG->NrVertices * sizeof(char *));
+    if (!_PathMatchings || !PathMatchings) {
+        fprintf(stderr, "MatchUsingPGA(): Not enough memory!\n");
+        return FALSE;
+    }
     for(t=0; t<pHG->NrVertices; ++t) {
         PathMatchings[t] = &(_PathMatchings[t*(MaxCnsqEdges+1)]);
     }
     
     /* Set up PathMatchingWeights */
     _PathMatchingWeights = (double *)malloc(2*(MaxCnsqEdges+1) * sizeof(double));
+    if (!_PathMatchingWeights) {
+        fprintf(stderr, "MatchUsingPGA(): Not enough memory!\n");
+        return FALSE;
+    }
     PathMatchingWeights[0] = &(_PathMatchingWeights[0]);
     PathMatchingWeights[1] = &(_PathMatchingWeights[MaxCnsqEdges+1]);
     
     /* Set up PathMatchingOpt */
     PathMatchingOpt = (char *)malloc(pHG->NrVertices * sizeof(char));
-    
-    if (!pHG || !pC || !iv || !Matched || !pOptions ||
-        !Ip || !ScIp || !Visited ||
-        !_PathMatchings || !PathMatchings || !_PathMatchingWeights || !PathMatchingOpt ||
-        !PathWeights || !PathIndices) {
-        fprintf(stderr, "MatchUsingPGA(): Null arguments or not enough memory!\n");
+    if (!PathMatchingOpt) {
+        fprintf(stderr, "MatchUsingPGA(): Not enough memory!\n");
         return FALSE;
     }
     
     if (!SetupData(&pData, pHG, pOptions)) {
-        fprintf(stderr, "MatchUsingGreedy(): Unable to create neighbor finding data!\n");
+        fprintf(stderr, "MatchUsingPGA(): Unable to create neighbor finding data!\n");
         return FALSE;
     }
     

@@ -272,7 +272,12 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Coarsening_NrVertices %ld \n", Opts->Coarsening_NrVertices);
     fprintf(Out, "Coarsening_MaxCoarsenings %ld \n", Opts->Coarsening_MaxCoarsenings);
     fprintf(Out, "Coarsening_NrMatchArbitrary %ld \n", Opts->Coarsening_NrMatchArbitrary);
-    fprintf(Out, "Coarsening_MaxNrVtxInMatch %ld \n", Opts->Coarsening_MaxNrVtxInMatch);
+    
+    if(Opts->Coarsening_MaxNrVtxInMatch == -1)
+        fprintf(Out, "Coarsening_MaxNrVtxInMatch log \n");
+    else
+        fprintf(Out, "Coarsening_MaxNrVtxInMatch %ld \n", Opts->Coarsening_MaxNrVtxInMatch);
+    
     fprintf(Out, "Coarsening_StopRatio %f \n", Opts->Coarsening_StopRatio);
     fprintf(Out, "Coarsening_VtxMaxFractionOfWeight %f \n", Opts->Coarsening_VtxMaxFractionOfWeight);
     
@@ -485,7 +490,12 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Coarsening-NrVertices & %ld \\\\\n", Opts->Coarsening_NrVertices);
     fprintf(Out, "Coarsening-MaxCoarsenings & %ld \\\\\n", Opts->Coarsening_MaxCoarsenings);
     fprintf(Out, "Coarsening-MaxNrMatchArbitrary & %ld \\\\\n", Opts->Coarsening_NrMatchArbitrary);
-    fprintf(Out, "Coarsening-MaxNrVtxInMatch & %ld \\\\\n", Opts->Coarsening_MaxNrVtxInMatch);
+    
+    if(Opts->Coarsening_MaxNrVtxInMatch == -1)
+        fprintf(Out, "Coarsening-MaxNrVtxInMatch & log \\\\\n");
+    else
+        fprintf(Out, "Coarsening-MaxNrVtxInMatch & %ld \\\\\n", Opts->Coarsening_MaxNrVtxInMatch);
+    
     fprintf(Out, "Coarsening-StopRatio & %f \\\\\n", Opts->Coarsening_StopRatio);
     fprintf(Out, "Coarsening-VtxMaxFractionOfWeight & %f \\\\\n", Opts->Coarsening_VtxMaxFractionOfWeight);
     
@@ -718,7 +728,7 @@ int ApplyOptions(const struct opts *pOptions) {
     }
     
     if (pOptions->Coarsening_MatchingStrategy == MatchATA && pOptions->Coarsening_MaxNrVtxInMatch != 2 && pOptions->Coarsening_MatchingATAMatcher != MatchMatcherPGA) {
-        fprintf(stderr, "ApplyOptions(): Greedy matching is only supported for matching groups of two vertices!\n");
+        fprintf(stderr, "ApplyOptions(): ATA Greedy matching is only supported for matching groups of two vertices!\n");
         return FALSE;
     }
 
@@ -881,7 +891,10 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
     } else if (!strcmp(option, "Coarsening_NrMatchArbitrary")) {
         pOptions->Coarsening_NrMatchArbitrary = atol(value);
     } else if (!strcmp(option, "Coarsening_MaxNrVtxInMatch")) {
-        pOptions->Coarsening_MaxNrVtxInMatch = atol(value);
+        if(!strcmp(value, "log"))
+            pOptions->Coarsening_MaxNrVtxInMatch = -1;
+        else
+            pOptions->Coarsening_MaxNrVtxInMatch = atol(value);
     } else if (!strcmp(option, "Coarsening_StopRatio")) {
         pOptions->Coarsening_StopRatio = atof(value);
     } else if (!strcmp(option, "Coarsening_VtxMaxFractionOfWeight")) {
