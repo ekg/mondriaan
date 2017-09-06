@@ -33,5 +33,7 @@ void PrintVecStatistics(int P, long *Ns, long *Nr, long *Nv);
 int WriteVector(const long int *X, const char base, const char *name, long l, int P, FILE *fp, const struct opts *pOptions);
 int WriteVectorDistribution(const long int *X, const char *name, long l, int P, FILE *fp, const struct opts *pOptions);
 int WriteVectorCollection(long int **X, const char *name, const long i, const long *j, FILE *fp);
+
+long * ReadVector(const char base, long *l, int *P, FILE *fp);
  
 #endif /* __DistributeVecLib_h__ */
