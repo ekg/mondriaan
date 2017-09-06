@@ -2674,3 +2674,158 @@ int CreateInitialMediumGrainDistribution(struct sparsematrix *pM, long *mid){
 
 } /* end CreateInitialMediumGrainDistribution */
 
+
+
+/* Comparison function for qsort().
+ * This functions compares the values a and b, and
+ * returns -1, 0 or 1 if a is respectively lower than, equal to or larger than b.
+ */
+int compareLong (const void *a, const void *b) {
+
+    long diff = *(long*)a - *(long*)b;
+    if(diff == 0)
+        return 0;
+    return (diff < 0) ? -1 : 1;
+
+} /* end compareLong */
+
+/**
+ * Convert a sparse matrix to CRS and CCS forms.
+ * This assumes that duplicate entries in pM have already been removed with SparseMatrixRemoveDuplicates().
+ * 
+ * Input:
+ * pM                : The matrix (m-by-n)
+ * 
+ * Output:
+ * pCCS              : The matrix in Compressed Column Storage format (Only if return value == TRUE)
+ * pCRS              : The matrix in Compressed Row Storage format (Only if return value == TRUE)
+ * 
+ * Returned memory allocations:
+ *     pCCS:    indirect  (Only if return value == TRUE)
+ *     pCRS:    indirect  (Only if return value == TRUE)
+ * 
+ * Return value: FALSE if an error occurs, TRUE otherwise.
+ */
+int SparseMatrixToCRS_CCS(struct sparsematrix *pM, struct CRCS *pCCS, struct CRCS *pCRS){
+    
+    long i;
+
+    /* Position of a matrix nonzero, 0 <= x < m and 0 <= y < n,
+       where pM is an m by n matrix */
+    long x, y;
+    
+    if(!initCRCS(pCRS, 0, pM->m, pM->n, pM->NrNzElts) || !initCRCS(pCCS, 1, pM->m, pM->n, pM->NrNzElts)) {
+        return FALSE;
+    }
+    /* Fill starts array */
+    for(i=0;i<=pM->m;i++)
+        pCRS->starts[i] = 0;
+    for(i=0;i<=pM->n;i++)
+        pCCS->starts[i] = 0;
+
+    for(i=0;i<pM->NrNzElts;i++){
+        x = pM->i[i];
+        y = pM->j[i];
+        pCRS->starts[x+1]++;
+        pCCS->starts[y+1]++;
+    }
+
+    for(i=2;i<=pM->m;i++)
+        pCRS->starts[i] += pCRS->starts[i-1];
+    for(i=2;i<=pM->n;i++)
+        pCCS->starts[i] += pCCS->starts[i-1];
+
+    /* Fill index arrays */
+    long *nInRow = (long*)malloc(sizeof(long)*pM->m);
+    long *nInCol = (long*)malloc(sizeof(long)*pM->n);
+    if (nInRow == NULL || nInCol == NULL){
+        if(nInRow != NULL)
+            free(nInRow);
+        if(nInCol != NULL)
+            free(nInCol);
+        freeCRCS(pCRS);
+        freeCRCS(pCCS);
+        fprintf(stderr, "SparseMatrixToCRS_CCS(): Not enough memory!\n");
+        return FALSE;
+    }
+
+    for(i=0;i<pM->m;i++)
+        nInRow[i] = 0;
+    for(i=0;i<pM->n;i++)
+        nInCol[i] = 0;
+
+    for(i=0;i<pM->NrNzElts;i++){
+        x = pM->i[i];
+        y = pM->j[i];
+        /* Fill first free position in row x with column index y */
+        pCRS->indices[pCRS->starts[x]+nInRow[x]]=y;
+        /* Fill first free position in column y with row index x */
+        pCCS->indices[pCCS->starts[y]+nInCol[y]]=x;
+        nInRow[x]++;
+        nInCol[y]++;
+    }
+
+    /* Sort the indices within the rows and columns */
+    for(i=0;i<pM->m;i++){
+        qsort(pCRS->indices+pCRS->starts[i], pCRS->starts[i+1]-pCRS->starts[i], sizeof(long), compareLong);
+    }
+    for(i=0;i<pM->n;i++){
+        qsort(pCCS->indices+pCCS->starts[i], pCCS->starts[i+1]-pCCS->starts[i], sizeof(long), compareLong);
+    }
+
+    free(nInRow);
+    free(nInCol);
+
+    return TRUE;
+    
+} /* end SparseMatrixToCRS_CCS */
+
+/**
+ * Initialize a CRCS struct.
+ * This assumes that the struct is not already initialized.
+ * 
+ * Input:
+ * crcs              : The CRCS struct
+ * dir               : 0 for row-direction, 1 for column-direction
+ * m, n, nnz         : Dimensions and number of nonzeros
+ * 
+ * Returned memory allocations:
+ *     crcs.indices:    O(nnz)
+ *     crcs.starts:     O(m+1) if dir=0, O(n+1) if dir=1
+ * 
+ * Return value: FALSE if an error occurs, TRUE otherwise.
+ */
+int initCRCS(struct CRCS *pCRCS, int dir, long m, long n, long nnz) {
+    pCRCS->dir = dir?1:0;
+    pCRCS->m = m;
+    pCRCS->n = n;
+    pCRCS->nnz = nnz;
+    
+    long numStarts = dir?(n+1):(m+1);
+    pCRCS->indices = (long*)malloc(sizeof(long)*nnz);
+    pCRCS->starts = (long*)malloc(sizeof(long)*numStarts);
+    
+    if(pCRCS->indices == NULL || pCRCS->starts == NULL) {
+        if(pCRCS->indices != NULL)
+            free(pCRCS->indices);
+        if(pCRCS->starts != NULL)
+            free(pCRCS->starts);
+        fprintf(stderr, "initCRCS(): Not enough memory!\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Free a CRCS struct.
+ * 
+ * Input:
+ * crcs              : The CRCS struct
+ */
+void freeCRCS(struct CRCS *pCRCS) {
+    free(pCRCS->indices);
+    free(pCRCS->starts);
+    pCRCS->indices = NULL;
+    pCRCS->starts = NULL;
+}
+

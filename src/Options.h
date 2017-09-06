@@ -57,6 +57,7 @@ struct opts {
     enum {PartMondriaan, PartPaToH, FullPaToH} Partitioner;
     enum {MetricLambda, MetricCut, MetricLambdaLambdaMinusOne} Metric;
     enum {FreeNetYes, FreeNetNo} DiscardFreeNets;
+    enum {ZeroVolNo, ZeroVolYes} ZeroVolumeSearch;
   
     /* Matrix options */
     enum {EqVecNo, EqVecYes} SquareMatrix_DistributeVectorsEqual;

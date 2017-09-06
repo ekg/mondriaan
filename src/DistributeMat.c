@@ -16,6 +16,9 @@ int SplitMatrixKLFM(struct sparsematrix *pT, int k, int i, int dir,
 int SplitMatrixSimple(struct sparsematrix *pT, int k, int i,
                        long weightlo, long weighthi, const struct opts *pOptions);
 
+int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
+                     long weightlo, long weighthi, const struct opts *pOptions);
+
 #ifdef USE_PATOH
 struct patohnz {
     int P;
@@ -484,7 +487,12 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
 #ifdef INFO2
         printf("  ******** Split part %d from %d parts******** \n", i, k);
 #endif
-        if (pOptions->SplitMethod == Simple) {
+        if (pOptions->ZeroVolumeSearch == ZeroVolYes && SplitMatrixZeroVolume(pT, k, i, weightlo, weighthi, pOptions)) {
+#ifdef INFO
+            printf("Found zero volume partition!\n");
+#endif
+        }
+        else if (pOptions->SplitMethod == Simple) {
             /* Simple split of the matrix only based on load balance,
                not minimising communication volume. 
                Useful for testing and debugging */
@@ -1505,3 +1513,111 @@ int SplitMatrixSimple(struct sparsematrix *pT, int k, int i,
     return TRUE;
 } /* end SplitMatrixSimple */
 
+
+int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
+                     long weightlo, long weighthi, const struct opts *pOptions) {
+    
+    /* This function splits part i of the sparse matrix T into two parts,
+       the first with weight <= weightlo and the second with weight <= weighthi.
+       The split is performed by searching for a split with zero communication
+       volume. If such a split is found, it is applied to pT. Otherwise, pT is
+       left untouched.
+
+       Input: T sparse matrix,
+              k current number of parts, 1 <= k < P,
+              i number of part to be split, 0 <= i < k,
+              weightlo = smallest upper bound for part weight, belongs to part 0
+              weighthi = largest upper bound for part weight, belongs to part 1.
+              
+       Output: T sparse matrix.
+               The following applies if a zero volume split is found:
+               The nonzeros of the new part i (the first part) are in positions
+                   pT->Pstart[i], pT->Pstart[i+1]-1.
+               The nonzeros of the new part i+1 (the second) are in positions
+                   pT->Pstart[i+1], pT->Pstart[i+2]-1.
+               All parts > i+1 have been shifted.
+       
+    */
+
+    long lo, hi, mid = 0, nz, weight;
+    int j;
+    struct sparsematrix A;
+    
+    if (!pT || !pOptions) {
+        fprintf(stderr, "SplitMatrixZeroVolume(): Null arguments!\n");
+        return FALSE;
+    }
+    
+    lo = pT->Pstart[i];
+    hi = pT->Pstart[i+1]-1;
+    
+    nz = hi-lo+1;
+    
+    if (nz > 0) {
+        weight = ComputeWeight(pT, lo, hi, NULL, pOptions);
+        
+        if (weight > weightlo + weighthi || weight < 0) {
+            /* Desired split is infeasible */
+            fprintf(stderr, "SplitMatrixZeroVolume(): desired split is infeasible!\n");
+            return FALSE;
+        }
+        
+        /* Copy info from T to A */
+        A = *pT;            /* A has same size as T, and same other parameters, */
+        A.i = &(pT->i[lo]); /* but only a subset of the nonzeros */
+        A.j = &(pT->j[lo]);
+        if (A.MMTypeCode[2] != 'P')
+            A.ReValue = &(pT->ReValue[lo]);
+        if (A.MMTypeCode[2] == 'C')
+            A.ImValue = &(pT->ImValue[lo]);
+        A.NrNzElts = nz;
+        
+#ifdef INFO
+#ifdef TIME
+        clock_t starttime, endtime;
+        double cputime;
+        starttime = clock();
+#ifdef UNIX
+        struct timeval starttime1, endtime1;
+        gettimeofday(&starttime1, NULL);
+#endif
+#endif
+#endif
+        /* Run zero volume search. If a zero volume split is found, ZeroVolumeSearch()
+         * will apply this split directly; we then only need to update Pstart.
+         */
+        int foundZeroVolumePartition = ZeroVolumeSearch(&A, weightlo, weighthi, &mid, pOptions);
+        
+#ifdef INFO
+#ifdef TIME
+        endtime = clock();
+        cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
+        printf("  ZeroVolumeSearch CPU-time    : %f seconds\n", cputime);
+#ifdef UNIX
+        gettimeofday(&endtime1, NULL);
+        printf("  ZeroVolumeSearch elapsed time: %f seconds\n",
+                (endtime1.tv_sec - starttime1.tv_sec) +
+                (endtime1.tv_usec - starttime1.tv_usec) / 1000000.0);
+#endif
+        fflush(stdout);
+#endif
+#endif
+
+        if(!foundZeroVolumePartition) {
+            return FALSE;
+        }
+    }
+    else {
+        mid = 0; /* Pstart[i] = Pstart[i+1] */
+    }
+    
+    /* Shift Pstart for parts > i */
+    for (j = k; j > i; j--)
+        pT->Pstart[j+1] = pT->Pstart[j];
+    
+    /* Register new splitting point.
+     * mid lies in [0,hi-lo], translate it to [lo,hi] */
+    pT->Pstart[i+1] = lo + mid;
+
+    return TRUE;
+} /* end SplitMatrixZeroVolume */
