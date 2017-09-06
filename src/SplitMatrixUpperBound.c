@@ -400,6 +400,35 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
             return FALSE;
         }
     }
+#endif
+    
+    free(p);
+    free(cutColPrtPtr);
+    free(ColWghtDist);
+    free(_ColWghtDist);
+    free(partPointer);
+
+#ifdef INFO2
+    if(!CheckUpperBoundSolution(pT)) {
+        return FALSE;
+    }
+#endif
+    
+    return TRUE;
+} /* end SplitMatrixUpperBound */
+
+
+int CheckUpperBoundSolution(struct sparsematrix *pT) {
+    /* This function checks whether the distributed matrix computed by
+       SplitMatrixUpperBound() is valid. I.e., it checks whether
+       the computed solution has a fairly distributed work load and
+       communication volume not higher than the upper bound.
+       
+       Input: T sparse matrix
+       Output: TRUE if the solution is valid, FALSE otherwise
+    */
+    
+    int P = pT->NrProcs;
     
     /* Calculate weights */
     long Wmax = 0, weight;
@@ -411,7 +440,9 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
     }
     
     if(Wmax > ceil(pT->NrNzElts/(double)P)) {
-        fprintf( stderr, "SplitMatrixUpperBound(): Invalid imbalance result.\n" );
+#ifdef INFO2
+        fprintf( stderr, "CheckUpperBoundSolution(): Invalid imbalance result.\n" );
+#endif
         return FALSE;
     }
     
@@ -420,18 +451,13 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
     CalcCom(pT, NULL, (pT->m < pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
     CalcCom(pT, NULL, (pT->m < pT->n)?COL:ROW, &ComVol2, &tmp, &tmp, &tmp, &tmp);
     
+    long n = (pT->m < pT->n)?pT->m:pT->n;
     if(ComVol1 > n*(P-1) || ComVol2 > P-1) {
-        fprintf( stderr, "SplitMatrixUpperBound(): Invalid communication result.\n" );
+#ifdef INFO2
+        fprintf( stderr, "CheckUpperBoundSolution(): Invalid communication result.\n" );
+#endif
         return FALSE;
     }
-#endif
-    
-    free(p);
-    free(cutColPrtPtr);
-    free(ColWghtDist);
-    free(_ColWghtDist);
-    free(partPointer);
-
     
     return TRUE;
-} /* end SplitMatrixUpperBound */
+} /* end CheckUpperBoundSolution */

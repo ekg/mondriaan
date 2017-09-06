@@ -682,7 +682,7 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
         
         if(ComVol1+ComVol2 > upperBound) {
 #ifdef INFO
-            fprintf(stderr, "DistributeMatrixMondriaan(): Volume %ld larger than upper bound %ld. Attempting to generate upper bound solution.\n", ComVol1+ComVol2, upperBound);
+            printf("Info: Achieved volume %ld is larger than upper bound %ld. Attempting to generate upper bound solution.\n", ComVol1+ComVol2, upperBound);
 #endif
             if (!SplitMatrixUpperBound(pT, P, pOptions)) {
                 fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute upper bound solution!\n");
