@@ -19,6 +19,7 @@ struct contraction {
 
 /*** Function declarations for Match.c ***/
 int MoveVtxInNetAdjncy(struct biparthypergraph *pHG, const long v);
+int MoveVtxBackInNetAdjncy(struct biparthypergraph *pHG, const long v);
 int FindMatchArbitrary(struct biparthypergraph *pHG, struct contraction *pC,
                         const long v, int *Matched);
 int FindMatchInprod(struct biparthypergraph *pHG, struct contraction *pC,

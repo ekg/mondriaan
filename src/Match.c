@@ -50,6 +50,55 @@ int MoveVtxInNetAdjncy(struct biparthypergraph *pHG, const long v) {
     return TRUE;
 } /* end MoveVtxInNetAdjncy */
 
+int MoveVtxBackInNetAdjncy(struct biparthypergraph *pHG, const long v) {
+
+    /* This function moves the vertex v to the start of the adjacency list
+       in all its nets, so that it is eligible again for matching.
+       This undoes what MoveVtxInNetAdjncy() does.
+       
+       This function does not exactly revert the modifications done by
+       MoveVtxInNetAdjncy(). I.e., applying both functions directly after
+       each other will likely lead to the adjacency lists being permuted.
+
+       On input, v must be stored somewhere in the range iStartP1..iEnd-1
+       for all its nets. On output, iStartP1 has been increased by 1
+       for all the nets of v, and the index of v equals the old iStartP1.
+        
+       @see MoveVtxInNetAdjncy()
+    */
+  
+    long t, n, v2, iv, iv2;
+    
+    if (!pHG) {
+        fprintf(stderr, "MoveVtxBackInNetAdjncy(): Null argument!\n");
+        return FALSE;
+    }
+ 
+    for (t = pHG->V[v].iStart; t < pHG->V[v].iEnd; t++) {
+        n = pHG->VtxAdjncy[t];
+ 
+        /* Find vertex v in adjacency list of net n */
+        iv = pHG->N[n].iEnd-1; /* index of v */
+        
+        while (pHG->NetAdjncy[iv] != v && iv >= pHG->N[n].iStartP1)
+            iv--;
+        
+        if (iv < pHG->N[n].iStartP1) {
+            fprintf(stderr, "MoveVtxBackInNetAdjncy(): vertex v (%ld) not found in range!\n", v);
+            /*fprintf(stderr, "Vtx2Index: %ld, Net2Index: %ld\n", pHG->Vtx2MatIndex[v], pHG->Net2MatIndex[n] );*/
+            return FALSE;
+        }
+  
+        /* Swap vertex:  v <-> Net[n].iStartP1  */
+        iv2 = pHG->N[n].iStartP1;
+        v2 = pHG->NetAdjncy[iv2];
+        pHG->NetAdjncy[iv2] = v;
+        pHG->NetAdjncy[iv] = v2;
+        pHG->N[n].iStartP1++;
+    }
+
+    return TRUE;
+} /* end MoveVtxBackInNetAdjncy */
 
 int FindMatchArbitrary(struct biparthypergraph *pHG, struct contraction *pC, const long v, int *Matched) {
     /* This function matches the vertex v repeatedly with an arbitrary
