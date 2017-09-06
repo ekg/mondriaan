@@ -31,6 +31,7 @@ void SwapDouble(double *x, long, long);
 
 long *QSort(long *X, long LengthX);
 void quicksort(long *item, long *Index, long lo, long hi);
+void quicksort3way (long *list, long *indices, size_t total_elems);
 int CSort(long *J, long *val, long maxval, long lo, long hi);
 
 void RandomPermute(long *X, long *Y, double *D, double *E, long lo, long hi);
