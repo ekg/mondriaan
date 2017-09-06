@@ -131,6 +131,7 @@ test_DetermineSplit
 test_logb2
 test_SplitMatrixSimple
 test_SplitMatrixKLFM
+test_SplitMatrixUpperBound
 test_DistributeMatrixMondriaan
 test_DetectConnectedComponents
 test_Heap

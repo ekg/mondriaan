@@ -59,6 +59,7 @@ struct opts {
     enum {FreeNetYes, FreeNetNo} DiscardFreeNets;
     enum {ZeroVolNo, ZeroVolYes} ZeroVolumeSearch;
     enum {FreeNonzerosNo, FreeNonzerosYes} ImproveFreeNonzeros;
+    enum {CheckUpperBoundNo, CheckUpperBoundYes} CheckUpperBound;
   
     /* Matrix options */
     enum {EqVecNo, EqVecYes} SquareMatrix_DistributeVectorsEqual;

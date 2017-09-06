@@ -21,7 +21,7 @@ test_DistributeVecGreedyImprove test_InitSums test_GenerateHistogram \
 test_DistributeVecOrig test_DistributeVecOrigEq test_DistributeVec \
 test_BalanceParts test_DetermineSplit test_logb2 \
 test_ComputeWeight test_SplitMatrixSimple test_SplitMatrixKLFM \
-test_DistributeMatrixMondriaan \
+test_SplitMatrixUpperBound test_DistributeMatrixMondriaan \
 test_CreateNewBiPartHyperGraph test_DeleteBiPartHyperGraph \
 test_SparseMatrix2BiPartHyperGraph test_BiPartHyperGraph2SparseMatrix \
 test_SparseMatrixSymmetric2Full test_SparseMatrixFull2Symmetric \
@@ -244,6 +244,9 @@ test_SplitMatrixSimple: test_SplitMatrixSimple.o ${DISTRIBUTEMAT:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_SplitMatrixKLFM: test_SplitMatrixKLFM.o ${DISTRIBUTEMAT:%=%.o} ${DISTRIBUTEVECLIB:%=%.o}
+	make -r OBJDEPS='$^' $@.target
+
+test_SplitMatrixUpperBound: test_SplitMatrixUpperBound.o testHelper_DisconnectedMatrix.o ${DISTRIBUTEMAT:%=%.o}
 	make -r OBJDEPS='$^' $@.target
 
 test_DistributeMatrixMondriaan: test_DistributeMatrixMondriaan.o ${DISTRIBUTEMAT:%=%.o}

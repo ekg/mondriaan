@@ -1,6 +1,7 @@
 #include "DistributeMat.h"
 #include "Permute.h"
 #include "FreeNonzeros.h"
+#include "SplitMatrixUpperBound.h"
 
 #ifdef USE_PATOH
 #include <patoh.h>
@@ -681,6 +682,25 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
     printf("  Column lambda histogram:\n");
     VerifyLambdas(pT->ColLambda, pT->n, P);
 #endif
+    
+    if(pOptions->CheckUpperBound == CheckUpperBoundYes) {
+        /* Compute volume. It should be at most (min(m,n)+1)(P-1) */
+        long ComVol1, ComVol2, tmp;
+        CalcCom(pT, NULL, (pT->m < pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
+        CalcCom(pT, NULL, (pT->m < pT->n)?COL:ROW, &ComVol2, &tmp, &tmp, &tmp, &tmp);
+        long upperBound = (((pT->m < pT->n)?pT->m:pT->n)+1)*(P-1);
+        
+        if(ComVol1+ComVol2 > upperBound) {
+#ifdef INFO
+            printf("Info: Achieved volume %ld is larger than upper bound %ld. Attempting to generate upper bound solution.\n", ComVol1+ComVol2, upperBound);
+#endif
+            if (!SplitMatrixUpperBound(pT, P, pOptions)) {
+                fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute upper bound solution!\n");
+            }
+            k = P;
+        }
+    }
+    
 
     /* Set matrix type code to distributed */
     pT->MMTypeCode[0] = 'D';
