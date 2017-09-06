@@ -9,6 +9,7 @@ extern int ComputeInitialGains(struct biparthypergraph *pHG);
 int main(int argc, char **argv) {
 
     struct biparthypergraph HG;
+    struct bucket *pB ;
 
     long n, t, i, P;
 
@@ -78,6 +79,11 @@ int main(int argc, char **argv) {
     for (P=0; P<2; P++) {
         HG.GBVtx[P].NrBuckets  = 0;
         HG.GBVtx[P].Root = NULL;
+    
+        if ( !InitGainBucket(&(HG.GBVtx[P]), n/3) ) {
+            printf("Error\n");
+            exit(1);
+        }
     }
 
     ComputeInitialGains(&HG);
@@ -90,9 +96,14 @@ int main(int argc, char **argv) {
 
     /* Check gainbucket data structure */
     for (P=0; P<2; P++) {
+#ifdef GAINBUCKET_ARRAY
+        pB = &(HG.GBVtx[P].Root[HG.GBVtx[P].MaxValue+HG.GBVtx[P].MaxPresentValue]) ;
+#else
+        pB = HG.GBVtx[P].Root ;
+#endif
         if (HG.GBVtx[P].NrBuckets  != 1 ||
-             (HG.GBVtx[P].Root)->value != n/3 ||
-             ((HG.GBVtx[P].Root)->entry)->vtxnr != P) {
+             pB->value != n/3 ||
+             (pB->entry)->vtxnr != P) {
             printf("Error\n");
             exit(1);
         }
@@ -102,6 +113,14 @@ int main(int argc, char **argv) {
     if (HG.CurComm != n/3) {
         printf("Error\n");
         exit(1);
+    }
+    
+    /* Delete gainbucket data structure */
+    for (P=0; P<2; P++) {
+        if ( !DeleteGainBucket(&(HG.GBVtx[P])) ) {
+            printf("Error\n");
+            exit(1);
+        }
     }
 
     printf("OK\n");

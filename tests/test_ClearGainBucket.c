@@ -11,10 +11,16 @@ int main(int argc, char **argv) {
     n= 100 ; /* number of buckets */
     bs = 5; /* bucket size */
     offset = n/2 ;
-
-    /* Insert vertices in increasing order of gain value */
+    
     GB.NrBuckets =0 ;
     GB.Root = NULL ;
+
+    if ( !InitGainBucket(&GB, n/2) ) {
+        printf("Error\n");
+        exit(1);
+    }
+
+    /* Insert vertices in increasing order of gain value */
     for (j=0; j<bs; j++)
         for (i=0; i<n; i++)
             BucketInsert(&GB, i-offset, j*n + i) ;
@@ -22,6 +28,11 @@ int main(int argc, char **argv) {
     CheckBuckets(GB, n, bs) ;
 
     ClearGainBucket(&GB) ;
+    
+    if ( !DeleteGainBucket(&GB) ) {
+        printf("Error\n");
+        exit(1);
+    }
     
     if (GB.Root != NULL || GB.NrBuckets != 0){
         printf("Error\n") ;
@@ -44,7 +55,11 @@ void CheckBuckets(struct gainbucket GB, long n, long bs) {
         exit(1);
     }
 
+#ifdef GAINBUCKET_ARRAY
+    pB = &(GB.Root[GB.MaxValue+GB.MaxPresentValue]) ;
+#else
     pB = GB.Root ;
+#endif
 
     offset = n/2 ; 
     i = 0;
@@ -64,7 +79,11 @@ void CheckBuckets(struct gainbucket GB, long n, long bs) {
             j++ ;
             pE = pE->next ;
         }
+#ifdef GAINBUCKET_ARRAY
+        pB = (pB->value > -GB.MaxValue) ? pB-1 : NULL ;
+#else
         pB = pB->next ;
+#endif
         if (j!= bs){  
             printf("Error\n") ;
             exit(1); 

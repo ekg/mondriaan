@@ -90,6 +90,10 @@ int main(int argc, char **argv) {
     for (P=0; P<2; P++) {
         HG.GBVtx[P].NrBuckets  = 0;
         HG.GBVtx[P].Root = NULL;
+        if ( !InitGainBucket(&(HG.GBVtx[P]), 3) ) {
+            printf("Error\n");
+            exit(1);
+        }
     }
     
     /* Insert vertices 0, 1, 3, 4 into gainbucket data structure */
@@ -166,6 +170,14 @@ int main(int argc, char **argv) {
     if (HG.CurComm != 6) {
         printf("Error\n");
         exit(1);
+    }
+    
+    /* Delete gainbucket data structure */
+    for (P=0; P<2; P++) {
+        if ( !DeleteGainBucket(&(HG.GBVtx[P])) ) {
+            printf("Error\n");
+            exit(1);
+        }
     }
 
     printf("OK\n");
