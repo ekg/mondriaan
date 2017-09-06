@@ -12,8 +12,6 @@ struct freeIndex {
 
 void SwapNonzero(struct sparsematrix *pM, long s, long t);
 
-int ImproveFreeNonzerosGlobal(struct sparsematrix *pM, const struct opts *pOptions, int P, const int *procs);
-
-int ImproveFreeNonzerosLocal(struct sparsematrix *pM, const struct opts *pOptions, int P, const int *procs, int p1, int p2);
+int ImproveFreeNonzeros(struct sparsematrix *pM, const struct opts *pOptions, const int *procs, int p1, int p2);
 
 #endif /* __FreeNonzeros_h__ */

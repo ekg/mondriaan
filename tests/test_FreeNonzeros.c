@@ -3,7 +3,7 @@
 #include "DistributeVecLib.h"
 #include <math.h>
 
-void test_FreeNonzeros(int global, int symmetric);
+void test_FreeNonzeros(int symmetric);
 
 int main(int argc, char **argv) {
 
@@ -15,11 +15,8 @@ int main(int argc, char **argv) {
     unsigned long time_in_micros = 1000000 * tv.tv_sec + tv.tv_usec;
     SetRandomSeed(time_in_micros);*/
     
-    test_FreeNonzeros(FALSE, FALSE);
-    test_FreeNonzeros(TRUE, FALSE);
-    
-    test_FreeNonzeros(FALSE, TRUE);
-    test_FreeNonzeros(TRUE, TRUE);
+    test_FreeNonzeros(FALSE);
+    test_FreeNonzeros(TRUE);
     
     printf("OK\n");
     exit(0);
@@ -51,10 +48,9 @@ long ComputeVolume(struct sparsematrix *pM, int symmetric) {
  * Test ImproveFreeNonzeros*()
  * 
  * Input:
- * global            : Whether to use the global (TRUE) or local (FALSE) method
- * symmetric         : Whether the matrix should be symmetric
+ * symmetric: Whether the matrix should be symmetric
  */
-void test_FreeNonzeros(int global, int symmetric) {
+void test_FreeNonzeros(int symmetric) {
     
     struct sparsematrix A;
     struct sparsematrix *pA = &A;
@@ -159,12 +155,7 @@ void test_FreeNonzeros(int global, int symmetric) {
     long volumeBefore = ComputeVolume(pA, symmetric);
     
     /* Run algorithm */
-    if(global) {
-        ImproveFreeNonzerosGlobal(pA, &options, P, procs);
-    }
-    else {
-        ImproveFreeNonzerosLocal(pA, &options, P, procs, 3, 4);
-    }
+    ImproveFreeNonzeros(pA, &options, procs, 3, 4);
     
     /* Compute statistics after applying algorithm */
     long totalImbalanceAfter = 0.0;

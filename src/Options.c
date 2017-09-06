@@ -130,7 +130,7 @@ char* GetDefaultOptionText() {
 "Partitioner                                    mondriaan \n"
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
-"Improve_Free_Nonzeros                          no \n"
+"Improve_Free_Nonzeros                          yes \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
 "SquareMatrix_DistributeVectorsEqual_AddDummies yes \n"
 "SymmetricMatrix_UseSingleEntry                 no \n"
@@ -247,8 +247,7 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "\n");
     
     fprintf(Out, "Improve_Free_Nonzeros ");
-    if (Opts->ImproveFreeNonzeros == FreeNonzerosGlobal) fprintf(Out, "global");
-    else if (Opts->ImproveFreeNonzeros == FreeNonzerosLocal) fprintf(Out, "local");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
     else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else return FALSE;
     fprintf(Out, "\n");
@@ -467,8 +466,7 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, " \\\\\n");
     
     fprintf(Out, "Improve-Free-Nonzeros & ");
-    if (Opts->ImproveFreeNonzeros == FreeNonzerosGlobal) fprintf(Out, "global");
-    else if (Opts->ImproveFreeNonzeros == FreeNonzerosLocal) fprintf(Out, "local");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
     else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
@@ -854,10 +852,8 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
     } else if (!strcmp(option, "Improve_Free_Nonzeros")) {
         if (!strcmp(value, "no") || !strcmp(value, "0"))
             pOptions->ImproveFreeNonzeros = FreeNonzerosNo;
-        else if (!strcmp(value, "local") || ! strcmp(value, "1"))
-            pOptions->ImproveFreeNonzeros = FreeNonzerosLocal;
-        else if (!strcmp(value, "global") || ! strcmp(value, "2"))
-            pOptions->ImproveFreeNonzeros = FreeNonzerosGlobal;
+        else if (!strcmp(value, "yes") || ! strcmp(value, "1"))
+            pOptions->ImproveFreeNonzeros = FreeNonzerosYes;
         else {
             fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;

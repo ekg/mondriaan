@@ -57,7 +57,7 @@ struct opts {
     enum {PartMondriaan, PartPaToH, FullPaToH} Partitioner;
     enum {MetricLambda, MetricCut, MetricLambdaLambdaMinusOne} Metric;
     enum {FreeNetYes, FreeNetNo} DiscardFreeNets;
-    enum {FreeNonzerosNo, FreeNonzerosLocal, FreeNonzerosGlobal} ImproveFreeNonzeros;
+    enum {FreeNonzerosNo, FreeNonzerosYes} ImproveFreeNonzeros;
   
     /* Matrix options */
     enum {EqVecNo, EqVecYes} SquareMatrix_DistributeVectorsEqual;
