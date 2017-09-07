@@ -487,9 +487,10 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
 #ifdef INFO2
         printf("  ******** Split part %d from %d parts******** \n", i, k);
 #endif
-        if (pOptions->ZeroVolumeSearch == ZeroVolYes && SplitMatrixZeroVolume(pT, k, i, weightlo, weighthi, pOptions)) {
+        int foundZVS = FALSE; /* Whether a zero volume split has been found */
+        if (pOptions->ZeroVolumeSearch == ZeroVolYes && (foundZVS = SplitMatrixZeroVolume(pT, k, i, weightlo, weighthi, pOptions))) {
 #ifdef INFO
-            printf("Found zero volume partition!\n");
+            printf("Found zero volume split!\n");
 #endif
         }
         else if (pOptions->SplitMethod == Simple) {
@@ -540,7 +541,7 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
         }
         
         /* Apply free nonzero search if enabled, but only for (symmetric) finegrain and mediumgrain strategies */
-        if(pOptions->ImproveFreeNonzeros == FreeNonzerosYes && (pOptions->SplitStrategy == FineGrain ||
+        if(pOptions->ImproveFreeNonzeros == FreeNonzerosYes && !foundZVS && (pOptions->SplitStrategy == FineGrain ||
             pOptions->SplitStrategy == SFineGrain || pOptions->SplitStrategy == MediumGrain)) {
             ImproveFreeNonzeros(pT, pOptions, procs, i, i+1);
             
