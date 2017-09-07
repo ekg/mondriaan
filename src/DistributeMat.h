@@ -8,6 +8,8 @@
 #include "SparseMatrix.h"
 #include "Remembrance.h"
 #include "ZeroVolumeSearch.h"
+#include "FreeNonzeros.h"
+#include "SplitMatrixUpperBound.h"
 
 /* Function declarations for DistributeMat.c */
 long ComputeWeight(const struct sparsematrix *pT, long lo, long hi, long *wnz, const struct opts *pOptions);

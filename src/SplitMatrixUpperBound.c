@@ -414,6 +414,10 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
     }
 #endif
     
+    /* Compute new lambdas */
+    InitNprocs(pT, COL, pT->RowLambda);
+    InitNprocs(pT, ROW, pT->ColLambda);
+    
     return TRUE;
 } /* end SplitMatrixUpperBound */
 
