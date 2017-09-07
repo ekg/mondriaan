@@ -32,6 +32,7 @@ int main(int argc, char **argv) {
             t++;
         }
     }
+    A.MMTypeCode[0]='M';
     A.MMTypeCode[3]='S';
     Options.SymmetricMatrix_UseSingleEntry = SingleEntYes;
 
