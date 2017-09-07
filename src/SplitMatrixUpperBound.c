@@ -415,8 +415,10 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
 #endif
     
     /* Compute new lambdas */
-    InitNprocs(pT, COL, pT->RowLambda);
-    InitNprocs(pT, ROW, pT->ColLambda);
+    if (!InitNprocs(pT, COL, pT->RowLambda) || !InitNprocs(pT, ROW, pT->ColLambda)) {
+        fprintf(stderr, "SplitMatrixUpperBound(): Unable to compute lambdas!\n");
+        return FALSE;
+    }
     
     return TRUE;
 } /* end SplitMatrixUpperBound */

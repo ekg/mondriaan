@@ -717,7 +717,30 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
                 if (!SplitMatrixUpperBound(pT, P, pOptions)) {
                     fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute upper bound solution!\n");
                 }
-                k = P;
+                else {
+                    /* Update variables to reflect new distribution */
+                    k = P;
+                    
+                    for (j = 0; j <= P; j++) {
+                        weight[j] = ComputeWeight(pT, pT->Pstart[j], pT->Pstart[j+1]-1, NULL, pOptions);
+                        procs[j] = 1;
+                    }
+#ifdef INFO2
+                    printf("  Number of parts = %d \n", k);
+                    printf("  Pstart = ");
+                    for (j = 0; j <= P; j++)
+                        printf("%ld ", pT->Pstart[j]);
+                    printf("\n\n");
+#endif      
+
+#ifdef INFO2
+                    /* Print all lambdas. */
+                    printf("  Row lambda histogram:\n");
+                    VerifyLambdas(pT->RowLambda, pT->m, P);
+                    printf("  Column lambda histogram:\n");
+                    VerifyLambdas(pT->ColLambda, pT->n, P);
+#endif
+                }
             }
         }
     }
