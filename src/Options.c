@@ -130,7 +130,7 @@ char* GetDefaultOptionText() {
 "Partitioner                                    mondriaan \n"
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
-"Zero_Volume_Search                             no \n"
+"Zero_Volume_Search                             yes \n"
 "Improve_Free_Nonzeros                          yes \n"
 "CheckUpperBound                                yes \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
