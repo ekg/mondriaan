@@ -567,7 +567,7 @@ int MMSparseMatrixGetTypeCode(struct sparsematrix *pM, char *line, const char *n
              return FALSE;
     } else return FALSE;
 
-    sprintf(line, "%s\n", line);
+    strcat(line, "\n");
     return TRUE;
 } /* end MMSparseMatrixGetTypeCode */
   
