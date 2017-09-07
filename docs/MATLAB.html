@@ -4,12 +4,23 @@
 <html>
 
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css">
+<link href="print.css" rel="stylesheet" type="text/css" media="print">
+
 <title>Mondriaan and MATLAB</title>
 </head>
 
 <body>
+
+<div id="mainContainer">
+
+<div id="pageNav">
+	<div><a href="USERS_GUIDE.html">Mondriaan</a></div>
+	<div><a href="HYPERGRAPH.html">Hypergraphs</a></div>
+	<div><a href="USERS_GUIDE_OPT.html">MondriaanOpt</a></div>
+</div>
 
 <h2>Mondriaan and MATLAB</h2>
 <hr>
@@ -28,46 +39,46 @@ Download the latest version from the
 Mondriaan software homepage</a>. Uncompress with
 </p>
 <ul>
-<li><tt>% tar xzvf mondriaan4.tar.gz</tt></li>
+<li><code>% tar xzvf mondriaan4.tar.gz</code></li>
 </ul>
 <p>
-This will create a directory <tt>Mondriaan4</tt>
+This will create a directory <code>Mondriaan4</code>
 which contains all the files of the Mondriaan package. 
-To enable MATLAB support, open the file <tt>Mondriaan4/mondriaan.mk</tt>
+To enable MATLAB support, open the file <code>Mondriaan4/mondriaan.mk</code>
 with a text-editor and look for a line which looks similar to
 </p>
 <ul>
-<li><tt>#MATLABHOMEDIR := /usr/local/matlab</tt></li>
+<li><code>#MATLABHOMEDIR := /usr/local/matlab</code></li>
 </ul>
 <p>
 Change the directory on the right-hand side to your installation
-directory of MATLAB and remove the <tt>#</tt> in front of the line,
+directory of MATLAB and remove the <code>#</code> in front of the line,
 such that it looks similar to
 </p>
 <ul>
-<li><tt>MATLABHOMEDIR := /your/matlab/installation/directory</tt></li>
+<li><code>MATLABHOMEDIR := /your/matlab/installation/directory</code></li>
 </ul>
 <p>
-Furthermore make sure that the variable <tt>MEXSUFFIX</tt> is set to the proper
+Furthermore make sure that the variable <code>MEXSUFFIX</code> is set to the proper
 extension for MATLAB binary files for your system (from the Mathworks <a href="http://www.mathworks.nl/help/matlab/ref/mexext.html">site</a>):
 </p>
 <table border="1">
-<tr><td><b>Platform</b></td><td><b><tt>MEXSUFFIX</tt></b></td></tr>
-<tr><td>Linux (32-bit)</td><td><tt>mexglx</tt></td></tr>
-<tr><td>Linux (64-bit)</td><td><tt>mexa64</tt></td></tr>
-<tr><td>Apple Macintosh (32-bit)</td><td><tt>mexmaci</tt></td></tr>
-<tr><td>Apple Macintosh (64-bit)</td><td><tt>mexmaci64</tt></td></tr>
-<tr><td>Microsoft Windows (32-bit)</td><td><tt>mexw32</tt></td></tr>
-<tr><td>Microsoft Windows (64-bit)</td><td><tt>mexw64</tt></td></tr>
+<tr><td><b>Platform</b></td><td><b><code>MEXSUFFIX</code></b></td></tr>
+<tr><td>Linux (32-bit)</td><td><code>mexglx</code></td></tr>
+<tr><td>Linux (64-bit)</td><td><code>mexa64</code></td></tr>
+<tr><td>Apple Macintosh (32-bit)</td><td><code>mexmaci</code></td></tr>
+<tr><td>Apple Macintosh (64-bit)</td><td><code>mexmaci64</code></td></tr>
+<tr><td>Microsoft Windows (32-bit)</td><td><code>mexw32</code></td></tr>
+<tr><td>Microsoft Windows (64-bit)</td><td><code>mexw64</code></td></tr>
 </table>
 <p>
-For example: on a 32-bit Macintosh system we would have <tt>MEXSUFFIX := mexmaci</tt>.
+For example: on a 32-bit Macintosh system we would have <code>MEXSUFFIX := mexmaci</code>.
 </p>
 <p>
 Now we are ready to compile Mondriaan, run
 </p>
 <ul>
-<li><tt>% make</tt></li>
+<li><code>% make</code></li>
 </ul>
 <p>
 which will build Mondriaan and the associated tools.
@@ -80,35 +91,35 @@ MATLAB interface of Mondriaan.
 </p>
 <p>
 As test matrix we can use <a href="http://www.staff.science.uu.nl/~bisse101/Matrices/tbdmatlab.mtx.gz">tbdmatlab.mtx.gz</a>
-from the Mondriaan website. The archive should be extracted to the <tt>Mondriaan4/tools</tt> directory.
+from the Mondriaan website. The archive should be extracted to the <code>Mondriaan4/tools</code> directory.
 </p>
 <p>
-Start MATLAB and navigate to the <tt>Mondriaan4/tools</tt> directory in the <i>Current Directory</i>
+Start MATLAB and navigate to the <code>Mondriaan4/tools</code> directory in the <i>Current Directory</i>
 subwindow.
-To read and view <tt>tbdmatlab.mtx</tt>, issue
+To read and view <code>tbdmatlab.mtx</code>, issue
 </p>
 <ul>
-<li><tt>A = mmread('tbdmatlab.mtx');</tt></li>
-<li><tt>spy(A)</tt></li>
+<li><code>A = mmread('tbdmatlab.mtx');</code></li>
+<li><code>spy(A)</code></li>
 </ul>
 <p>
-We can partition the matrix <tt>A</tt> among 30 processors with a maximum imbalance of 3% by using
-the <tt>mondriaan</tt> function in MATLAB
+We can partition the matrix <code>A</code> among 30 processors with a maximum imbalance of 3% by using
+the <code>mondriaan</code> function in MATLAB
 </p>
 <ul>
-<li><tt>[I, s] = mondriaan(A, 30, 0.03);</tt></li>
+<li><code>[I, s] = mondriaan(A, 30, 0.03);</code></li>
 </ul>
 <p>
-where <tt>I</tt> is the same matrix as <tt>A</tt>, only with the real values
+where <code>I</code> is the same matrix as <code>A</code>, only with the real values
 of all the matrix nonzeroes set to the index of the processor to which
-the nonzero was assigned, and <tt>s</tt> contains partitioning information.
+the nonzero was assigned, and <code>s</code> contains partitioning information.
 Full output can be generated with
 </p>
 <ul>
-<li><tt>[I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A, 30, 0.03, 2);</tt></li>
+<li><code>[I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A, 30, 0.03, 2);</code></li>
 </ul>
 <p>
-where the last parameter (<tt>2</tt>) is the desired permutation method (see below).
+where the last parameter (<code>2</code>) is the desired permutation method (see below).
 Here, p and q are permutation vectors, r and c are row-boundaries and column-boundaries
 corresponding to the ordering's block structure, rh and ch store the separator hierarchy 
 information, the matrix B stores the reordered matrix PAQ (in MATLAB terminology:
@@ -116,7 +127,7 @@ B=A(p,q)) and finally u and v contain the indices of the processors to which the
 components are assigned (for parallel multiplication of <i>u = A*v</i>).
 See the <a href="USERS_GUIDE.html">User's Guide</a> for full details on these output 
 vectors and matrices. For particulars on the boundary and hierarchy functions, jump to
-the appriopiate section <a href="USERS_GUIDE.html#SBDoutput">here</a>.
+the appropriate section <a href="USERS_GUIDE.html#SBDoutput">here</a>.
 </p>
 <table border="1">
 <tr><td><b>Value</b><td><b>Ordering</b></td></tr>
@@ -134,10 +145,10 @@ of the input matrix A. This is done by setting a fifth parameter, such that the 
 call becomes:
 </p>
 <ul>
-<li><tt>[I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A, 30, 0.03, 2, symm);</tt></li>
+<li><code>[I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A, 30, 0.03, 2, symm);</code></li>
 </ul>
 <p>where symm is 0 by default (if the parameter is not given), and indicates A is
-not symmetric. If <tt>symm</tt> takes a value 1 or 2, A is assumed symmetric
+not symmetric. If <code>symm</code> takes a value 1 or 2, A is assumed symmetric
 and <em>only the lower triangular part of A is passed through to Mondriaan</em>. This
 is exactly the same as using the regular (terminal-based) Mondriaan application on a
 symmetric matrix with the options SymmetricMatrix_UseSingleEntry set to <b>yes</b> and
@@ -148,14 +159,14 @@ taken as usual from the Mondriaan.defaults file. Recommended is to use the fineg
 or symmetric finegrain strategies. Others will work, but may not minimise the 
 communication volume during parallel sparse matrix-vector multiplication when 
 considering the full matrix A.</p>
-<p>Setting <tt>symm</tt> to 2 will indicate the matrix is structurally symmetric,
+<p>Setting <code>symm</code> to 2 will indicate the matrix is structurally symmetric,
 but as said before, still only the lower triangular part of A is passed through to
 Mondriaan. This makes no difference for any of the output parameters, except for B,
-which would, for <tt>symm</tt>=1, return an incorrect full matrix PAQ as the full
-reordered matrix is inferred only from the lower triangular part. Setting <tt>symm</tt>
+which would, for <code>symm</code>=1, return an incorrect full matrix PAQ as the full
+reordered matrix is inferred only from the lower triangular part. Setting <code>symm</code>
 to 2 prevents this by automatically postprocessing B by rebuilding PAQ using the 
 output parameters p and q.</p>
-<p>Note that setting <tt>symm</tt> equal to 1 or 2 yields symmetric permutations 
+<p>Note that setting <code>symm</code> equal to 1 or 2 yields symmetric permutations 
 (B=PAP<sup>T</sup>). Also note that it is not checked whether the input matrix really 
 is symmetric, and as such unsymmetric matrices can also be passed through this method.
 This probably does not yield any meaningful results.</p>
@@ -164,7 +175,7 @@ This probably does not yield any meaningful results.</p>
 <p>We present two small examples of using Matlab in conjunction with Mondriaan; the
 first will be on speeding up the sequential sparse matrix-vector multiply, the
 second will illustrate speeding up the sequential sparse LU decomposition.
-Assumed is that the working directory is <tt>Mondriaan4/tools</tt>. Also available
+Assumed is that the working directory is <code>Mondriaan4/tools</code>. Also available
 should be:
 <ul>
 <li>the tbdlinux matrix (available through Rob Bisseling's
@@ -181,14 +192,14 @@ system jitter.
 [<a href="#cite1">1</a>], 
 [<a href="#cite2">2</a>]):</h5>
 <p>
-<tt>
+<code>
 &gt;&gt; A=mmread('tbdlinux.mtx');<br>
 &gt;&gt; [I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A,50,0.1,2);<br>
 &gt;&gt; x=rand(size(A,2),1);<br>
 &gt;&gt; tic, for i=1:1000 A*x; end, toc<br>
 Elapsed time is 24.707203 seconds.<br>
 &gt;&gt; tic, z=x(q), for i=1:1000 B*z; end, toc<br>
-Elapsed time is 19.786526 seconds.</tt>
+Elapsed time is 19.786526 seconds.</code>
 </p>
 <p>
 Using Mondriaan to transform the tbdlinux matrix into SBD form thus yields a modest 20 percent
@@ -203,7 +214,7 @@ for details.</p>
 [<a href="#cite3">3</a>], 
 [<a href="#cite4">4</a>]):</h5>
 <p>
-<tt>
+<code>
 &gt;&gt; A=mmread('west0497.mtx');<br>
 &gt;&gt; [I, s, p, q, r, c, rh, ch, B, u, v] = mondriaan(A,10,0.1,3);<br>
 &gt;&gt; tic, for i=1:1000 [L,U,lu_P] = lu(A); end, toc<br>
@@ -222,53 +233,56 @@ ans =<br>
 <br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4647<br>
 <br>
-</tt>
+</code>
 </p>
 <p>Here the use of Mondriaan with BBD ordering lets the stock MATLAB 
 LU algorithm run almost a factor 2 faster, and reduces the fill-in
 with almost a factor 3. Note that this is not the UMFPACK version of
 the LU algorithm, which employs its own reordering techniques
-(amongst others); see <tt>help lu</tt> within MATLAB.</p>
+(amongst others); see <code>help lu</code> within MATLAB.</p>
 
 
 <h3>Visualisation</h3>
 <p>
-We can also directly visualise the partitioning process by using <tt>mondriaanplot</tt>
+We can also directly visualise the partitioning process by using <code>mondriaanplot</code>
 in the following fashion:
 </p>
 <ul>
-<li><tt>mondriaanplot(A, 30, 0.03, 2);</tt></li>
+<li><code>mondriaanplot(A, 30, 0.03, 2);</code></li>
 </ul>
 <p>
 This concludes this small tutorial.
-More information is available through issueing <tt>help mondriaan</tt> from within MATLAB.
+More information is available through issuing <code>help mondriaan</code> from within MATLAB.
 </p>
 
 <h3>MondriaanOpt</h3>
+<p>
 Apart from Mondriaan itself, also MondriaanOpt is available in MATLAB through the MatlabMondriaanOpt MEX routine.
 Example matlab functions are given in mondriaanOpt.m and mondriaanOptPlot.m.
 The interface of mondriaanOpt is as follows:
+</p>
 <ul>
-<li><tt>[I, s] = mondriaanOpt(A, Imbalance, Volume)</tt></li>
+<li><code>[I, s] = mondriaanOpt(A, Imbalance, Volume)</code></li>
 </ul>
-Here, <tt>A</tt> is the sparse matrix to be partitioned, <tt>Imbalance</tt> is the maximum allowed load imbalance,
-<tt>Volume</tt> is the initial upper bound on the volume, <tt>I</tt> contains the partitioning information and
-<tt>s</tt> contains statistics about the run.
-For more information, type <tt>help mondriaanOpt</tt> or <tt>help mondriaanOptPlot</tt> in MATLAB.
-
+<p>
+Here, <code>A</code> is the sparse matrix to be partitioned, <code>Imbalance</code> is the maximum allowed load imbalance,
+<code>Volume</code> is the initial upper bound on the volume, <code>I</code> contains the partitioning information and
+<code>s</code> contains statistics about the run.
+For more information, type <code>help mondriaanOpt</code> or <code>help mondriaanOptPlot</code> in MATLAB.
+</p>
 
 <h3>References</h3>
 <p>
-[<a name="cite1" href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/yzelman09.pdf">1</a>]
+[<a id="cite1" href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/yzelman09.pdf">1</a>]
 <em>Cache-oblivious sparse matrix-vector multiplication by using sparse matrix partitioning methods</em>,
 A. N. Yzelman and Rob H. Bisseling, SIAM Journal of Scientific Computation, Vol. 31, Issue 4, pp. 3128-3154 (2009).<br>
-[<a name="cite2" href="http://www.sciencedirect.com/science/article/pii/S0167819111001062">2</a>]
+[<a id="cite2" href="http://www.sciencedirect.com/science/article/pii/S0167819111001062">2</a>]
 <em>Two-dimensional cache-oblivious sparse matrix-vector multiplication</em>,
 A. N. Yzelman and Rob H. Bisseling, Parallel Computing, Vol. 37, Issue 12, pp. 806-819 (2011).<br>
-[<a name="cite3" href="http://www.cerfacs.fr/files/cerfacs_algo/conferences/PastWorkshops/CSC05/11_Catalyurek_Aykanat.pdf">3</a>]
+[<a id="cite3" href="http://www.cerfacs.fr/files/cerfacs_algo/conferences/PastWorkshops/CSC05/11_Catalyurek_Aykanat.pdf">3</a>]
 <em>Hypergraph-partitioning-based sparse matrix ordering</em>,
 &Uuml;mit V. &Ccedil;ataly&uuml;rek and C. Aykanat, Second International Workshop on Combinatorial Scientic Computing, CERFACS, 2005.<br>
-[<a name="cite4" href="http://www.sandia.gov/~egboman/papers/HUND.pdf">4</a>]
+[<a id="cite4" href="http://www.sandia.gov/~egboman/papers/HUND.pdf">4</a>]
 <em>Hypergraph-based Unsymmetric Nested Dissection Ordering for Sparse LU Factorization</em>,
 L. Grigori, E. G. Boman, S. Donfack, and T. A. Davis, SIAM Journal of Scientific Computation,
 Vol. 32, Issue 6, pp. 3426-3446 (2010).<br>
@@ -293,6 +307,8 @@ Home page Mondriaan package</a>.</p>
 </a>
 </p>
 <hr>
+
+</div>
 
 </body>
 

@@ -4,12 +4,23 @@
 <html>
 
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css">
+<link href="print.css" rel="stylesheet" type="text/css" media="print">
+
 <title>Partitioning a hypergraph using Mondriaan</title>
 </head>
 
 <body>
+
+<div id="mainContainer">
+
+<div id="pageNav">
+	<div><a href="USERS_GUIDE.html">Mondriaan</a></div>
+	<div><a href="MATLAB.html">MATLAB</a></div>
+	<div><a href="USERS_GUIDE_OPT.html">MondriaanOpt</a></div>
+</div>
 
 <h2>Partitioning a hypergraph using Mondriaan</h2>
 <hr>
@@ -29,15 +40,15 @@ Download the latest version of
 Mondriaan</a>. Uncompress with
 </p>
 <ul>
-<li><tt>% tar xzvf mondriaan4.tar.gz</tt></li>
+<li><code>% tar xzvf mondriaan4.tar.gz</code></li>
 </ul>
 <p>
-This will create a directory <tt>Mondriaan4</tt>
+This will create a directory <code>Mondriaan4</code>
 which contains all the files of the Mondriaan package. 
 Run
 </p>
 <ul>
-<li><tt>% make</tt></li>
+<li><code>% make</code></li>
 </ul>
 <p>
 which will build Mondriaan and the associated tools.
@@ -53,9 +64,9 @@ for each vertex, and a row for each hyperedge or net.
 </p>
 <div class="image squareimage"><img src="hypergraph.gif" alt=""><div class="caption">Figure 1</div></div>
 <p>
-For example, we can consider the hypergraph <tt>G = (V, E)</tt> from Figure 1 with
-vertices <tt>V = {1, 2, 3, 4, 5}</tt> and nets <tt>E = {{1}, {1, 2}, {2, 3, 4}, {3, 4}}</tt>
-as a matrix <tt>A</tt> with 5 columns and 4 rows in Matrix Market format:
+For example, we can consider the hypergraph <code>G = (V, E)</code> from Figure 1 with
+vertices <code>V = {1, 2, 3, 4, 5}</code> and nets <code>E = {{1}, {1, 2}, {2, 3, 4}, {3, 4}}</code>
+as a matrix <code>A</code> with 5 columns and 4 rows in Matrix Market format:
 </p>
 <pre>
 %%MatrixMarket weightedmatrix coordinate pattern general
@@ -75,8 +86,8 @@ as a matrix <tt>A</tt> with 5 columns and 4 rows in Matrix Market format:
 1
 </pre>
 <p>
-Here the values <tt>4 5 8 2</tt> indicate that this is a matrix with 4 rows (nets), 5 columns (vertices), 8 entries (total number of vertices in all nets), and weighted columns (the value 2 equals 10 in binary: weighted columns, unweighted rows).
-Then after all nonzeroes, <tt>1 1, 2 1, ...</tt>, we find the vertex weights, which are set to 1 for all five vertices.
+Here the values <code>4 5 8 2</code> indicate that this is a matrix with 4 rows (nets), 5 columns (vertices), 8 entries (total number of vertices in all nets), and weighted columns (the value 2 equals 10 in binary: weighted columns, unweighted rows).
+Then after all nonzeroes, <code>1 1, 2 1, ...</code>, we find the vertex weights, which are set to 1 for all five vertices.
 </p>
 <p>
 Providing the vertex weights is <b>essential</b>, because otherwise Mondriaan will by default weigh all the columns by the number of nonzeroes contained in them, which will lead to unbalanced hypergraph partitions.
@@ -84,23 +95,23 @@ Providing the vertex weights is <b>essential</b>, because otherwise Mondriaan wi
 
 <h3>Setting the proper Mondriaan options</h3>
 <p>
-Now that we have our hypergraph as a Matrix Market file, say <a href="hypergraph.mtx"><tt>foo.mtx</tt></a>, we can use Mondriaan to partition it.
-First we go to the <tt>tools/</tt> directory.
+Now that we have our hypergraph as a Matrix Market file, say <a href="hypergraph.mtx"><code>foo.mtx</code></a>, we can use Mondriaan to partition it.
+First we go to the <code>tools/</code> directory.
 </p>
 <ul>
-<li><tt>% cd tools</tt></li>
+<li><code>% cd tools</code></li>
 </ul>
 <p>
-Here the options file <tt>Mondriaan.defaults</tt> should set <tt>SplitStrategy</tt> to <tt>onedimcol</tt>, because we want Mondriaan to partition the matrix columns, which correspond to the hypergraph vertices.
-Then we partition <tt>foo.mtx</tt> in two parts with a maximum imbalance of 10% by running
+Here the options file <code>Mondriaan.defaults</code> should set <code>SplitStrategy</code> to <code>onedimcol</code>, because we want Mondriaan to partition the matrix columns, which correspond to the hypergraph vertices.
+Then we partition <code>foo.mtx</code> in two parts with a maximum imbalance of 10% by running
 </p>
 <ul>
-<li><tt>% ./Mondriaan foo.mtx 2 0.1</tt></li>
+<li><code>% ./Mondriaan foo.mtx 2 0.1</code></li>
 </ul>
 
 <h3>Extracting the hypergraph partitioning from the matrix partitioning</h3>
 <p>
-After performing the matrix partitioning, the file <tt>foo.mtx-v2</tt> contains the vector distribution of the columns
+After performing the matrix partitioning, the file <code>foo.mtx-v2</code> contains the vector distribution of the columns
 </p>
 <pre>
 5 2
@@ -111,10 +122,13 @@ After performing the matrix partitioning, the file <tt>foo.mtx-v2</tt> contains 
 5 1
 </pre>
 <p>
-The first line <tt>5 2</tt> contains the number of columns (5) and the number of parts to which they have been assigned (2).
+The first line <code>5 2</code> contains the number of columns (5) and the number of parts to which they have been assigned (2).
 Following this line are the column indices and the parts to which the columns have been assigned.
-Because the column indices correspond directly to the vertices of our hypergraph, we see that our hypergraph has been partitioned into two parts: <tt>{1, 2, 5}</tt> and <tt>{3, 4}</tt>, which was to be expected if you look at Figure 1.
+Because the column indices correspond directly to the vertices of our hypergraph, we see that our hypergraph has been partitioned into two parts: <code>{1, 2, 5}</code> and <code>{3, 4}</code>, which was to be expected if you look at Figure 1.
 </p>
+
+</div>
+
 </body>
 
 </html>
