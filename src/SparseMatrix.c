@@ -1006,14 +1006,19 @@ int SpMatReadIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct s
         return FALSE;
     }
     
+    if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+        return FALSE;
+    }
+    
     /* Use values as processor numbers */
     if (!SpMatValuesToProcessorIndices(pI)) {
         fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Error while reading processor indices!\n");
         return FALSE;
     }
     
-    if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
-        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+    if(pI->MMTypeCode[0] != 'D') {
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Processor number matrix not imported correctly!\n");
         return FALSE;
     }
     

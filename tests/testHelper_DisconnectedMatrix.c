@@ -181,8 +181,10 @@ void ConstructDisconnectedMatrix(struct sparsematrix *pA, int symmetric, int dum
     pA->i = (long *)malloc(pA->NrNzElts*sizeof(long));
     pA->j = (long *)malloc(pA->NrNzElts*sizeof(long));
     pA->Pstart = (long *)malloc((pA->NrProcs+1)*sizeof(long));
+    pA->RowLambda = (int *)malloc(pA->m*sizeof(int));
+    pA->ColLambda = (int *)malloc(pA->n*sizeof(int));
     
-    if (pA->i == NULL || pA->j == NULL || pA->Pstart == NULL) {
+    if (pA->i == NULL || pA->j == NULL || pA->Pstart == NULL || pA->RowLambda == NULL || pA->ColLambda == NULL) {
         printf("Error\n");
         exit(1);
     }
