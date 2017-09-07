@@ -410,6 +410,17 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
     /* Setup Mondriaan options. */
     maxweight = ((1 + eps) * totweight) / P;  /* rounded down */
     
+#ifdef INFO
+    if(ceil(totweight/(double)P) > maxweight) {
+        /* Compute minimum epsilon, rounded up at 5th decimal place */
+        double eps_min = ceil(totweight/(double)P) * (P/(double)totweight) - 1;
+        eps_min = ceil(eps_min * 100000)/100000;
+        
+        fprintf(stderr, "Info: The posed problem is infeasible, hence the resulting matrix distribution will not satisfy the balance constraint.\n");
+        fprintf(stderr, "      For the problem to be feasible, epsilon should be at least %.5lf.\n", eps_min);
+    }
+#endif
+    
     if (pOptions->SplitStrategy == OneDimRow)
         dir = ROW;
   
