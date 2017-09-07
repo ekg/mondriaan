@@ -7,8 +7,8 @@ SplitMethod                                    KLFM
 Partitioner                                    mondriaan 
 Metric                                         lambda1 
 Discard_Free_Nets                              yes 
-Zero_Volume_Search                             yes 
-Improve_Free_Nonzeros                          yes 
+ZeroVolumeSearch                               yes 
+ImproveFreeNonzeros                            yes 
 CheckUpperBound                                yes 
 SquareMatrix_DistributeVectorsEqual            no 
 SquareMatrix_DistributeVectorsEqual_AddDummies yes 

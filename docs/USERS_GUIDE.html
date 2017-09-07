@@ -513,6 +513,18 @@ It is also called the connectivity metric.
 Discard nets (and vertices) of the hypergraph that have no influence on the communication volume (i.e. when they
 contain at most one nonzero, or when they are cut and <code>Metric</code> is cutnet).
 This option should be <b>enabled</b> whenever the cut-net metric is used.</li>
+<li><code class="option_name">ZeroVolumeSearch</code>: <code class="option_values"><b>yes</b>, no</code><br>
+Before applying the simple or KLFM split method, first check whether a split is possible with zero communication.
+Whenever such a zero volume split is possible, this method is more likely to find it than the other methods, while at the same time being faster than most other methods.
+</li>
+<li><code class="option_name">ImproveFreeNonzeros</code>: <code class="option_values"><b>yes</b>, no</code><br>
+After a split is performed, improve the load balance by moving free nonzeros between parts.
+In this context, free nonzeros are nonzeros that may be moved between parts without increasing the communication volume.
+</li>
+<li><code class="option_name">CheckUpperBound</code>: <code class="option_values"><b>yes</b>, no</code><br>
+After finishing, check whether the computed partitioning has a communication volume of at most (min(m,n)+1)(P-1).
+If not, this option makes sure an alternative method is used that does produce a partitioning with volume at most (min(m,n)+1)(P-1).
+This option will only take effect if UseSingleEntry, dummies and column weights are not used.</li>
 <li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual</code>: <code class="option_values"><b>no</b>, yes</code><br>
 If yes, force the distribution of the vectors u and v to be the same.</li>
 <li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual_<wbr/>AddDummies</code>: <code class="option_values">no, <b>yes</b></code><br>
@@ -656,7 +668,9 @@ The number of matching levels that should be performed arbitrarily during coarse
 Set to 0 to disable.</li>
 <li><code class="option_name">Coarsening_<wbr/>MaxNrVtxInMatch</code>: <code class="option_values"><b>2</b></code><br>
 Integer. Range &gt;= 2. Recommended range : 2-10.
-The default value of 2 represents pairwise matching.</li>
+The default value of 2 represents pairwise matching.
+When using PGA as ATA matcher, you can also set MaxNrVtxInMatch=log or -1, in which case MaxNrVtxInMatch will equal either 2, 3 or 4,
+given by the formula MaxNrVtxInMatch = floor(log2(floor(NrVerticesInGraph / Coarsening_NrVertices))), clamped between 2 and 4.</li>
 <li><code class="option_name">Coarsening_<wbr/>StopRatio</code>: <code class="option_values"><b>0.05</b></code><br>
 Float. Range = [0,1]. 
 The contraction ratio is defined as: [NrVtx(old)-NrVtx(new)] / NrVtx(old). 

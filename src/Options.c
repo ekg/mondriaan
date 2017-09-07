@@ -130,8 +130,8 @@ char* GetDefaultOptionText() {
 "Partitioner                                    mondriaan \n"
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
-"Zero_Volume_Search                             yes \n"
-"Improve_Free_Nonzeros                          yes \n"
+"ZeroVolumeSearch                               yes \n"
+"ImproveFreeNonzeros                            yes \n"
 "CheckUpperBound                                yes \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
 "SquareMatrix_DistributeVectorsEqual_AddDummies yes \n"
@@ -248,13 +248,13 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     else return FALSE;
     fprintf(Out, "\n");
     
-    fprintf(Out, "Zero_Volume_Search ");
+    fprintf(Out, "ZeroVolumeSearch ");
     if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
     else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
     else return FALSE;
     fprintf(Out, "\n");
     
-    fprintf(Out, "Improve_Free_Nonzeros ");
+    fprintf(Out, "ImproveFreeNonzeros ");
     if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
     else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else return FALSE;
@@ -484,19 +484,19 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
     
-    fprintf(Out, "Zero-Volume-Search & ");
+    fprintf(Out, "ZeroVolumeSearch & ");
     if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
     else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    
+    fprintf(Out, "ImproveFreeNonzeros & ");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
     
     fprintf(Out, "CheckUpperBound & ");
     if (Opts->CheckUpperBound == CheckUpperBoundYes) fprintf(Out, "yes");
     else if (Opts->CheckUpperBound == CheckUpperBoundNo) fprintf(Out, "no");
-    else fprintf(Out, "?");
-    fprintf(Out, " \\\\\n");
-    
-    fprintf(Out, "Improve-Free-Nonzeros & ");
-    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
-    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
     
@@ -885,7 +885,7 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
             fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
-    } else if (!strcmp(option, "Zero_Volume_Search")) {
+    } else if (!strcmp(option, "ZeroVolumeSearch")) {
         if (!strcmp(value, "yes")) {
             pOptions->ZeroVolumeSearch = ZeroVolYes;
         } else if (!strcmp(value, "no")) {
@@ -894,7 +894,7 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
             fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
-    } else if (!strcmp(option, "Improve_Free_Nonzeros")) {
+    } else if (!strcmp(option, "ImproveFreeNonzeros")) {
         if (!strcmp(value, "no") || !strcmp(value, "0"))
             pOptions->ImproveFreeNonzeros = FreeNonzerosNo;
         else if (!strcmp(value, "yes") || ! strcmp(value, "1"))
