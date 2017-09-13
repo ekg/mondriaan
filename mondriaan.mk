@@ -8,7 +8,7 @@
 # Absolute path of the directory which contains this file (included last in every Makefile in the subdirectories).
 MONDRIAANHOMEDIR:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-MONDRIAANCURRENTVERSION := 4.1
+MONDRIAANCURRENTVERSION := 4.2
 MONDRIAANMAJORVERSION := 4
 
 # Gainbucket type must be either LIST or ARRAY
