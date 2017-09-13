@@ -1562,13 +1562,14 @@ int MMSparseMatrixPrintPstart(struct sparsematrix *pM, FILE *stream, const struc
         return FALSE;
     }
   
-    if (pM->MMTypeCode[0] == 'D') 
+    if (pM->MMTypeCode[0] == 'D') {
         for (t = 0; t <= pM->NrProcs; t++ )
             if( pOptions->OutputFormat==OutputDMM )
                  fprintf(stream, "%ld\n", pM->Pstart[t]);
             else /* default to 1-based, except if explicitly in old Mondriaan mode */
                  fprintf(stream, "%ld\n", pM->Pstart[t]+1);
-
+    }
+    
     return TRUE;
 } /* end MMSparseMatrixPrintPstart */
 

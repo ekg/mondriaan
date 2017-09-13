@@ -487,6 +487,8 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "ZeroVolumeSearch & ");
     if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
     else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
     
     fprintf(Out, "ImproveFreeNonzeros & ");
     if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
@@ -882,7 +884,7 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
         } else if (!strcmp(value, "no")) {
             pOptions->DiscardFreeNets = FreeNetNo;
         } else {
-            fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
     } else if (!strcmp(option, "ZeroVolumeSearch")) {
@@ -891,15 +893,15 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
         } else if (!strcmp(value, "no")) {
             pOptions->ZeroVolumeSearch = ZeroVolNo;
         } else {
-            fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
     } else if (!strcmp(option, "ImproveFreeNonzeros")) {
-        if (!strcmp(value, "no") || !strcmp(value, "0"))
+        if (!strcmp(value, "no") || !strcmp(value, "0")) {
             pOptions->ImproveFreeNonzeros = FreeNonzerosNo;
-        else if (!strcmp(value, "yes") || ! strcmp(value, "1"))
+        } else if (!strcmp(value, "yes") || ! strcmp(value, "1")) {
             pOptions->ImproveFreeNonzeros = FreeNonzerosYes;
-        else {
+        } else {
             fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
@@ -909,7 +911,7 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
         } else if (!strcmp(value, "no")) {
             pOptions->CheckUpperBound = CheckUpperBoundNo;
         } else {
-            fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
     } else if (!strcmp(option, "SquareMatrix_DistributeVectorsEqual")) {
