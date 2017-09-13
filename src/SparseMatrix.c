@@ -567,7 +567,7 @@ int MMSparseMatrixGetTypeCode(struct sparsematrix *pM, char *line, const char *n
              return FALSE;
     } else return FALSE;
 
-    sprintf(line, "%s\n", line);
+    strcat(line, "\n");
     return TRUE;
 } /* end MMSparseMatrixGetTypeCode */
   
@@ -791,6 +791,11 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     long * i_orig = pM->i;
     long * j_orig = pM->j;
     
+    if (pM->ReValue == NULL) {
+        fprintf(stderr, "SpMatValuesToProcessorIndices(): Matrix does not contain ReValue values!\n");
+        return FALSE;
+    }
+    
     pM->i = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
     pM->j = (long *) malloc((pM->NrNzElts+1) * sizeof(long));
     
@@ -802,6 +807,10 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     /* Determine number of processors */
     pM->NrProcs = 0;
     for (t = 0; t < pM->NrNzElts; t++) {
+        if(pM->ReValue[t] < 0.0) {
+            fprintf(stderr, "SpMatValuesToProcessorIndices(): Negative values cannot be used as processor indices!\n");
+            return FALSE;
+        }
         if(((long)pM->ReValue[t]) > pM->NrProcs) {
             pM->NrProcs = (long)pM->ReValue[t];
         }
@@ -856,6 +865,8 @@ int SpMatValuesToProcessorIndices(struct sparsematrix *pM) {
     free(i_orig);
     free(j_orig);
     free(Pindex);
+
+    pM->MMTypeCode[0] = 'D';
     
     return TRUE;
 }
@@ -995,14 +1006,19 @@ int SpMatReadIndexAndValueMatrixFiles(const char *fnA, const char *fnI, struct s
         return FALSE;
     }
     
+    if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+        return FALSE;
+    }
+    
     /* Use values as processor numbers */
     if (!SpMatValuesToProcessorIndices(pI)) {
         fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Error while reading processor indices!\n");
         return FALSE;
     }
     
-    if(pI->MMTypeCode[0] != 'M' || pI->MMTypeCode[1] != 'C') {
-        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Unsupported index matrix format!\n");
+    if(pI->MMTypeCode[0] != 'D') {
+        fprintf(stderr, "SpMatReadIndexAndValueMatrixFiles(): Processor number matrix not imported correctly!\n");
         return FALSE;
     }
     
@@ -1546,13 +1562,14 @@ int MMSparseMatrixPrintPstart(struct sparsematrix *pM, FILE *stream, const struc
         return FALSE;
     }
   
-    if (pM->MMTypeCode[0] == 'D') 
+    if (pM->MMTypeCode[0] == 'D') {
         for (t = 0; t <= pM->NrProcs; t++ )
             if( pOptions->OutputFormat==OutputDMM )
                  fprintf(stream, "%ld\n", pM->Pstart[t]);
             else /* default to 1-based, except if explicitly in old Mondriaan mode */
                  fprintf(stream, "%ld\n", pM->Pstart[t]+1);
-
+    }
+    
     return TRUE;
 } /* end MMSparseMatrixPrintPstart */
 
@@ -2080,6 +2097,135 @@ int SparseMatrixSymmetric2Full(struct sparsematrix *pM) {
    
     return TRUE;
 } /* end SparseMatrixSymmetric2Full */
+
+
+int SparseMatrixFull2Symmetric(struct sparsematrix *pM, char MMTypeCode) {
+
+    /* This function converts a full sparse matrix to the
+       symmetric, skew-symmetric, or hermitian representation.
+
+       This function is the 'inverse' of SparseMatrixSymmetric2Full().
+       
+       See SparseMatrixSymmetric2Full() for more information.
+    */
+  
+    long t, tt, Ndiag;
+    long start, NrNzEltsNew;
+    int q;
+    
+    if (!pM) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Null parameter!\n");
+        return FALSE;
+    }
+  
+    /* Check if matrix is general square */
+    if (pM->m != pM->n || pM->MMTypeCode[3] != 'G') {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): matrix is not general square!\n");
+        return FALSE;
+    }
+    if (MMTypeCode != 'S' && MMTypeCode != 'K' && MMTypeCode != 'H') {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): type code must equal S, K or H!\n");
+        return FALSE;
+    }
+  
+    /* Count the number of diagonal elements */
+    Ndiag = 0;
+    for (t = 0; t < pM->NrNzElts; t++)
+        if (pM->i[t] == pM->j[t])
+            Ndiag++;
+    NrNzEltsNew = (pM->NrNzElts + Ndiag)/2;
+
+    if (MMTypeCode == 'K' && Ndiag > 0) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): matrix is not skew-symmetric!\n");
+        return FALSE;
+    }
+
+    /* Update Pstart */
+    if (pM->NrProcs >= 1 && pM->Pstart != NULL) {
+        tt = 0;
+        start = pM->Pstart[0];
+        for (q = 0; q < pM->NrProcs; q++) {
+            for (t = start; t < pM->Pstart[q+1]; t++) {
+                if (pM->i[t] >= pM->j[t])
+                    tt++;
+            }
+            
+            start = pM->Pstart[q+1];
+            pM->Pstart[q+1] = tt;
+        }
+    
+        if(tt != NrNzEltsNew) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Processor weights not rearranged correctly!\n");
+            return FALSE;
+        }
+    }
+    
+    /* Copy the entries */
+    tt = 0;
+    for (t = 0; t < pM->NrNzElts; t++) {
+        /* Copy entry t into tt */
+        if (pM->i[t] < pM->j[t]) {
+            continue;
+        }
+
+        pM->i[tt] = pM->i[t];
+        pM->j[tt] = pM->j[t];
+        if (pM->MMTypeCode[2] != 'P')
+            pM->ReValue[tt] = pM->ReValue[t];
+        if (pM->MMTypeCode[2] == 'C')
+            pM->ImValue[tt] = pM->ImValue[t];
+        tt++;
+    }
+    
+    if(tt != NrNzEltsNew) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Nonzeros not rearranged correctly!\n");
+        return FALSE;
+    }
+   
+    /* Allocate memory for the entries */
+    pM->i = (long *) realloc(pM->i, (NrNzEltsNew+1) * sizeof(long));
+    pM->j = (long *) realloc(pM->j, (NrNzEltsNew+1) * sizeof(long));
+    
+    if (pM->i == NULL || pM->j == NULL) {
+        fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+        return FALSE;
+    }
+    
+    if (pM->MMTypeCode[2] != 'P') {
+        pM->ReValue = (double *) realloc(pM->ReValue, (NrNzEltsNew+1)*sizeof(double));
+        
+        if (pM->ReValue == NULL) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+            return FALSE;
+        }
+    }
+    
+    if (pM->MMTypeCode[2] == 'C') {
+        pM->ImValue = (double *) realloc(pM->ImValue, (NrNzEltsNew+1)*sizeof(double));
+        
+        if (pM->ImValue == NULL) {
+            fprintf(stderr, "SparseMatrixFull2Symmetric(): Unable to reallocate!\n");
+            return FALSE;
+        }
+    }
+  
+    /* Update the number of nonzero entries and the matrix type code */
+    pM->NrNzElts = NrNzEltsNew;
+    pM->MMTypeCode[3] = MMTypeCode;
+    switch(MMTypeCode) {
+        case 'S':
+            strcpy(pM->Symmetry, "symmetric");
+            break;
+        case 'K':
+            strcpy(pM->Symmetry, "skew-symmetric");
+            break;
+        case 'H':
+            strcpy(pM->Symmetry, "hermitian");
+            break;
+    }
+   
+    return TRUE;
+} /* end SparseMatrixFull2Symmetric */
   
 
 int SparseMatrixSymmetricLower2Random(struct sparsematrix *pM) {
@@ -2673,4 +2819,159 @@ int CreateInitialMediumGrainDistribution(struct sparsematrix *pM, long *mid){
     return TRUE;
 
 } /* end CreateInitialMediumGrainDistribution */
+
+
+
+/* Comparison function for qsort().
+ * This functions compares the values a and b, and
+ * returns -1, 0 or 1 if a is respectively lower than, equal to or larger than b.
+ */
+int compareLong (const void *a, const void *b) {
+
+    long diff = *(long*)a - *(long*)b;
+    if(diff == 0)
+        return 0;
+    return (diff < 0) ? -1 : 1;
+
+} /* end compareLong */
+
+/**
+ * Convert a sparse matrix to CRS and CCS forms.
+ * This assumes that duplicate entries in pM have already been removed with SparseMatrixRemoveDuplicates().
+ * 
+ * Input:
+ * pM                : The matrix (m-by-n)
+ * 
+ * Output:
+ * pCCS              : The matrix in Compressed Column Storage format (Only if return value == TRUE)
+ * pCRS              : The matrix in Compressed Row Storage format (Only if return value == TRUE)
+ * 
+ * Returned memory allocations:
+ *     pCCS:    indirect  (Only if return value == TRUE)
+ *     pCRS:    indirect  (Only if return value == TRUE)
+ * 
+ * Return value: FALSE if an error occurs, TRUE otherwise.
+ */
+int SparseMatrixToCRS_CCS(struct sparsematrix *pM, struct CRCS *pCCS, struct CRCS *pCRS){
+    
+    long i;
+
+    /* Position of a matrix nonzero, 0 <= x < m and 0 <= y < n,
+       where pM is an m by n matrix */
+    long x, y;
+    
+    if(!initCRCS(pCRS, 0, pM->m, pM->n, pM->NrNzElts) || !initCRCS(pCCS, 1, pM->m, pM->n, pM->NrNzElts)) {
+        return FALSE;
+    }
+    /* Fill starts array */
+    for(i=0;i<=pM->m;i++)
+        pCRS->starts[i] = 0;
+    for(i=0;i<=pM->n;i++)
+        pCCS->starts[i] = 0;
+
+    for(i=0;i<pM->NrNzElts;i++){
+        x = pM->i[i];
+        y = pM->j[i];
+        pCRS->starts[x+1]++;
+        pCCS->starts[y+1]++;
+    }
+
+    for(i=2;i<=pM->m;i++)
+        pCRS->starts[i] += pCRS->starts[i-1];
+    for(i=2;i<=pM->n;i++)
+        pCCS->starts[i] += pCCS->starts[i-1];
+
+    /* Fill index arrays */
+    long *nInRow = (long*)malloc(sizeof(long)*pM->m);
+    long *nInCol = (long*)malloc(sizeof(long)*pM->n);
+    if (nInRow == NULL || nInCol == NULL){
+        if(nInRow != NULL)
+            free(nInRow);
+        if(nInCol != NULL)
+            free(nInCol);
+        freeCRCS(pCRS);
+        freeCRCS(pCCS);
+        fprintf(stderr, "SparseMatrixToCRS_CCS(): Not enough memory!\n");
+        return FALSE;
+    }
+
+    for(i=0;i<pM->m;i++)
+        nInRow[i] = 0;
+    for(i=0;i<pM->n;i++)
+        nInCol[i] = 0;
+
+    for(i=0;i<pM->NrNzElts;i++){
+        x = pM->i[i];
+        y = pM->j[i];
+        /* Fill first free position in row x with column index y */
+        pCRS->indices[pCRS->starts[x]+nInRow[x]]=y;
+        /* Fill first free position in column y with row index x */
+        pCCS->indices[pCCS->starts[y]+nInCol[y]]=x;
+        nInRow[x]++;
+        nInCol[y]++;
+    }
+
+    /* Sort the indices within the rows and columns */
+    for(i=0;i<pM->m;i++){
+        qsort(pCRS->indices+pCRS->starts[i], pCRS->starts[i+1]-pCRS->starts[i], sizeof(long), compareLong);
+    }
+    for(i=0;i<pM->n;i++){
+        qsort(pCCS->indices+pCCS->starts[i], pCCS->starts[i+1]-pCCS->starts[i], sizeof(long), compareLong);
+    }
+
+    free(nInRow);
+    free(nInCol);
+
+    return TRUE;
+    
+} /* end SparseMatrixToCRS_CCS */
+
+/**
+ * Initialize a CRCS struct.
+ * This assumes that the struct is not already initialized.
+ * 
+ * Input:
+ * crcs              : The CRCS struct
+ * dir               : 0 for row-direction, 1 for column-direction
+ * m, n, nnz         : Dimensions and number of nonzeros
+ * 
+ * Returned memory allocations:
+ *     crcs.indices:    O(nnz)
+ *     crcs.starts:     O(m+1) if dir=0, O(n+1) if dir=1
+ * 
+ * Return value: FALSE if an error occurs, TRUE otherwise.
+ */
+int initCRCS(struct CRCS *pCRCS, int dir, long m, long n, long nnz) {
+    pCRCS->dir = dir?1:0;
+    pCRCS->m = m;
+    pCRCS->n = n;
+    pCRCS->nnz = nnz;
+    
+    long numStarts = dir?(n+1):(m+1);
+    pCRCS->indices = (long*)malloc(sizeof(long)*nnz);
+    pCRCS->starts = (long*)malloc(sizeof(long)*numStarts);
+    
+    if(pCRCS->indices == NULL || pCRCS->starts == NULL) {
+        if(pCRCS->indices != NULL)
+            free(pCRCS->indices);
+        if(pCRCS->starts != NULL)
+            free(pCRCS->starts);
+        fprintf(stderr, "initCRCS(): Not enough memory!\n");
+        return FALSE;
+    }
+    return TRUE;
+}
+
+/**
+ * Free a CRCS struct.
+ * 
+ * Input:
+ * crcs              : The CRCS struct
+ */
+void freeCRCS(struct CRCS *pCRCS) {
+    free(pCRCS->indices);
+    free(pCRCS->starts);
+    pCRCS->indices = NULL;
+    pCRCS->starts = NULL;
+}
 

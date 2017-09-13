@@ -117,7 +117,8 @@ int CreateNewBiPartHyperGraph(long NrVertices, long NrNets,
         pHG->V[t].iStart = 0;
         pHG->V[t].iEnd = 0;
         pHG->V[t].partition = 0;
-        pHG->V[t].GBentry = NULL;      
+        pHG->V[t].Free = FALSE;
+        pHG->V[t].GBentry = NULL;
         pHG->OptPartVtx[t] = 0;
         if (StoreMat)
             pHG->Vtx2MatIndex[t] = 0;

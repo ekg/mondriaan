@@ -4,32 +4,46 @@
 <html>
 
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css">
-<title>User's guide Mondriaan version 4.1</title>
+<link href="print.css" rel="stylesheet" type="text/css" media="print">
+<script type="text/javascript" src="script.js"></script>
+
+<title>User's guide Mondriaan version 4.2</title>
+
 </head>
 
 <body>
 
-<h2>User's guide Mondriaan version 4.1</h2>
+<div id="mainContainer">
 
-<div id="top">
-<div><a href="#inst">Installing</a></div>
-<div><a href="#comp">Compiling</a></div>
-<div><a href="#run">Running</a></div>
-<div><a href="#outp">Output</a></div>
-<div><a href="#opts">Options</a></div>
-<div><a href="#libr">Library use</a></div>
-<div><a href="MATLAB.html">MATLAB</a></div>
-<div><a href="HYPERGRAPH.html">Hypergraphs</a></div>
-<div><a href="USERS_GUIDE_OPT.html">MondriaanOpt</a></div>
-<div><a href="#prof">Profiling</a></div>
-<div><a href="#dev">Developers</a></div>
-<div><a href="#moar">More...</a></div>
+<div id="pageNav">
+	<div><a href="MATLAB.html">MATLAB</a></div>
+	<div><a href="HYPERGRAPH.html">Hypergraphs</a></div>
+	<div><a href="USERS_GUIDE_OPT.html">MondriaanOpt</a></div>
+</div>
+
+<h2 class="mainTitle">User's guide Mondriaan version 4.2</h2>
+
+
+<div id="menuPos"></div>
+<div id="menu">
+	<div id="menuItems">
+		<div><a href="#inst">Installing</a></div>
+		<div><a href="#comp">Compiling</a></div>
+		<div><a href="#run">Running</a></div>
+		<div><a href="#outp">Output</a></div>
+		<div><a href="#opts">Options</a></div>
+		<div><a href="#libr">Library use</a></div>
+		<div><a href="#prof">Profiling</a></div>
+		<div><a href="#dev">Developers</a></div>
+		<div><a href="#moar">More...</a></div>
+	</div>
 </div>
 
 <hr>
-<p>
+<p class="updateNote">
 This page is continuously being improved and updated;
 therefore, a more recent version may be obtained 
 <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/Docs/USERS_GUIDE.html">
@@ -38,17 +52,17 @@ This offline version is bundled with the software for your convenience.
 </p>
 <hr>
 
-<h3><a name="inst">How to download and install Mondriaan</a></h3>
+<h3><a class="anchor" id="inst">How to download and install Mondriaan</a></h3>
 <p>
 Download the latest version from the
 <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/">
 Mondriaan software homepage</a>. Uncompress with, e.g.,
 </p>
 <ul>
-<li><tt>% tar xzvf mondriaan4.tar.gz</tt><br><small>(Here, '<tt>%</tt>' is the prompt of your operating system.)</small></li>
+<li><code>% tar xzvf mondriaan4.tar.gz</code><br><small>(Here, '<code>%</code>' is the prompt of your operating system.)</small></li>
 </ul>
 <p>
-This will create a directory <tt>Mondriaan4</tt>
+This will create a directory <code>Mondriaan4</code>
 which contains all the files of the Mondriaan package. 
 </p>
 
@@ -56,46 +70,46 @@ which contains all the files of the Mondriaan package.
 Important files are:
 </p>
 <ul>
-<li><tt>README</tt>, which tells you about copyright and how to cite the work.</li>
-<li><tt>COPYING</tt>, the GNU General Public License (GNU GPL).</li>
-<li><tt>COPYING.LESSER</tt>, the GNU Lesser General Public License (GNU LGPL),
+<li><code>README</code>, which tells you about copyright and how to cite the work.</li>
+<li><code>COPYING</code>, the GNU General Public License (GNU GPL).</li>
+<li><code>COPYING.LESSER</code>, the GNU Lesser General Public License (GNU LGPL),
 which is an addition to GNU GPL, making its use more liberal.</li>
-<li><tt>mondriaan.mk</tt>, which contains the Mondriaan compilation options.</li>
+<li><code>mondriaan.mk</code>, which contains the Mondriaan compilation options.</li>
 </ul>
 
-<h3><a name="comp">How to compile and test Mondriaan</a></h3>
+<h3><a class="anchor" id="comp">How to compile and test Mondriaan</a></h3>
 <p>
-Go inside the directory <tt>Mondriaan4</tt> and type
+Go inside the directory <code>Mondriaan4</code> and type
 </p>
 <ul>
-<li><tt>% make</tt></li>
+<li><code>% make</code></li>
 </ul>
 <p>
 This will compile the Mondriaan library, the <a href="USERS_GUIDE_OPT.html">MondriaanOpt</a> library and
 tools included with the Mondriaan library.
 
-After compilation the include files are located in <tt>Mondriaan4/src/include</tt>,
-the compiled library in <tt>Mondriaan4/src/lib</tt>,
-and the stand-alone Mondriaan tools in <tt>Mondriaan4/tools</tt>.
+After compilation the include files are located in <code>Mondriaan4/src/include</code>,
+the compiled library in <code>Mondriaan4/src/lib</code>,
+and the stand-alone Mondriaan tools in <code>Mondriaan4/tools</code>.
 
 An example of how to use the Mondriaan library in your own
-program is provided by <tt>Mondriaan4/docs/example.c</tt> and
-<tt>Mondriaan4/tools/Mondriaan.c</tt>.
+program is provided by <code>Mondriaan4/docs/example.c</code> and
+<code>Mondriaan4/tools/Mondriaan.c</code>.
 </p>
 
 <p>
 For more information about MATLAB usage, please see the <a href="MATLAB.html">Mondriaan MATLAB guide</a>.
 To enable <em>MATLAB support</em> for Mondriaan and MondriaanOpt, edit the file
-<tt>mondriaan.mk</tt> and change the line containing the variable
-<tt>MATLABHOMEDIR</tt> to your current MATLAB install directory and
-remove the '<tt>#</tt>' in front of the line to uncomment it.
-The variable <tt>MEXSUFFIX</tt> should be set to the appropriate
+<code>mondriaan.mk</code> and change the line containing the variable
+<code>MATLABHOMEDIR</code> to your current MATLAB install directory and
+remove the '<code>#</code>' in front of the line to uncomment it.
+The variable <code>MEXSUFFIX</code> should be set to the appropriate
 extension for your platform, as specified on the Mathworks <a href="http://www.mathworks.nl/help/matlab/ref/mexext.html">site</a>.
 This should be done before compiling Mondriaan.
 </p><p>
 Similarly, to enable <i>PaToH support</i> (the PaToH library can be found
 <a href="http://bmi.osu.edu/~umit/software.html#patoh">here</a>),
-edit <tt>mondriaan.mk</tt> to change the line containing the <tt>PATOHHOMEDIR</tt> variable, as detailed above.
+edit <code>mondriaan.mk</code> to change the line containing the <code>PATOHHOMEDIR</code> variable, as detailed above.
 </p>
 
 <p>
@@ -105,35 +119,35 @@ for proper behaviour. The unit tests have been tried successfully on two
 architectures: Linux and Mac Os X. If one or more of the tests fails,
 please try to identify the relevant error message, and inform me
 (R . H . Bisseling @ NOSPAM uu . nl ) about the problem. I will try to help you 
-solve it. The tests called can be found in the script <tt>runtest</tt> 
-residing in the <tt>tests/</tt> subdirectory.
-To compile and run all 102 <em>unit tests</em>, type
+solve it. The tests called can be found in the script <code>runtest</code> 
+residing in the <code>tests/</code> subdirectory.
+To compile and run all 109 <em>unit tests</em>, type
 </p>
 <ul>
-<li><tt>% make test</tt></li>
+<li><code>% make test</code></li>
 </ul>
 
 <h4>Timers</h4>
-<p>The compile option <tt>-DTIME</tt> causes the CPU time used by Mondriaan 
+<p>The compile option <code>-DTIME</code> causes the CPU time used by Mondriaan 
 for the matrix distribution to be printed, and also the time for the vector
 distribution. This timer has a relatively low (guaranteed) accuracy, and
 it is in danger of clock wraparound.
 
-The compile option <tt>-DUNIX</tt> tells Mondriaan
+The compile option <code>-DUNIX</code> tells Mondriaan
 you are using a UNIX system.
-Together with <tt>-DTIME</tt> this also causes the elapsed (wall clock)
+Together with <code>-DTIME</code> this also causes the elapsed (wall clock)
 time to be printed, which is an upper bound on the CPU time.
 Usually the timer accuracy is higher, and there is no danger of clock
 wraparound. This is the best timer if you are the single user of the system.
 </p>
 
-<h4><a name="verb">Levels of verbosity</a></h4>
+<h4><a class="anchor" id="verb">Levels of verbosity</a></h4>
 <p>Mondriaan writes the output distributions to file.
 It can also generate useful statistics about the partitioning
 to the standard output stream stdout (or the screen).
 There are three levels of verbosity: silent, standard, and verbose.
 The silent mode is useful when running the unit tests by 
-<tt>make test</tt>. (If these are not done silently,
+<code>make test</code>. (If these are not done silently,
 the OKs are obscured.)
 The silent mode may also be useful if (parts of) Mondriaan are used as library
 functions.
@@ -142,102 +156,113 @@ a particular run in detail.
 The standard mode generates 1-2 pages of output, and 
 is aimed at easy digestion.
 You can change the verbosity level by commenting and uncommenting
-the appropriate <tt>CFLAGS</tt> lines in <tt>mondriaan.mk</tt>.
-Using the flag <tt>-DINFO</tt> generates standard output,
-and using the flags <tt>-DINFO -DINFO2</tt> generates verbose output.
+the appropriate <code>CFLAGS</code> lines in <code>mondriaan.mk</code>.
+Using the flag <code>-DINFO</code> generates standard output,
+and using the flags <code>-DINFO -DINFO2</code> generates verbose output.
 </p>
 
-<h3><a name="run">How to run Mondriaan</a></h3>
+<h3><a class="anchor" id="run">How to run Mondriaan</a></h3>
 <p>
-Go inside the directory <tt>Mondriaan4</tt> and type
+Go inside the directory <code>Mondriaan4</code> and type
 </p>
 <ul>
-<li><tt>% cd tools</tt></li>
-<li><tt>% ./Mondriaan ../tests/arc130.mtx 8 0.03</tt></li>
+<li><code>% cd tools</code></li>
+<li><code>% ./Mondriaan ../tests/arc130.mtx 8 0.03</code></li>
 </ul>
 <p>
-if you want to partition the <tt>arc130.mtx</tt> matrix (Matrix Market file format)
+if you want to partition the <code>arc130.mtx</code> matrix (Matrix Market file format)
 for 8 processors with at most 3% load imbalance. The matrix should be the full
-relative path; <em>in the above example output is saved in the Mondriaan tests folder</em> (<tt>../tests/</tt>).
+relative path; <em>in the above example output is saved in the Mondriaan tests folder</em> (<code>../tests/</code>).
 <br>
 Mondriaan may also be used to partition matrices provided via the standard
 input, e.g., by using piping:
 </p>
 <ul>
-<li><tt>% cat ../tests/arc130.mtx | ./Mondriaan - 8 0.03</tt></li>
+<li><code>% cat ../tests/arc130.mtx | ./Mondriaan - 8 0.03</code></li>
 </ul>
 <p>
 to obtain the same result as with the previous method, with one difference:
-results are written in the current (<tt>tools</tt>) directory.
+results are written in the current (<code>tools</code>) directory.
 For integration with already existing software you may have, without resorting to writing and reading files (or pipes),
 look at the <a href="#libr">how to use Mondriaan as a library</a> section of this guide.
 </p>
 
-<h3><a name="outp">Output</a></h3>
+<h3><a class="anchor" id="outp">Output</a></h3>
 
-<p>The main <tt>Mondriaan</tt> tool yields, after a successful run on an input matrix,
+<p>The main <code>Mondriaan</code> tool yields, after a successful run on an input matrix,
 various output files. All possible output files are described below. Typically,
 the output filenames are that of the input matrix filename, appended with a small
 descriptor and usually the number of parts <i>x</i> Mondriaan was requested to 
 construct.</p>
 
-<h4>Distributed matrix (<tt>-Px</tt>)</h4>
-<p> The <tt>Mondriaan</tt> program writes the distributed matrix to a file called
-<tt>input-Px</tt>,
-where <tt>input</tt> is the name of the input matrix, or <tt>stdin</tt> if the
+<div class="indent4">
+<h4>Distributed matrix (<code>-Px</code>)</h4>
+<p> The <code>Mondriaan</code> program writes the distributed matrix to a file called
+<code>input-Px</code>,
+where <code>input</code> is the name of the input matrix, or <code>stdin</code> if the
 matrix was read from the standard input, and x is the number of processors
 used in the distribution.
 
 We use an adapted Matrix Market format, with this structure: 
 <br>
-<tt>%%MatrixMarket distributed-matrix coordinate real general<br>
+<code>%%MatrixMarket distributed-matrix coordinate real general<br>
 m n nnz P<br>
-Pstart[0]</tt> ( this should be 0 )<br>
+Pstart[0]</code> ( this should be 0 )<br>
 ...<br>
 ...<br>
 ...<br>
-<tt>Pstart[P]</tt>( this should be nnz )<br>
-<tt>A.i[0] A.j[0] A.value[0]</tt>
+<code>Pstart[P]</code>( this should be nnz )<br>
+<code>A.i[0] A.j[0] A.value[0]</code>
 ...<br>
 ...<br>
 ...<br>
-<tt>A.i[nnz-1] A.j[nnz-1] A.value[nnz-1]</tt>
+<code>A.i[nnz-1] A.j[nnz-1] A.value[nnz-1]</code>
 <br>
-Here, <tt>Pstart[k]</tt> points to the start of the nonzeroes
+Here, <code>Pstart[k]</code> points to the start of the nonzeroes
 of processor k.
 </p>
+</div>
 
 
-
-<h4>Processor indices (<tt>-Ix</tt>)</h4>
-<p> The <tt>Mondriaan</tt> program also writes the processor indices of each
-nonzero to the Matrix Market file <tt>input-Ix</tt> where the value of each
+<div class="indent4">
+<h4>Processor indices (<code>-Ix</code>)</h4>
+<p> The <code>Mondriaan</code> program also writes the processor indices of each
+nonzero to the Matrix Market file <code>input-Ix</code> where the value of each
 nonzero is replaced by the processor index to which the nonzero has been assigned.
-The order of the nonzeroes is exactly that of the distributed matrix (<tt>-Px</tt>).
+The order of the nonzeroes is exactly that of the distributed matrix (<code>-Px</code>).
 </p>
+</div>
 
-<h4>Row and column permutations (<tt>-rowx</tt>, <tt>-colx</tt>)</h4>
-<p><tt>Mondriaan</tt> writes the row and column permutations determined by the
-Mondriaan algorithm (set by the <tt>Permute</tt> option) to <tt>input-rowx</tt>
-and <tt>input-colx</tt>. The goal of these permutations is to bring the input
+
+<div class="indent4">
+<h4>Row and column permutations (<code>-rowx</code>, <code>-colx</code>)</h4>
+<p><code>Mondriaan</code> writes the row and column permutations determined by the
+Mondriaan algorithm (set by the <code>Permute</code> option) to <code>input-rowx</code>
+and <code>input-colx</code>. The goal of these permutations is to bring the input
 matrix <i>A</i> into (doubly) Separated Block Diagonal (SBD) or Bordered Block 
 Diagonal (BBD) form, after applying the found permutations. This can have many 
 possible applications, including, but not limited to, cache-oblivious sparse 
 matrix vector multiplication (SBD form) or minimising fill-in in sparse LU 
-decomposition (BBD form). These files are not written if the <tt>Permute</tt> 
-option is set to <tt>none</tt>.
+decomposition (BBD form). These files are not written if the <code>Permute</code> 
+option is set to <code>none</code>.
 </p>
+</div>
 
-<h4>Reordered matrix (<tt>-reor-Px</tt>)</h4>
-<p><tt>Mondriaan</tt> also directly writes the permuted matrix <i>PAQ</i> to 
+
+<div class="indent4">
+<h4>Reordered matrix (<code>-reor-Px</code>)</h4>
+<p><code>Mondriaan</code> also directly writes the permuted matrix <i>PAQ</i> to 
 file, where the permutation matrix <i>P</i> corresponds to the row permutation 
 determined by the Mondriaan algorithm, as described in the previous paragraph. 
 The permutation matrix <i>Q</i> is similarly inferred from the column 
-permutation. This file is not written if the <tt>Permute</tt> option is set 
-to <tt>none</tt>.
+permutation. This file is not written if the <code>Permute</code> option is set 
+to <code>none</code>.
+</div>
 
+
+<div class="indent4">
 <h4>Separator boundary indices &amp; hierarchy 
-(<tt>-rowblocksx</tt>, <tt>-colblocksx</tt>)<a name="SBDoutput"></a></h4>
+(<code>-rowblocksx</code>, <code>-colblocksx</code>)<a id="SBDoutput"></a></h4>
 
 <p>These two files store two column-vectors each. The first column-vector 
 relates to the <em>separator boundary indices</em>, the second to the 
@@ -259,7 +284,7 @@ blocks</em>. The indices where these blocks start and end in the reordered
 matrix are given in these two files; this is done by consecutively listing
 the start index and end index of each block, both separator and 
 non-separator, as they occur in the row and column direction. These files 
-are not written if the <tt>Permute</tt> option is set to <tt>none</tt>.
+are not written if the <code>Permute</code> option is set to <code>none</code>.
 </p>
 
 <p>A more detailed explanation follows from the (idealised) Figures 1 and 2.
@@ -289,7 +314,7 @@ be viewed as a <em>child</em> of the largest separator blocks; in this
 way a binary tree of separator blocks can be defined. See Figure 3 for
 clarification.</p>
 
-<p>Each row of the <tt>rowblocks</tt> and <tt>columnblocks</tt> file 
+<p>Each row of the <code>rowblocks</code> and <code>columnblocks</code> file 
 corresponds to the start of a block (excluding the very last row which 
 always equals m+1, resp., n+1, where m by n is the matrix size). 
 Integers from 1 to m or 1 to n thus indicate blocks, and each separator 
@@ -305,20 +330,23 @@ array <em>(2,4,2,8,6,4,6,0,10,12,10,8,14,12,14)</em>.</p>
 
 <p>The rowblocks file in this instance would then look as follows (only
 partially shown):<br>
-<tt>
+<code>
 0 2<br>
 2 4<br>
 3 2<br>
 5 8<br>
 ...<br>
 21 14<br>
-23</tt></p>
+23</code></p>
+</div>
 
-<h4>Input/output vector distributions (<tt>-ux</tt>, <tt>-vx</tt>)</h4>
+
+<div class="indent4">
+<h4>Input/output vector distributions (<code>-ux</code>, <code>-vx</code>)</h4>
 
 <p>The program writes the processor numbers of the vector components
-to the files called <tt>input-ux</tt> and <tt>input-vx</tt>,
-where <tt>input</tt> is the name of the input matrix 
+to the files called <code>input-ux</code> and <code>input-vx</code>,
+where <code>input</code> is the name of the input matrix 
 and x is the number of processors used in the distribution.
 The vectors u and v are the output and input vectors
 of the sparse matrix-vector multiplication <i>u=A*v</i>.
@@ -330,19 +358,25 @@ following the Matrix Market conventions.
 In I/O, the processors are numbered 1 to P. Internally, the indices are 
 converted to the standard C-numbering starting from 0.
 </p>
+</div>
 
-<h4>Cartesian submatrices (<tt>-Cx</tt>)</h4>
+
+<div class="indent4">
+<h4>Cartesian submatrices (<code>-Cx</code>)</h4>
 <p>The program writes the row index sets I(q) 
 and column index sets J(q) of the Cartesian submatrix I(q) x J(q)
-for the processors q=1,...,P to the file called <tt>input-Cx</tt>,
-where <tt>input</tt> is the name of the input matrix 
+for the processors q=1,...,P to the file called <code>input-Cx</code>,
+where <code>input</code> is the name of the input matrix 
 and x is the number of processors used in the distribution.
 This file is additional information, useful e.g. for visualisation,
 and you may not need it.
 </p>
+</div>
 
+
+<div class="indent4">
 <h4>Statistics on standard output</h4>
-<p>Provided the library is compiled with the <tt>-DINFO</tt> or <tt>-DINFO2</tt> option,
+<p>Provided the library is compiled with the <code>-DINFO</code> or <code>-DINFO2</code> option,
 the program prints plenty of useful statistics to standard output.
 The <b>communication volume</b> is given for the two phases
 of the matrix-vector multiplication separately:
@@ -355,55 +389,59 @@ sent and the number of data words received, over all processors.
 This metric is also called the <b>BSP cost</b>; it is the cost
 metric of the <a href="http://www.bsp-worldwide.org/">Bulk Synchronous Parallel</a> model.
 </p>
+</div>
 
+
+<div class="indent4">
 <h4>Graphical output</h4>
-<p>In the <tt>tools/</tt> subdirectory the program <tt>MondriaanPlot</tt>
+<p>In the <code>tools/</code> subdirectory the program <code>MondriaanPlot</code>
 can be used to get insight in the Mondriaan partitioning algorithm.
 This program creates a series of Truevision TGA image files named
-<tt>img0000.tga</tt>, <tt>img0001.tga</tt>, ..., up to the number of
+<code>img0000.tga</code>, <code>img0001.tga</code>, ..., up to the number of
 processors over which the matrix is divided.
 To use this program, issue
 </p>
 <ul>
-<li><tt>% cd tools</tt></li>
-<li><tt>% ./MondriaanPlot ../tests/arc130.mtx 8 0.03</tt></li>
+<li><code>% cd tools</code></li>
+<li><code>% ./MondriaanPlot ../tests/arc130.mtx 8 0.03</code></li>
 </ul>
 <p>
-If you have <tt>mencoder</tt> installed, you can use the <tt>MondriaanMovie</tt>
+If you have <code>mencoder</code> installed, you can use the <code>MondriaanMovie</code>
 script to generate a small movie of the partitioning process:
 </p>
 <ul>
-<li><tt>% ./MondriaanMovie ../tests/arc130.mtx 8 0.03</tt></li>
+<li><code>% ./MondriaanMovie ../tests/arc130.mtx 8 0.03</code></li>
 </ul>
 <p>
-This will create <tt>../tests/arc130.mtx.avi</tt>.
-If you have <tt>imagemagick</tt> installed (or if the <tt>convert</tt> command is
-otherwise available), you can use <tt>MondriaanGIF</tt> to create an animated
+This will create <code>../tests/arc130.mtx.avi</code>.
+If you have <code>imagemagick</code> installed (or if the <code>convert</code> command is
+otherwise available), you can use <code>MondriaanGIF</code> to create an animated
 GIF of the partitioning process:
 </p>
 <ul>
-<li><tt>% ./MondriaanGIF ../tests/arc130.mtx 8 0.03</tt></li>
+<li><code>% ./MondriaanGIF ../tests/arc130.mtx 8 0.03</code></li>
 </ul>
 <p>
-This will create <tt>../tests/arc130.mtx.gif</tt>.
+This will create <code>../tests/arc130.mtx.gif</code>.
 </p>
 <p>
-When creating images with <tt>MondriaanPlot</tt>, also an SVG file is generated.
-Just as the <tt>.tga</tt> files, the <tt>.svg</tt> file also contains a visualisation of the partitioning.
-In the above examples, the svg file created will be <tt>../tests/arc130.mtx-8.svg</tt>.
+When creating images with <code>MondriaanPlot</code>, also an SVG file is generated.
+Just as the <code>.tga</code> files, the <code>.svg</code> file also contains a visualisation of the partitioning.
+In the above examples, the svg file created will be <code>../tests/arc130.mtx-8.svg</code>.
 </p>
+</div>
 
-<h3><a name="opts">Program options</a></h3>
+<h3><a class="anchor" id="opts">Program options</a></h3>
 <p>
 The Mondriaan options can be set in the
-<tt>Mondriaan.defaults</tt> file. If no such file exists, it is created
+<code>Mondriaan.defaults</code> file. If no such file exists, it is created
 at run time. Afterwards, this file can be edited for further runs.
 The default values of the options are given below in <b>boldface</b>. 
 It is possible to overrule the defaults from the command line,
 e.g. by typing
 </p>
 <ul>
-<li><tt>% ./Mondriaan ../tests/arc130.mtx 8 0.03 -SplitStrategy=onedimrow</tt></li>
+<li><code>% ./Mondriaan ../tests/arc130.mtx 8 0.03 -SplitStrategy=onedimrow</code></li>
 </ul>
 <p>
 you can force Mondriaan to split the matrix in one dimension only,
@@ -416,9 +454,9 @@ The nonnumerical options are used to choose partitioning methods.
 You may need to change them from the defaults to explore 
 different partitioning methods.
 </p>
-<ul>
-<li><tt>SplitStrategy</tt>: alternate, localbest, localratio, 
-onedimrow, onedimcol, finegrain, hybrid, symfinegrain, <b>mediumgrain</b><br>
+<ul class="options">
+<li><code class="option_name">SplitStrategy</code>: <code class="option_values">alternate, localbest, localratio, 
+onedimrow, onedimcol, finegrain, hybrid, symfinegrain, <b>mediumgrain</b></code><br>
 The main choice of strategy. Alternate forces alternating splits in row
 and column direction; localbest tries both directions and 
 chooses the best (this is also called the pure Mondriaan strategy);
@@ -444,89 +482,101 @@ Separated Block Diagonal, using symmetric finegrain, will always result in symme
 permutations. Structurally symmetric matrices can be handled as well, but requires 
 some deftness from the user: only the lower triangular part (including diagonal) 
 should be given to Mondriaan, and the resulting permutation should be manually 
-applied to the original matrix. The terminal program (<tt>tools/Mondriaan</tt>) 
+applied to the original matrix. The terminal program (<code>tools/Mondriaan</code>) 
 cannot perform this procedure automatically. The Matlab interface, in contrast, can.
-For symmetric permutations, see also the <tt>EnforceSymmetricPermutation</tt>
+For symmetric permutations, see also the <code>EnforceSymmetricPermutation</code>
 option.</li>
-<li><tt>Partitioner</tt>: <b>mondriaan</b>, patoh<br>
+<li><code class="option_name">Partitioner</code>: <code class="option_values"><b>mondriaan</b>, patoh</code><br>
 Permits the user to choose between the Mondriaan or PaToH hypergraph partitioner.
-Selecting <tt>patoh</tt> will use PaToH in a bipartitioning mode, effectively using
+Selecting <code>patoh</code> will use PaToH in a bipartitioning mode, effectively using
 it instead of the built-in hypergraph partitioner. This will also use the PaToH
 coarsening scheme instead of the one employed by Mondriaan.</li>
-<li><tt>Alternate_FirstDirection</tt>: row, col, <b>ratio</b><br>
+<li><code class="option_name">Alternate_<wbr/>FirstDirection</code>: <code class="option_values">row, col, <b>ratio</b></code><br>
 How to start the alternating strategy.</li>
-<li><tt>LoadbalanceStrategy</tt>: <b>constant</b>, increase, decrease<br>
+<li><code class="option_name">LoadbalanceStrategy</code>: <code class="option_values"><b>constant</b>, increase, decrease</code><br>
 Determines how to adjust the allowed imbalance epsilon for each split.</li>
-<li><tt>LoadbalanceAdjust</tt>: no, <b>yes</b><br>
+<li><code class="option_name">LoadbalanceAdjust</code>: <code class="option_values">no, <b>yes</b></code><br>
 Adjusting may change the number of processors assigned to each
 current part, to reflect the nonzero loads better.</li>
-<li><tt>SplitMethod</tt>: simple, <b>KLFM</b><br>
+<li><code class="option_name">SplitMethod</code>: <code class="option_values">simple, <b>KLFM</b></code><br>
 Simple is just meant for debugging, since it bypasses the sophisticated
 multilevel partitioning. It just partitions the nonzeroes into two nearly equal sets
 (in case of two processors) without looking at the communication costs incurred.</li>
-<li><tt>Metric</tt>: <b>lambda1</b>, cutnet, lambdalambda1<br>
+<li><code class="option_name">Metric</code>: <code class="option_values"><b>lambda1</b>, cutnet, lambdalambda1</code><br>
 Determines the metric with respect to which the communication volume is being
 minimised: the Lambda-minus-one, cut-net, and Lambda-times-Lambda-minus-one [<a href="#cite4">4</a>] metrics are available.
 For the Lambda-times-Lambda-minus-one metric, the PaToH bipartitioner must be used.
 The Lambda-minus-one metric is the default, since it precisely measures the communication volume of a parallel sparse matrix-vector multiplication.
 It is also called the connectivity metric.
 </li>
-<li><tt>DiscardFreeNets</tt>: <b>yes</b>, no<br>
+<li><code class="option_name">DiscardFreeNets</code>: <code class="option_values"><b>yes</b>, no</code><br>
 Discard nets (and vertices) of the hypergraph that have no influence on the communication volume (i.e. when they
-contain at most one nonzero, or when they are cut and <tt>Metric</tt> is cutnet).
+contain at most one nonzero, or when they are cut and <code>Metric</code> is cutnet).
 This option should be <b>enabled</b> whenever the cut-net metric is used.</li>
-<li><tt>SquareMatrix_DistributeVectorsEqual</tt>: <b>no</b>, yes<br>
+<li><code class="option_name">ZeroVolumeSearch</code>: <code class="option_values"><b>yes</b>, no</code><br>
+Before applying the simple or KLFM split method, first check whether a split is possible with zero communication.
+Whenever such a zero volume split is possible, this method is more likely to find it than the other methods, while at the same time being faster than most other methods.
+</li>
+<li><code class="option_name">ImproveFreeNonzeros</code>: <code class="option_values"><b>yes</b>, no</code><br>
+After a split is performed, improve the load balance by moving free nonzeros between parts.
+In this context, free nonzeros are nonzeros that may be moved between parts without increasing the communication volume.
+</li>
+<li><code class="option_name">CheckUpperBound</code>: <code class="option_values"><b>yes</b>, no</code><br>
+After finishing, check whether the computed partitioning has a communication volume of at most (min(m,n)+1)(P-1).
+If not, this option makes sure an alternative method is used that does produce a partitioning with volume at most (min(m,n)+1)(P-1).
+This option will only take effect if UseSingleEntry, dummies and column weights are not used.</li>
+<li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual</code>: <code class="option_values"><b>no</b>, yes</code><br>
 If yes, force the distribution of the vectors u and v to be the same.</li>
-<li><tt>SquareMatrix_DistributeVectorsEqual_AddDummies</tt>: no, <b>yes</b><br>
+<li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual_<wbr/>AddDummies</code>: <code class="option_values">no, <b>yes</b></code><br>
 If yes, and the vectors must be distributed the same, 
 add dummy nonzeroes for diagonal elements a(i,i) = 0.</li>
-<li><tt>SymmetricMatrix_UseSingleEntry</tt>: <b>no</b>, yes<br>
+<li><code class="option_name">SymmetricMatrix_<wbr/>UseSingleEntry</code>: <code class="option_values"><b>no</b>, yes</code><br>
 If yes, feed the lower triangular part of a symmetric matrix to Mondriaan,
 partition it, and then assign a(i,j) for i &lt; j to the same processor as a(j,i).
-If the <tt>SplitStrategy</tt> is symfinegrain, this option must be set to yes.</li>
-<li><tt>SymmetricMatrix_SingleEntryType</tt>: <b>lower</b>, random<br>
+If the <code>SplitStrategy</code> is symfinegrain, this option must be set to yes.</li>
+<li><code class="option_name">SymmetricMatrix_<wbr/>SingleEntryType</code>: <code class="option_values"><b>lower</b>, random</code><br>
 If random, and if the matrix is symmetric and a single entry is used,
 then choose either a(i,j) or a(j,i) randomly to be fed into Mondriaan.
-If the <tt>SplitStrategy</tt> is symfinegrain, this option must be set to lower.</li>
-<li><tt>Coarsening_MatchingStrategy</tt>: random, inproduct, <b>ata</b><br>
+If the <code>SplitStrategy</code> is symfinegrain, this option must be set to lower.</li>
+<li><code class="option_name">Coarsening_<wbr/>MatchingStrategy</code>: <code class="option_values">random, inproduct, <b>ata</b></code><br>
 Random causes matching of a random neighbouring column when merging
 columns in the multilevel coarsening. Inproduct takes the neighbouring column
 with the highest inner product. This works better, but is slower.
-ATA combines a specific graph matching algorithm with a specific neighbor finding algorithm in the hypergraph to generate matchings (see <tt>Coarsening_MatchingATAMatcher</tt> and <tt>Coarsening_MatchingATAFinder</tt>).</li>
-<li><tt>Coarsening_MatchingATAMatcher</tt>: greedy, <b>pga</b><br>
-If <tt>Coarsening_MatchingStrategy</tt> is set to ata, this is the used graph matching algorithm.
+ATA combines a specific graph matching algorithm with a specific neighbor finding algorithm in the hypergraph to generate matchings (see <code>Coarsening_MatchingATAMatcher</code> and <code>Coarsening_MatchingATAFinder</code>).</li>
+<li><code class="option_name">Coarsening_<wbr/>MatchingATAMatcher</code>: <code class="option_values">greedy, <b>pga</b></code><br>
+If <code>Coarsening_MatchingStrategy</code> is set to ata, this is the used graph matching algorithm.
 Greedy is the standard Mondriaan algorithm which greedily matches vertices in-order to their most heavy unmatched neighbors.
 PGA is the PGA' (1/2)-approximation algorithm developed by Drake and Hougardy, which offers higher quality matchings.
-<li><tt>Coarsening_MatchingATAFinder</tt>: <b>inproduct</b>, stairway<br>
-If <tt>Coarsening_MatchingStrategy</tt> is set to ata, this is the used hypergraph neighbor finding algorithm.
+<li><code class="option_name">Coarsening_<wbr/>MatchingATAFinder</code>: <code class="option_values"><b>inproduct</b>, stairway</code><br>
+If <code>Coarsening_<wbr/>MatchingStrategy</code> is set to ata, this is the used hypergraph neighbor finding algorithm.
 Inproduct always yields the neighbors of a given vertex with exact inner products.
 Stairway provides an efficient heuristic to approximate these inner products.
 It is much faster for matrices that have dense rows.
-<li><tt>Coarsening_InprodMatchingOrder</tt>: <b>decrwgt</b>, incrwgt, decrdeg,
-                                             incrdeg, natural, random<br>
+<li><code class="option_name">Coarsening_<wbr/>InprodMatchingOrder</code>: <code class="option_values"><b>decrwgt</b>, incrwgt, decrdeg,
+                                             incrdeg, natural, random</code><br>
 Determines the order in which columns are visited in the matching.
 This is either by decreasing column weight, increasing column weight, 
 increasing column degree,
 decreasing column degree, the natural given order, or a random order.
 The column weight represents the total number of nonzeroes merged into the column,
 whereas the degree represents the current sparsity pattern.</li>
-<li><tt>Coarsening_NetScaling</tt>: no, <b>linear</b><br>
+<li><code class="option_name">Coarsening_<wbr/>NetScaling</code>: <code class="option_values">no, <b>linear</b></code><br>
 Linear scaling gives each overlapping nonzero in the inner product matching
 a weight inversely proportional to the number of nonzeroes present in its row.</li>
-<li><tt>Coarsening_InprodScaling</tt>: no, cos, <b>min</b>, max, jaccard<br>
+<li><code class="option_name">Coarsening_<wbr/>InprodScaling</code>: <code class="option_values">no, cos, <b>min</b>, max, jaccard</code><br>
 Minimum scaling scales the inner product IP for the match between columns j0 and j1 
 by a factor 1/min(deg(j0, j1)). Maximum scaling uses 1/max(deg(j0, j1)).
 Cosine scaling uses 1/sqrt(min*max), which represents the cosine of the angle
 between the corresponding vectors.
 Jaccard uses 1/(min+max-IP), and is a metric often used in information retrieval.</li>
-<li><tt>Coarsening_MatchIdenticalFirst</tt>: no, <b>yes</b><br>
+<li><code class="option_name">Coarsening_<wbr/>MatchIdenticalFirst</code>: <code class="option_values">no, <b>yes</b></code><br>
 If yes, try to match identical columns first, before looking at inner products.</li>
-<li><tt>VectorPartition_Step3</tt>: increase, decrease, <b>random</b><br>
+<li><code class="option_name">VectorPartition_<wbr/>Step3</code>: <code class="option_values">increase, decrease, <b>random</b></code><br>
 Remainder from original Mondriaan vector distribution. 
 Determines the order in which matrix columns with at least 3 processors owning nonzeroes therein,
 are visited in Step 3 of the vector distribution algorithm (Algorithm 2 in the paper 
 by Vastenhouw and Bisseling, 2005).</li>
-<li><tt>Permute</tt>: <b>none</b>, reverseBBD, SBD, BBD<br>
+<li><code class="option_name">Permute</code>: <code class="option_values"><b>none</b>, reverseBBD, SBD, BBD</code><br>
 Generate row and column permutations of the matrix that is being processed, reflecting
 the partitioning process.
 The SBD or (reverse)BBD tags determine where the rows or columns are permuted if they 
@@ -541,32 +591,32 @@ The BBD reordering has applications in sparse LU (reduction of fill-in), whereas
 the SBD permutation is useful in cache-oblivious sparse matrix-vector multiplication;
 see e.g. [<a href="#cite1">1</a>], [<a href="#cite2">2</a>]. Many other applications 
 are expected to appear.</li>
-<li><tt>EnforceSymmetricPermutation</tt>: <b>no</b>, yes<br>
+<li><code class="option_name">EnforceSymmetricPermutation</code>: <code class="option_values"><b>no</b>, yes</code><br>
 Controls whether symmetric row and column permutations are generated; that is,
 P=Q<sup>T</sup>, where the reordered matrix is given by PAQ with A the input matrix.
-Note that A is permuted to PAQ only when the <tt>Permute</tt> option is set to something
-other than <tt>none</tt>. There are no restrictions on A: in particular, it need 
+Note that A is permuted to PAQ only when the <code>Permute</code> option is set to something
+other than <code>none</code>. There are no restrictions on A: in particular, it need 
 <em>not</em> be (structurally) symmetric. When A is symmetric, however, this option 
 ensures PAQ also is symmetric.<br>
 Much as with the symmetric finegrain option discussed in the section on the 
-<tt>SplitStrategy</tt> option, the quality of the separators degrades when symmetry is 
+<code>SplitStrategy</code> option, the quality of the separators degrades when symmetry is 
 forced: the separators will in most cases be wider than optimally required. E.g., the 
 only way an SBD permutation in one dimension (row-net, for instance) can be symmetric,
 is to introduce a vertical separator block in addition to the horizontal separator 
 already there.</li>
-<li><tt>Iterative_Refinement</tt>: never, <b>aftermg</b>, always<br>
+<li><code class="option_name">Iterative_<wbr/>Refinement</code>: <code class="option_values">never, <b>aftermg</b>, always</code><br>
 When to perform iterative refinement to improve a partitioning (see [<a href="#cite3">3</a>]).
 Iterative refinement slightly increases partitioning time, but leads to better results. If set 
 to never, iterative refinement is not performed. If set to aftermg, it is only performed if 
-<tt>SplitStrategy</tt> is set to mediumgrain. If set to always, iterative refinement is always 
+<code>SplitStrategy</code> is set to mediumgrain. If set to always, iterative refinement is always 
 performed after partitioning, which may yield two-dimensional partitionings even if a one-dimensional strategy is used.
 </li>
 </ul>
 
 <h4>Output options</h4>
-<ul>
+<ul class="options">
  <li>
-<tt>OutputFormat</tt>: <b>original</b>, emm<br>
+<code class="option_name">OutputFormat</code>: <code class="option_values"><b>original</b>, emm</code><br>
 Controls the output format of matrix and vector files. Original mode writes the files
 exactly as described in the previous section. The emm mode refers to the <em>Extended
  Matrix-Market</em> (EMM) format; this format is described  <a href="extendedMM.pdf">
@@ -577,13 +627,13 @@ which processor is now 1-based, as are most other values in the Matrix-Market fo
 Also, all files generated by Mondriaan are now preceded by an EMM banner; for example,
 previously, vector files would not possess such a header.
  </li><li>
-<tt>OutputMode</tt>: <b>original</b>, onefile, DIMACS<br>
+<code class="option_name">OutputMode</code>: <code class="option_values"><b>original</b>, onefile, DIMACS</code><br>
 Controls how file output is generated. Original mode causes Mondriaan to write a new
 file for each different object (distributed matrix, Cartesian matrix, vector 
 distributions, row-permutation, column permutation, et cetera). See also the 
 previous section on output files. The new Extended Matrix-Market format, however, 
 has support to store all these data in a single  file instead of many; to enable 
-this, select onefile as the <tt>OutputMode</tt>. This does require the OutputFormat 
+this, select onefile as the <code>OutputMode</code>. This does require the OutputFormat 
 to be set to EMM. See the <a href="extendedMM.pdf">pdf</a> file on the EMM format 
 for specifics on how all data is stored in a single file.
 The DIMACS output format will generate partitioning output file appropriate for the 10th DIMACS
@@ -594,68 +644,70 @@ challenge on graph partitioning and clustering.
 <h4>Numerical options</h4>
 <p>
 The numerical options are often used to optimise given partitioning methods.
-Setting values such as <tt>NrRestarts</tt>, 
-<tt>MaxNrLoops</tt>, or
-<tt>MaxNrNoGainMoves</tt> to a higher number, often results in better quality
+Setting values such as <code>NrRestarts</code>, 
+<code>MaxNrLoops</code>, or
+<code>MaxNrNoGainMoves</code> to a higher number, often results in better quality
 of the partitioning solution, at the expense of increased run-time.
 </p>
-<ul>
-<li><tt>Seed</tt>: <b>99</b><br>
+<ul class="options">
+<li><code class="option_name">Seed</code>: <code class="option_values"><b>99</b></code><br>
 Integer. Range &gt;= 0. Set the random seed. 
 You can also set Seed=random to set the seed depending on your system time.
-This can only be done on a UNIX system, compiled with the flag <tt>-DUNIX</tt>.
+This can only be done on a UNIX system, compiled with the flag <code>-DUNIX</code>.
 This is useful, for instance, if you want to obtain an average 
 communication volume over 10 runs, each time
 with a different seed.</li>
-<li><tt>Coarsening_NrVertices</tt>: <b>200</b><br>
+<li><code class="option_name">Coarsening_<wbr/>NrVertices</code>: <code class="option_values"><b>200</b></code><br>
 Integer. Range &gt;= 1. Recommended range : 100-500.
 Determines when to stop coarsening, as the current number
 of vertices is small enough.</li>
-<li><tt>Coarsening_MaxCoarsenings</tt>: <b>128</b><br>
+<li><code class="option_name">Coarsening_<wbr/>MaxCoarsenings</code>: <code class="option_values"><b>128</b></code><br>
 The maximum number of graph coarsenings that may be performed by Mondriaan.</li>
-<li><tt>Coarsening_NrMatchArbitrary</tt>: <b>0</b><br>
+<li><code class="option_name">Coarsening_<wbr/>NrMatchArbitrary</code>: <code class="option_values"><b>0</b></code><br>
 The number of matching levels that should be performed arbitrarily during coarsening (i.e. irrespective of the actual inner products between vertices).
 Set to 0 to disable.</li>
-<li><tt>Coarsening_MaxNrVtxInMatch</tt>: <b>2</b><br>
+<li><code class="option_name">Coarsening_<wbr/>MaxNrVtxInMatch</code>: <code class="option_values"><b>2</b></code><br>
 Integer. Range &gt;= 2. Recommended range : 2-10.
-The default value of 2 represents pairwise matching.</li>
-<li><tt>Coarsening_StopRatio</tt>: <b>0.05</b><br>
+The default value of 2 represents pairwise matching.
+When using PGA as ATA matcher, you can also set MaxNrVtxInMatch=log or -1, in which case MaxNrVtxInMatch will equal either 2, 3 or 4,
+given by the formula MaxNrVtxInMatch = floor(log2(floor(NrVerticesInGraph / Coarsening_NrVertices))), clamped between 2 and 4.</li>
+<li><code class="option_name">Coarsening_<wbr/>StopRatio</code>: <code class="option_values"><b>0.05</b></code><br>
 Float. Range = [0,1]. 
 The contraction ratio is defined as: [NrVtx(old)-NrVtx(new)] / NrVtx(old). 
 Stop coarsening if the ratio drops below the stopping value.</li>
-<li><tt>Coarsening_VtxMaxFractionOfWeight</tt>: <b>0.2</b><br>
+<li><code class="option_name">Coarsening_<wbr/>VtxMaxFractionOfWeight</code>: <code class="option_values"><b>0.2</b></code><br>
 Float. Range = (0,1]. To ensure load balance : fraction &lt; 0.5.
 This parameter is set to prevent matching all vertices into one huge vertex.</li>
-<li><tt>Coarsening_FineSwitchLevel</tt>: <b>2</b><br>
+<li><code class="option_name">Coarsening_<wbr/>FineSwitchLevel</code>: <code class="option_values"><b>2</b></code><br>
 If a finegrain split is performed (either in the finegrain, symfinegrain,
 or hybrid strategy) 
 we use a specialised, faster matching function for the first <b>2</b> splitting
 levels of the graph coarsening to improve performance.
 This value can be set to <b>0</b> to disable this optimisation.</li>
-<li><tt>KLFM_InitPart_NrRestarts</tt>: <b>8</b><br>
+<li><code class="option_name">KLFM_InitPart_<wbr/>NrRestarts</code>: <code class="option_values"><b>8</b></code><br>
 Integer. Range &gt;= 1. 
 Number of times the Kernighan-Lin Fiduccia-Mathheyses algorithm is run,
 each time with a different initial partitioning.</li>
-<li><tt>KLFM_InitPart_MaxNrLoops</tt>: <b>25</b><br>
+<li><code class="option_name">KLFM_InitPart_<wbr/>MaxNrLoops</code>: <code class="option_values"><b>25</b></code><br>
 Integer. Range &gt;= 1. 
 Maximum number of loops within one run.</li>
-<li><tt>KLFM_InitPart_MaxNrNoGainMoves</tt>: <b>200</b><br>
+<li><code class="option_name">KLFM_InitPart_<wbr/>MaxNrNoGainMoves</code>: <code class="option_values"><b>200</b></code><br>
 Integer. Range &gt;= 0. 
 Maximum number of successive no-gain moves allowed in one loop of a KLFM run.</li>
-<li><tt>KLFM_Refine_MaxNrLoops</tt>: <b>25</b><br>
+<li><code class="option_name">KLFM_Refine_<wbr/>MaxNrLoops</code>: <code class="option_values"><b>25</b></code><br>
 Integer. Range &gt;= 1. 
 Maximum number of loops within the refinement run of KLFM.</li>
-<li><tt>KLFM_Refine_MaxNrNoGainMoves</tt>: <b>200</b><br>
+<li><code class="option_name">KLFM_Refine_<wbr/>MaxNrNoGainMoves</code>: <code class="option_values"><b>200</b></code><br>
 Integer. Range &gt;= 0. 
 Maximum number of successive no-gain moves allowed in one loop of 
 the refinement run of KLFM.</li>
-<li><tt>VectorPartition_MaxNrLoops</tt>: <b>10</b><br>
+<li><code class="option_name">VectorPartition_<wbr/>MaxNrLoops</code>: <code class="option_values"><b>10</b></code><br>
 Integer. Range &gt;= 1. 
 Number of times a vector partitioning is tried.
 Each time, the matrix columns are randomly reordered on input.
 Vector partitioning is much cheaper than matrix partitioning,
 so trying this several times is justified.</li>
-<li><tt>VectorPartition_MaxNrGreedyImproves</tt>: <b>10</b><br>
+<li><code class="option_name">VectorPartition_<wbr/>MaxNrGreedyImproves</code>: <code class="option_values"><b>10</b></code><br>
 Integer. Range &gt;= 0.
 Each vector partitioning can be improved by a very cheap
 greedy improvement procedure (described in [<a href="#cite6">6</a>]).
@@ -663,126 +715,114 @@ MaxNrGreedyImproves is the number of times this is done
 for each vector partitioning.</li>
 </ul>
 
-<h3><a name="libr">How to use Mondriaan as a library</a></h3>
+<h3><a class="anchor" id="libr">How to use Mondriaan as a library</a></h3>
 
 <p>
-After successful compilation (using <tt>make</tt>),
-all relevant header files are exported to the <tt>src/include</tt> directory,
-and a static library is available in the <tt>src/lib</tt> directory.
+After successful compilation (using <code>make</code>),
+all relevant header files are exported to the <code>src/include</code> directory,
+and a static library is available in the <code>src/lib</code> directory.
 </p>
 <p>
 To illustrate the use of Mondriaan we provide a small <a href="example.c">example program</a> together with this guide.
 This example can be compiled (provided the Mondriaan library was successfully built) by executing
 </p>
 <ul>
-<li><tt>% gcc example.c -I../src/include -L../src/lib -lMondriaan4 -lm</tt></li>
+<li><code>% gcc example.c -I../src/include -L../src/lib -lMondriaan4 -lm</code></li>
 </ul>
 <p>
-in the <tt>docs/</tt> directory which will generate the executable <tt>a.out</tt>.
-More advanced use of the library is illustrated in <tt>tools/Mondriaan.c</tt>.
+in the <code>docs/</code> directory which will generate the executable <code>a.out</code>.
+More advanced use of the library is illustrated in <code>tools/Mondriaan.c</code>.
 </p>
 <p>
 Mondriaan uses a triplet-based datastructure (the Matrix Market format) to store sparse matrices;
 that is, for each nonzero, its row- and column-index are stored, as well as its numerical value (in general).
-The exact representation is detailed in <tt>src/SparseMatrix.c</tt>/<tt>.h</tt>; and to successfully interface,
+The exact representation is detailed in <code>src/SparseMatrix.c</code>/<code>.h</code>; and to successfully interface,
 your sparse matrix scheme has to be translated into this format.
 </p>
 <p>
 Since the Compressed Row Storage (CRS), or alternatively known as Compressed Sparse Row (CSR), is a more prevailing standard,
-<tt>SparseMatrix</tt> comes with a translation function specifically for that datastructure: <tt>CRSSparseMatrixInit</tt>.
-It takes as input an uninitialised Mondriaan <tt>SparseMatrix</tt> struct, the matrix dimensions and number of nonzeroes, and 
-the CRS datastructure arrays. The <tt>base</tt> parameter automatically translates from, e.g., 1-based arrays (base=1) as
+<code>SparseMatrix</code> comes with a translation function specifically for that datastructure: <code>CRSSparseMatrixInit</code>.
+It takes as input an uninitialised Mondriaan <code>SparseMatrix</code> struct, the matrix dimensions and number of nonzeroes, and 
+the CRS datastructure arrays. The <code>base</code> parameter automatically translates from, e.g., 1-based arrays (base=1) as
 they may appear in for example Fortran, to 0-based arrays as used in Mondriaan.
 </p>
 <p>
-Next is setting any options for Mondriaan. Recommended is to use an options file, storing all the defaults tuned to your application (e.g. as provided by <tt>tools/Mondriaan.defaults</tt>).
-These defaults can be read from file and stored in the Mondriaan <tt>Options</tt> struct by using the function <tt>SetOptionsFromFile</tt>;
-see <tt>src/Options.c</tt>/<tt>.h</tt>.
+Next is setting any options for Mondriaan. Recommended is to use an options file, storing all the defaults tuned to your application (e.g. as provided by <code>tools/Mondriaan.defaults</code>).
+These defaults can be read from file and stored in the Mondriaan <code>Options</code> struct by using the function <code>SetOptionsFromFile</code>;
+see <code>src/Options.c</code>/<code>.h</code>.
 </p><p>
-Once both the sparse matrix and the options are ready the main Mondriaan distribution function, <tt>DistributeMatrixMondriaan</tt>, can be used.
+Once both the sparse matrix and the options are ready the main Mondriaan distribution function, <code>DistributeMatrixMondriaan</code>, can be used.
 This function takes as parameters the sparse matrix struct, the number of processors, the load imbalance parameter, and the options struct.
-The callback function is for advanced use, and is usually kept a <tt>NULL</tt> pointer (an example of using the callback is given in <tt>tools/MondriaanPlot.c</tt>). This function is a blocking call.
-After partitioning, all relevant information can be extracted from the <tt>SparseMatrix</tt> struct (see the source code for details).
-The struct can be freed by calling <tt>MMDeleteSparseMatrix</tt>.
+The callback function is for advanced use, and is usually kept a <code>NULL</code> pointer (an example of using the callback is given in <code>tools/MondriaanPlot.c</code>). This function is a blocking call.
+After partitioning, all relevant information can be extracted from the <code>SparseMatrix</code> struct (see the source code for details).
+The struct can be freed by calling <code>MMDeleteSparseMatrix</code>.
 </p><p>
-Interfacing with non-C code is best achieved by writing a custom interface between your code and Mondriaan, using <tt>extern "C"</tt>-style additions when, e.g., interfacing between C++ and C; or using any other specific translation required (e.g., writing all parameters as pointers (Fortran), using <tt>jni</tt> (Java), etc.).
-As an example, the MATLAB interface is given in <tt>tools/MatlabMondriaan.c</tt>.
+Interfacing with non-C code is best achieved by writing a custom interface between your code and Mondriaan, using <code>extern "C"</code>-style additions when, e.g., interfacing between C++ and C; or using any other specific translation required (e.g., writing all parameters as pointers (Fortran), using <code>jni</code> (Java), etc.).
+As an example, the MATLAB interface is given in <code>tools/MatlabMondriaan.c</code>.
 </p>
 
-<h3><a name="matl">Using Mondriaan in MATLAB</a></h3>
-
-<p>
-For more information about MATLAB usage, please see the <a href="MATLAB.html">Mondriaan MATLAB guide</a>.
-</p>
-
-<h3><a name="hyper">Partitioning hypergraphs using Mondriaan</a></h3>
-
-<p>
-For more information about hypergraph partitioning, please see the <a href="HYPERGRAPH.html">Mondriaan hypergraph guide</a>.
-</p>
-
-<h3><a name="prof">Profiling Mondriaan</a></h3>
+<h3><a class="anchor" id="prof">Profiling Mondriaan</a></h3>
 <p>To profile the Mondriaan library for various configurations, please use
-the <tt>Profile</tt> program and <tt>RunProfiler</tt> script both included
-in the <tt>tools/</tt> directory.
-Entering the <tt>tools/</tt> directory and executing</p>
+the <code>Profile</code> program and <code>RunProfiler</code> script both included
+in the <code>tools/</code> directory.
+Entering the <code>tools/</code> directory and executing</p>
 <ul>
-<li><tt>% ./Profile 8 0.03 10 a.mtx b.mtx c.mtx &gt; out.tex</tt></li>
+<li><code>% ./Profile 8 0.03 10 a.mtx b.mtx c.mtx &gt; out.tex</code></li>
 </ul>
 <p>
-partitions the matrices <tt>a.mtx</tt>, <tt>b.mtx</tt>, and <tt>c.mtx</tt>
+partitions the matrices <code>a.mtx</code>, <code>b.mtx</code>, and <code>c.mtx</code>
 among 8 processors with at most 3% imbalance, taking the average over 10
 runs with a different random seed.
-The results are written, via <tt>stdout</tt>, to the LaTeX file <tt>out.tex</tt>
+The results are written, via <code>stdout</code>, to the LaTeX file <code>out.tex</code>
 which then contains a table with the averaged results of the partitioning
 process.</p>
 
-<h3><a name="dev">For code developers</a></h3>
+<h3><a class="anchor" id="dev">For code developers</a></h3>
 <p>
 If you develop new code to <b>add to Mondriaan</b>, you probably would like to add possibilities
 to use your code through a new option. In that case you need to adjust a few files:
 </p>
 <ul>
-<li><tt>src/Options.h</tt>: you should add the option and its possible values.
-<li><tt>src/Options.c</tt>: you should make a choice for the default value
-and set it in the function <tt>SetDefaultOptions</tt>. 
+<li><code>src/Options.h</code>: you should add the option and its possible values.
+<li><code>src/Options.c</code>: you should make a choice for the default value
+and set it in the function <code>SetDefaultOptions</code>. 
 If the option is a numerical option,
-you should check its range in the function <tt>SetDefaultOptions</tt>.
+you should check its range in the function <code>SetDefaultOptions</code>.
 Finally, you should add the option and all its possible values
-as an if-statement in the function <tt>SetOption</tt>. 
-<li>subdirectory <tt>tests</tt>: it may happen that adding the options
+as an if-statement in the function <code>SetOption</code>. 
+<li>subdirectory <code>tests</code>: it may happen that adding the options
 will break a few unit tests, in particular those connected to functions
-<tt>GetParameters</tt>, <tt>SetDefaultOptions</tt>, <tt>SetOption</tt>.
+<code>GetParameters</code>, <code>SetDefaultOptions</code>, <code>SetOption</code>.
 This is quite harmless, and easy to repair.
 </ul>
 
-<h3><a name="moar">More information</a></h3>
+<h3><a class="anchor" id="moar">More information</a></h3>
 <p>
-All functions of Mondriaan have extensive documentation in the source code (<tt>.c</tt> files).
+All functions of Mondriaan have extensive documentation in the source code (<code>.c</code> files).
 Please have a look there for more details.
 </p>
 
 <h3>References</h3>
 <p>
-[<a name="cite1" href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/yzelman09.pdf">1</a>]
+[<a id="cite1" href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/yzelman09.pdf">1</a>]
 <em>Cache-oblivious sparse matrix-vector multiplication by using sparse matrix partitioning methods</em>,
 A. N. Yzelman and Rob H. Bisseling, SIAM Journal of Scientific Computation, Vol. 31, Issue 4, pp. 3128-3154 (2009).<br>
-[<a name="cite2" href="http://www.sciencedirect.com/science/article/pii/S0167819111001062">2</a>]
+[<a id="cite2" href="http://www.sciencedirect.com/science/article/pii/S0167819111001062">2</a>]
 <em>Two-dimensional cache-oblivious sparse matrix-vector multiplication</em>,
 A. N. Yzelman and Rob H. Bisseling, Parallel Computing, Vol. 37, Issue 12, pp. 806-819 (2011).<br>
-[<a name="cite3" href="">3</a>]
+[<a id="cite3" href="">3</a>]
 <em>A medium-grain method for fast 2D bipartitioning of sparse matrices</em>,
 Dani&euml;l M. Pelt and Rob H. Bisseling, submitted for publication (2013).<br>
-[<a name="cite4" href="http://www.sciencedirect.com/science/article/pii/S0167819113000690">4</a>]
+[<a id="cite4" href="http://www.sciencedirect.com/science/article/pii/S0167819113000690">4</a>]
 <em>A new metric enabling an exact hypergraph model for the communication volume in distributed-memory parallel applications</em>
 O. Fortmeier, H. M. B&uuml;cker, B. O. Fagginger Auer, R. H. Bisseling, Parallel Computing, Vol. 39, Issue 8, pp. 319-335 (2013).<br>
-[<a name="cite5" href="http://dl.acm.org/citation.cfm?id=663255">5</a>]
+[<a id="cite5" href="http://dl.acm.org/citation.cfm?id=663255">5</a>]
 <em>A Fine-Grain Hypergraph Model for 2D Decomposition of Sparse Matrices</em>
 &Uuml;mit V. &Ccedil;ataly&uuml;rek and Cevdet Aykanat, IPDPS 2001, p. 118 (2001).<br>
-[<a name="cite6" href="http://emis.library.cornell.edu/journals/ETNA/vol.21.2005/index.html">6</a>]
+[<a id="cite6" href="http://emis.library.cornell.edu/journals/ETNA/vol.21.2005/index.html">6</a>]
 <em>Communication balancing in parallel sparse matrix-vector multiplication</em>
 Rob H. Bisseling and Wouter Meesen, ETNA, pp. 47-65 (2005).<br>
-[<a name="cite7" href="http://www.crcnetbase.com/doi/abs/10.1201/b11644-13">7</a>]
+[<a id="cite7" href="http://www.crcnetbase.com/doi/abs/10.1201/b11644-13">7</a>]
 <em>Two-Dimensional Approaches to Sparse Matrix Partitioning</em>
 Rob H. Bisseling, Bas O. Fagginger Auer, A. N. Yzelman, Tristan van Leeuwen and &Uuml;mit V. &Ccedil;ataly&uuml;rek,
 Chapter 12 of Combinatorial Scientific Computing, Chapman and Hall/CRC, pp. 321-349 (2012).<br>
@@ -811,6 +851,7 @@ the Mondriaan package home page</a>.</p>
 </p>
 
 <hr>
+</div>
 
 </body>
 

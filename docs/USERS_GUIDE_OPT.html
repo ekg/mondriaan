@@ -4,25 +4,40 @@
 <html>
 
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
 <link href="style.css" rel="stylesheet" type="text/css">
+<link href="print.css" rel="stylesheet" type="text/css" media="print">
+<script type="text/javascript" src="script.js"></script>
+
 <title>User's guide MondriaanOpt</title>
 </head>
 
 <body>
 
+<div id="mainContainer">
+
+<div id="pageNav">
+	<div><a href="USERS_GUIDE.html">Mondriaan</a></div>
+	<div><a href="MATLAB.html">MATLAB</a></div>
+	<div><a href="HYPERGRAPH.html">Hypergraphs</a></div>
+</div>
+
 <h2>User's guide MondriaanOpt</h2>
 
-<div id="top">
-<div><a href="USERS_GUIDE.html">&laquo; Mondriaan</a></div>
-<div><a href="#inst">Installing</a></div>
-<div><a href="#outp">Output</a></div>
-<div><a href="#opts">Options</a></div>
-<div><a href="#matl">MATLAB</a></div>
+<div id="menuPos"></div>
+<div id="menu">
+	<div id="menuItems">
+		<div><a href="#inst">Installing</a></div>
+		<div><a href="#outp">Output</a></div>
+		<div><a href="#opts">Options</a></div>
+		<div><a href="#constraint">Imbalance constraint</a></div>
+		<div><a href="#matl">MATLAB</a></div>
+	</div>
 </div>
 
 <hr>
-<p>
+<p class="updateNote">
 This page is continuously being improved and updated;
 therefore, a more recent version may be obtained 
 <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/Docs/USERS_GUIDE_OPT.html">
@@ -33,25 +48,27 @@ This offline version is bundled with the software for your convenience.
 
 <p>
 Whereas Mondriaan uses heuristics to obtain good partitionings for sparse matrix-vector multiplication for any number of processors,
-MondriaanOpt will calculate an actual optimal solution for this partitioning problem with 2 processors. More precisely, it will
-calculate a partitioning with minimum volume among all solutions that obey the imbalance constraint.
+MondriaanOpt calculates an optimal solution to this partitioning problem with 2 processors. More precisely, it 
+calculates a partitioning with minimum communication volume among all solutions that obey the imbalance constraint.
 </p>
 
 <p>
 A database with already solved problems with use of MondriaanOpt can be found <a href="http://www.staff.science.uu.nl/~bisse101/Mondriaan/Opt/">online</a>.
 </p>
 
-<h3><a name="inst">How to install MondriaanOpt</a></h3>
+<h3><a class="anchor" id="inst">How to install MondriaanOpt</a></h3>
 <p>
 MondriaanOpt comes packaged with the Mondriaan software. Refer to <a href="./USERS_GUIDE.html">this page</a> for
 instructions on using Mondriaan. MondriaanOpt is automatically compiled when you compile Mondriaan. The executable
-is then available at <tt>tools/MondriaanOpt</tt>.
+is then available at <code>tools/MondriaanOpt</code>.
 </p>
 
-<h3><a name="run">How to run MondriaanOpt</a></h3>
+<h3><a class="anchor" id="run">How to run MondriaanOpt</a></h3>
 <p>
 The MondriaanOpt program has the following interface:
-<ul><li><tt>% ./tools/MondriaanOpt matrix [P [eps]] [options]</tt></li></ul>
+</p>
+<ul><li><code>% ./tools/MondriaanOpt matrix [P [eps]] [options]</code></li></ul>
+<p>
 One, two or three parameters may be passed, after which further options may be given.
 Either [eps], -e or -k must be passed, and it is advised to pass -v (see <a href="#opts">options</a>).
 Take note that while MondriaanOpt may be called with the same parameters as Mondriaan, the actual problem
@@ -62,21 +79,21 @@ being solved may be <a href="#constraint">slightly different</a>.
 Some equivalent examples are:
 </p>
 <ul>
-	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx 2 0.03 -v 17</tt></li>
-	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx -e 0.03 -v 17</tt></li>
-	<li><tt>% ./tools/MondriaanOpt tests/arc130.mtx -k 660 -v 17</tt></li>
+	<li><code>% ./tools/MondriaanOpt tests/arc130.mtx 2 0.03 -v 17</code></li>
+	<li><code>% ./tools/MondriaanOpt tests/arc130.mtx -e 0.03 -v 17</code></li>
+	<li><code>% ./tools/MondriaanOpt tests/arc130.mtx -k 660 -v 17</code></li>
 </ul>
 
 <p>
-The above examples partition the <tt>arc130.mtx</tt> matrix (Matrix Market file format)
+The above examples partition the <code>arc130.mtx</code> matrix (Matrix Market file format)
 for 2 processors with at most 3% load imbalance, knowing that solutions must exist with
 volume at most 17. The matrix should be the full relative path; <em>in the above example 
-output is saved in the Mondriaan tests folder</em> (<tt>../tests/</tt>).
+output is saved in the Mondriaan tests folder</em> (<code>../tests/</code>).
 </p>
 
-<h3><a name="outp">Output</a></h3>
+<h3><a class="anchor" id="outp">Output</a></h3>
 
-<p>The <tt>MondriaanOpt</tt> tool yields, after a successful run on an input matrix,
+<p>The <code>MondriaanOpt</code> tool yields, after a successful run on an input matrix,
 various output files. All possible output files are described below. Typically,
 the output filenames are that of the input matrix filename, modified with a small
 descriptor and the number of parts <i>(=2)</i>.</p>
@@ -88,109 +105,132 @@ All free nonzeros will be assigned index 3.
 (Free nonzeros are nonzeros that are not assigned to a processor because assigning
 it to either one will not influence communication volume.)
 To stress the potential presence of free nonzeros, the number of processors (2) in the
-filename is followed by a suffix <tt>f</tt>.
+filename is followed by a suffix <code>f</code>.
 </i></p>
 
-<h4>Processor indices (<tt>-I2f</tt>)</h4>
-<p> The <tt>MondriaanOpt</tt> program writes the processor indices of each
-nonzero to the Matrix Market file <tt>input-2f.mtx</tt> where the value of each
+<div class="indent4">
+<h4>Processor indices (<code>-I2f</code>)</h4>
+<p> The <code>MondriaanOpt</code> program writes the processor indices of each
+nonzero to the Matrix Market file <code>input-2f.mtx</code> where the value of each
 nonzero is replaced by the processor index to which the nonzero has been assigned.
 </p>
+</div>
 
-<h4>Graphical output (<tt>-2f.svg</tt>)</h4>
-<p>If the option <tt>-svg</tt> is given, at the end of the algorithm an SVG graphic is written to the file <tt>input-2f.svg</tt>,
+<div class="indent4">
+<h4>Graphical output (<code>-2f.svg</code>)</h4>
+<p>If the option <code>-svg</code> is given, at the end of the algorithm an SVG graphic is written to the file <code>input-2f.svg</code>,
 containing a visualisation of the partitioning.
 </p>
+</div>
 
 <h4><u>Formats without free nonzeros</u></h4>
 <p><i>
 Here, the free nonzeros of a partitioning are distributed among the two processors in
 such a way that load imbalance is kept at a minimum.
-Note that whenever we write <tt>P</tt> for the number of processors below, it implicitly equals 2.
+Note that whenever we write <code>P</code> for the number of processors below, it implicitly equals 2.
 </i></p>
-<h4>Distributed matrix (<tt>-P2</tt>)</h4>
-<p> The <tt>MondriaanOpt</tt> program
-writes the distributed matrix to a file called <tt>input-P2</tt>,
-where <tt>input</tt> is the name of the input matrix.
+
+<div class="indent4">
+<h4>Distributed matrix (<code>-P2</code>)</h4>
+<p> The <code>MondriaanOpt</code> program
+writes the distributed matrix to a file called <code>input-P2</code>,
+where <code>input</code> is the name of the input matrix.
 
 We use an adapted Matrix Market format, with this structure: 
 <br>
-<tt>%%MatrixMarket distributed-matrix coordinate real general<br>
+<code>%%MatrixMarket distributed-matrix coordinate real general<br>
 m n nnz P<br>
-Pstart[0]</tt> ( this should be 0 )<br>
+Pstart[0]</code> ( this should be 0 )<br>
 ...<br>
 ...<br>
 ...<br>
-<tt>Pstart[P]</tt>( this should be nnz )<br>
-<tt>A.i[0] A.j[0] A.value[0]</tt>
+<code>Pstart[P]</code>( this should be nnz )<br>
+<code>A.i[0] A.j[0] A.value[0]</code>
 ...<br>
 ...<br>
 ...<br>
-<tt>A.i[nnz-1] A.j[nnz-1] A.value[nnz-1]</tt>
+<code>A.i[nnz-1] A.j[nnz-1] A.value[nnz-1]</code>
 <br>
-Here, <tt>Pstart[k]</tt> points to the start of the nonzeroes
+Here, <code>Pstart[k]</code> points to the start of the nonzeroes
 of processor k.
 </p>
+</div>
 
-<h4>Processor indices (<tt>-I2</tt>)</h4>
-<p> The <tt>MondriaanOpt</tt> program
-also writes the processor indices of each nonzero to the Matrix Market file <tt>input-I2</tt>
+<div class="indent4">
+<h4>Processor indices (<code>-I2</code>)</h4>
+<p> The <code>MondriaanOpt</code> program
+also writes the processor indices of each nonzero to the Matrix Market file <code>input-I2</code>
 where the value of each nonzero is replaced by the processor index to which
-the nonzero has been assigned. The order of the nonzeroes is exactly that of the distributed matrix (<tt>-P2</tt>).
+the nonzero has been assigned. The order of the nonzeroes is exactly that of the distributed matrix (<code>-P2</code>).
 </p>
+</div>
 
-<h4>Cartesian submatrices (<tt>-C2</tt>)</h4>
+<div class="indent4">
+<h4>Cartesian submatrices (<code>-C2</code>)</h4>
 <p> The program writes the row index sets I(q) 
 and column index sets J(q) of the Cartesian submatrix I(q) x J(q)
-for the processors q=1,...,P to the file called <tt>input-C2</tt>.
+for the processors q=1,...,P to the file called <code>input-C2</code>.
 This file is additional information, useful e.g. for visualisation,
 and you may not need it.
 </p>
+</div>
 
-<h4>Graphical output (<tt>-2.svg</tt>)</h4>
-<p>If the option <tt>-svg</tt> is given, at the end of the algorithm an SVG graphic is written to the file <tt>input-2.svg</tt>,
+<div class="indent4">
+<h4>Graphical output (<code>-2.svg</code>)</h4>
+<p>If the option <code>-svg</code> is given, at the end of the algorithm an SVG graphic is written to the file <code>input-2.svg</code>,
 containing a visualisation of the partitioning.
 </p>
+</div>
 
-<h4><u>Output to <tt>stdout</tt>/<tt>stderr</tt></u></h4>
+<h4><u>Output to <code>stdout</code>/<code>stderr</code></u></h4>
 <p>
-In a succesful run, at the end of execution general statistics are written to <tt>stdout</tt>.
-Also, during such a run, every <tt>2^23 = 8388608</tt> iterations the current depth in the tree is written to <tt>stderr</tt>, in the format <tt>`current depth`/`maximum depth`</tt>.
-Last but not least, every time a new solution is found which improves on the previous solution regarding total volume, a message is written to <tt>stderr</tt> reporting the newly found volume and load distribution in the format <tt>`load P0`, `load P1`, `load Free`</tt>.
+In a successful run, at the end of execution general statistics are written to <code>stdout</code>.
+Also, during such a run, every <code>2^23 = 8388608</code> iterations the current depth in the tree is written to <code>stderr</code>, in the format <code>`current depth`/`maximum depth`</code>.
+Last but not least, every time a new solution is found which improves on the previous solution regarding total volume, a message is written to <code>stderr</code> reporting the newly found volume and load distribution in the format <code>`load P0`, `load P1`, `load Free`</code>.
 </p>
 
-<h3><a name="opts">Program options</a></h3>
+<h3><a class="anchor" id="opts">Program options</a></h3>
 <p>
 The MondriaanOpt program has the following interface:
-<ul><li><tt>% ./tools/MondriaanOpt matrix [P [eps]] [options]</tt></li></ul>
+</p>
+<ul><li><code>% ./tools/MondriaanOpt matrix [P [eps]] [options]</code></li></ul>
+<p>
 One, two or three parameters may be passed, after which further options may be given.
 An overview of the available parameters and options is given below.
 </p>
-<h4>Parameters</h4>
+
+<div class="indent4">
+<h4><u>Parameters</u></h4>
 <table>
 	<thead>
 		<tr>
 			<th>Parameter</th>
+			<th>Name</th>
 			<th>Description</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
+			<td><code>matrix</code></td>
 			<td>Matrix file</td>
 			<td><i>Required.</i> The input matrix file in Matrix Market (.mtx) format</td>
 		</tr>
 		<tr>
+			<td><code>P</code></td>
 			<td>Number of processors</td>
 			<td>Present for consistency with other Mondriaan* commands. This parameter, if given, must be equal to 2.</td>
 		</tr>
 		<tr>
+			<td><code>eps</code></td>
 			<td>Load imbalance</td>
 			<td>The maximum allowed load imbalance</td>
 		</tr>
 	</tbody>
 </table>
+</div>
 
-<h4>Options</h4>
+<div class="indent4">
+<h4><u>Options</u></h4>
 <p>
 Apart from the matrix, at least one of [eps], -e or -k must be given, defining the maximum allowed load imbalance.
 </p>
@@ -208,7 +248,7 @@ Apart from the matrix, at least one of [eps], -e or -k must be given, defining t
 			<td>Volume</td>
 			<td>
 				<i>Recommended.</i> The starting upper bound volume.
-				This defaults to <tt>min(m,n)+1</tt>, with <tt>m</tt> and <tt>n</tt> denoting the dimensions of the matrix to be partitioned.
+				This defaults to <code>min(m,n)+1</code>, with <code>m</code> and <code>n</code> denoting the dimensions of the matrix to be partitioned.
 				While this is a valid upper bound, you may wish to pass a tighter upper bound to reduce computing time.
 			</td>
 		</tr>
@@ -235,35 +275,40 @@ Apart from the matrix, at least one of [eps], -e or -k must be given, defining t
 		<tr>
 			<td>-svg</td>
 			<td><i>None</i></td>
-			<td>Write visualisations of the partitioning to <tt>.svg</tt> files</td>
+			<td>Write visualisations of the partitioning to <code>.svg</code> files</td>
 		</tr>
 	</tbody>
 </table>
+</div>
 
-<h3><a name="constraint">Difference in imbalance constraints</a></h3>
+<h3><a class="anchor" id="constraint">Difference in imbalance constraints</a></h3>
+<p>
 While the command line interface of MondriaanOpt can be used just as Mondriaan, there is a subtle difference in the problem being solved in these two.
-More precisely, with <tt>N</tt> being the total number of nonzeros, <tt>p</tt> being the total number of processors (which equals 2) and
-<tt>load</tt> the number of nonzeros assigned to a processor, compare:
+More precisely, with <code>N</code> being the total number of nonzeros, <code>p</code> being the total number of processors (which equals 2) and
+<code>load</code> the number of nonzeros assigned to a processor, compare:
+</p>
 <ul>
-	<li>the imbalance constraint <tt>load &lt;= (1+epsilon) (N/p)</tt> which is used in Mondriaan (In the code, this amounts to <tt>floor( ((1+epsilon)*N)/p )</tt>.), and</li>
-	<li>the imbalance constraint <tt>load &lt;= (1+epsilon) ceil(N/p)</tt> which is used in MondriaanOpt.</li>
+	<li>the imbalance constraint <code>load &lt;= (1+epsilon) (N/p)</code> which is used in Mondriaan (In the code, this amounts to <code>floor( ((1+epsilon)*N)/p )</code>.), and</li>
+	<li>the imbalance constraint <code>load &lt;= (1+epsilon) ceil(N/p)</code> which is used in MondriaanOpt.</li>
 </ul>
-As <tt>p=2</tt>, this difference may only be of importance whenever <tt>N</tt> is odd.
-In [<a href="#cite1">1,p.2</a>] it is explained that this different choice was made to ensure feasibility of the problem, even if <tt>epsilon=0</tt>.
+<p>
+As <code>p=2</code>, this difference may only be of importance whenever <code>N</code> is odd.
+In [<a href="#cite1">1,p.2</a>] it is explained that this different choice was made to ensure feasibility of the problem, even if <code>epsilon=0</code>.
+</p>
 
 
-<h3><a name="matl">Using MondriaanOpt in MATLAB</a></h3>
+<h3><a class="anchor" id="matl">Using MondriaanOpt in MATLAB</a></h3>
 
 <p>
 For more information about MATLAB usage, please see the <a href="MATLAB.html">Mondriaan MATLAB guide</a>.
-MondriaanOpt is available in Matlab using the <tt>MatlabMondriaanOpt</tt> MEX routine. Example matlab files
-are given as <tt>mondriaanOpt.m</tt> and <tt>mondriaanOptPlot.m</tt>.
+MondriaanOpt is available in Matlab using the <code>MatlabMondriaanOpt</code> MEX routine. Example matlab files
+are given as <code>mondriaanOpt.m</code> and <code>mondriaanOptPlot.m</code>.
 </p>
 
 
 <h3>References</h3>
 <p>
-[<a name="cite1" href="http://doi.org/10.1016/j.jpdc.2015.06.005">1</a>]
+[<a id="cite1" href="http://doi.org/10.1016/j.jpdc.2015.06.005">1</a>]
 <em>An exact algorithm for sparse matrix bipartitioning</em>,
 Daniel M. Pelt and Rob H. Bisseling, <i>Journal of Parallel and Distributed Computing</i>, <b>85</b> (2015) pp. 79-90.
 </p>
@@ -285,6 +330,8 @@ the Mondriaan package home page</a>.</p>
 </p>
 
 <hr>
+
+</div>
 
 </body>
 

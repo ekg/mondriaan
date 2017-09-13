@@ -923,3 +923,75 @@ int WriteVectorCollection(long int **X, const char *name, const long i, const lo
         return TRUE;
 } /* end WriteVectorCollection */
 
+
+long * ReadVector(const char base, long *l, int *P, FILE *fp) {
+
+    /* Base vector-reading function. Automatically adapts base of array to read.
+       Assumes that we are writing a distribution vector with P>0.
+       base is the base value of X (usually 0).
+       l is the length of the vector read (X).
+       P is the number of processors.
+       The return value is the array of vector values (X), or NULL if an error occurs.
+    */
+
+    long t;
+
+    if (!fp) {
+        fprintf(stderr, "ReadVector(): Null arguments!\n");
+        return NULL;
+    }
+
+    if (ferror(fp)) {
+        fprintf(stderr, "ReadVector(): Unable to write to stream!\n");
+        return NULL;
+    }
+    
+    
+    int SizeRead=FALSE, count=0;
+    char *line, linebuffer[MAX_LINE_LENGTH];
+  
+    while (SizeRead == FALSE && 
+           (line = fgets(linebuffer, MAX_LINE_LENGTH, fp)) != NULL) { 
+        /* a new line has been read */
+        if (strlen(line) > 0) {
+            if (linebuffer[0] != '%') {
+                /* The size line */
+
+                /* Read l and P from the line */
+                count = sscanf(line, "%ld %d\n", l, P);
+                
+                if (count < 2 || *l < 1 || *P < 0) {
+                    fprintf(stderr, "ReadVector(): Error in vector size!\n");
+                    return NULL;
+                }
+                else {
+                    SizeRead = TRUE;
+                }
+            }
+        }
+    }
+    
+    if(*P == 0) {
+        fprintf(stderr, "ReadVector(): This function has not been implemented for undistributed vectors!\n");
+        return NULL;
+    }
+    
+    long *X = (long *)malloc((*l)*sizeof(long));
+    long tmp;
+    
+    if (X == NULL) {
+        fprintf(stderr, "ReadVector(): Not enough memory!\n");
+        return NULL;
+    }
+    
+    for (t = 0; t < *l; t++) {
+        if(fscanf(fp, "%ld %ld\n", &tmp, &(X[t])) != 2) {
+            fprintf(stderr, "ReadVector(): Read Error!\n");
+            return NULL;
+        }
+        X[t] -= (1-base);
+    }
+    
+    return X;
+} /* end ReadVector */
+

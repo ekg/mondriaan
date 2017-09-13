@@ -1,25 +1,110 @@
+* {
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+}
 
 body {
 	text-align: left;
 	background-color: #DDD;
-	color: black;
+	color: #333;
+	font-family: Verdana;
+	font-size: 10pt;
 }
 
-#top {
+h2 {
+	margin-bottom: 0.5em;
+}
+
+h3 {
+	border-bottom: 1px solid #888;
+	margin-top: 30px;
+}
+
+h4 {
+	margin-top: 1em;
+}
+
+li {
+	margin-left: 45px;
+}
+
+p {
+	margin: 1em 0px;
+}
+
+div#mainContainer {
+	width: 80%;
+	margin: 10px auto;
+	background-color: #fff;
+	border-radius: 20px;
+	padding: 20px;
 	position: relative;
-	height: 40px;
-	width: 100%;
-	text-align: center;
 }
 
-#top A {
+#menu {
+	position: relative;
+	background-color: #f8f8f8;
+	border: 1px solid #999;
+	border-width: 1px 0px;
+	padding: 8px 0px;
+}
+
+#menuItems {
+	max-width: 800px;
+	text-align: center;
+	margin: 0px auto;
+	height: 16px;
+	overflow: hidden;
+}
+
+#menuItems:hover {
+	height: auto;
+	overflow: auto;
+}
+
+#menu.fixed {
+	width: 80%;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	margin: 0px auto;
+}
+
+#menu A {
 	color: black;
 }
 
-div#top div {
+div#menuItems div {
 	display: inline;
 	position: relative;
 	margin-right: 17px;
+}
+
+/* Make sure anchor links arrive where they should (+2em due to fixed menu) */
+a.anchor:before { content: ''; display: block; position: relative; width: 0; height: 2em; margin-top: -2em }
+
+
+#pageNav {
+	float: right;
+	text-align: right;
+}
+#pageNav a {
+	color: black;
+}
+div#pageNav div {
+	display: inline;
+	position: relative;
+	margin-right: 17px;
+}
+
+p.updateNote {
+	border: 1px solid #ccc;
+	font-style: italic;
+	padding: 5px;
+	margin: 10px 5px;
+	background-color: #f8f8f8;
 }
 
 .center {
@@ -34,7 +119,7 @@ div#top div {
 
 .squareimage img {
 	width:256px;
-	height:256px;
+	max-width: 100%;
 	padding:10px;
 	border-style:solid;
 	border-width:2px;
@@ -42,7 +127,7 @@ div#top div {
 
 .wideimage img {
 	width:572px;
-	height:207px;
+	max-width: 100%;
 	padding:10px;
 	border-style:solid;
 	border-width:2px;
@@ -52,3 +137,32 @@ div#top div {
 	font-size:small;
 }
 
+div.indent4 {
+	border-left: 1px solid #888;
+	padding-left: 10px;
+	margin-top: 15px;
+	margin-bottom: 25px;
+}
+
+ul.options li {
+	padding-bottom: 10px;
+}
+
+code.option_name {
+	font-style: italic;
+}
+
+@media (max-width:600px) {
+	
+	div#mainContainer {
+		width: auto;
+		margin: 0px;
+		border-radius: 0px;
+		padding: 10px;
+	}
+	
+	#menu.fixed {
+		width: auto;
+		margin: 0px 10px;
+	}
+}

@@ -8,8 +8,11 @@
 # Absolute path of the directory which contains this file (included last in every Makefile in the subdirectories).
 MONDRIAANHOMEDIR:= $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
-MONDRIAANCURRENTVERSION := 4.1
+MONDRIAANCURRENTVERSION := 4.2
 MONDRIAANMAJORVERSION := 4
+
+# Gainbucket type must be either LIST or ARRAY
+GAINBUCKET_TYPE := ARRAY
 
 # ==== Matlab support ====
 #
@@ -29,10 +32,12 @@ MEXSUFFIX := mexa64
 # ==== Compiler flags ====
 # Debug/verbose, standard (default), performance flags.
 
-#CFLAGS := -Wall -Wextra -Wshadow -Wno-unused-parameter -ansi -pedantic -O2 -DTIME -DUNIX -DINFO -g -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\"
-#CFLAGS := -Wall -O2 -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\"
-CFLAGS := -Wall -O3 -ffast-math -funroll-loops -fomit-frame-pointer -std=c99 -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\"
-#CFLAGS := -Wall -O3 -pg -ffast-math -funroll-loops -std=c99 -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\"
+CFLAGS := -DMONDRIAANVERSION=\"${MONDRIAANCURRENTVERSION}\" -DGAINBUCKET_${GAINBUCKET_TYPE}
+
+#CFLAGS := ${CFLAGS} -Wall -Wextra -Wshadow -Wno-unused-parameter -ansi -pedantic -O2 -DTIME -DUNIX -DINFO -g
+#CFLAGS := ${CFLAGS} -Wall -O2
+CFLAGS := ${CFLAGS} -Wall -O3 -ffast-math -funroll-loops -fomit-frame-pointer -std=c99
+#CFLAGS := ${CFLAGS} -Wall -O3 -pg -ffast-math -funroll-loops -std=c99
 
 
 # ==== Standard compilation options (it should not be necessary to change these) ====

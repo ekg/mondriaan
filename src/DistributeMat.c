@@ -16,6 +16,9 @@ int SplitMatrixKLFM(struct sparsematrix *pT, int k, int i, int dir,
 int SplitMatrixSimple(struct sparsematrix *pT, int k, int i,
                        long weightlo, long weighthi, const struct opts *pOptions);
 
+int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
+                     long weightlo, long weighthi, const struct opts *pOptions);
+
 #ifdef USE_PATOH
 struct patohnz {
     int P;
@@ -407,6 +410,17 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
     /* Setup Mondriaan options. */
     maxweight = ((1 + eps) * totweight) / P;  /* rounded down */
     
+#ifdef INFO
+    if(ceil(totweight/(double)P) > maxweight) {
+        /* Compute minimum epsilon, rounded up at 5th decimal place */
+        double eps_min = ceil(totweight/(double)P) * (P/(double)totweight) - 1;
+        eps_min = ceil(eps_min * 100000)/100000;
+        
+        fprintf(stderr, "Info: The posed problem is infeasible, hence the resulting matrix distribution will not satisfy the balance constraint.\n");
+        fprintf(stderr, "      For the problem to be feasible, epsilon should be at least %.5lf.\n", eps_min);
+    }
+#endif
+    
     if (pOptions->SplitStrategy == OneDimRow)
         dir = ROW;
   
@@ -484,7 +498,13 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
 #ifdef INFO2
         printf("  ******** Split part %d from %d parts******** \n", i, k);
 #endif
-        if (pOptions->SplitMethod == Simple) {
+        int foundZVS = FALSE; /* Whether a zero volume split has been found */
+        if (pOptions->ZeroVolumeSearch == ZeroVolYes && (foundZVS = SplitMatrixZeroVolume(pT, k, i, weightlo, weighthi, pOptions))) {
+#ifdef INFO
+            printf("Found zero volume split!\n");
+#endif
+        }
+        else if (pOptions->SplitMethod == Simple) {
             /* Simple split of the matrix only based on load balance,
                not minimising communication volume. 
                Useful for testing and debugging */
@@ -503,6 +523,43 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
             fprintf(stderr, "DistributeMatrixMondriaan(): Unknown SplitMethod!\n");
             return FALSE;
         }
+        
+        /* Shift weight and procs */
+        for (j = k; j > i+1; j--) {
+            weight[j] = weight[j-1];
+            procs[j] = procs[j-1];
+        }
+
+        k++; /* new number of parts */
+
+        weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
+        weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
+        
+        if (weight[i] < 0 || weight[i + 1] < 0) {
+            fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute weights!\n");
+            return FALSE;
+        }
+        
+        procslo = procs[i]/2;
+        procshi = (procs[i]%2==0 ? procslo : procslo+1);
+        
+        if (weight[i] <= weight[i+1]) {
+            procs[i] = procslo;
+            procs[i+1] = procshi;
+        } else {
+            procs[i] = procshi;
+            procs[i+1] = procslo;
+        }
+        
+        /* Apply free nonzero search if enabled, but only for (symmetric) finegrain and mediumgrain strategies */
+        if(pOptions->ImproveFreeNonzeros == FreeNonzerosYes && !foundZVS && (pOptions->SplitStrategy == FineGrain ||
+            pOptions->SplitStrategy == SFineGrain || pOptions->SplitStrategy == MediumGrain)) {
+            ImproveFreeNonzeros(pT, pOptions, procs, i, i+1);
+            
+            weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
+            weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
+        }
+        
 #ifdef INFO2
         printf("  Pstart[%d] = %ld ", i,  pT->Pstart[i]);
         printf("Pstart[%d] = %ld ", i+1,  pT->Pstart[i+1]);
@@ -584,34 +641,6 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
                 }
             }
         }
-        
-        /* Shift weight and procs */
-        for (j = k; j > i+1; j--) {
-            weight[j] = weight[j-1];
-            procs[j] = procs[j-1];
-        }
-
-        k++; /* new number of parts */
-
-        weight[i] = ComputeWeight(pT, pT->Pstart[i], pT->Pstart[i+1]-1, NULL, pOptions);
-        weight[i+1] = ComputeWeight(pT, pT->Pstart[i+1], pT->Pstart[i+2]-1, NULL, pOptions);
-        
-        if (weight[i] < 0 || weight[i + 1] < 0) {
-            fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute weights!\n");
-            return FALSE;
-        }
-        
-        procslo = procs[i]/2;
-        procshi = (procs[i]%2==0 ? procslo : procslo+1);
-        
-        if (weight[i] <= weight[i+1]) {
-            procs[i] = procslo;
-            procs[i+1] = procshi;
-        } else { 
-            procs[i] = procshi;
-            procs[i+1] = procslo;
-        }
-
 
         /* Check if there is a part that is too large */
         done = TRUE;
@@ -663,6 +692,59 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
     printf("  Column lambda histogram:\n");
     VerifyLambdas(pT->ColLambda, pT->n, P);
 #endif
+    
+    if(pOptions->CheckUpperBound == CheckUpperBoundYes) {
+        /* Check whether we can apply the upper bound algorithm */
+        int isSymmetric   = ((pT->MMTypeCode[3]=='S' || pT->MMTypeCode[3]=='K' || pT->MMTypeCode[3]=='H') &&
+                             pOptions->SymmetricMatrix_UseSingleEntry == SingleEntYes);
+        int hasDummies    = (pT->NrDummies > 0);
+        int isColWeighted = (pT->MMTypeCode[0] == 'W' && pT->NrColWeights > 0);
+        
+        /* To support OrderPermutation, new code should be written to recompute the permutation from scratch */
+        int orderPermute  = (pOptions->OrderPermutation != OrderNone);
+        
+        if(!isSymmetric && !hasDummies && !isColWeighted && !orderPermute) {
+            /* Compute volume. It should be at most (min(m,n)+1)(P-1) */
+            long ComVol1, ComVol2, tmp;
+            CalcCom(pT, NULL, (pT->m < pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
+            CalcCom(pT, NULL, (pT->m < pT->n)?COL:ROW, &ComVol2, &tmp, &tmp, &tmp, &tmp);
+            long upperBound = (((pT->m < pT->n)?pT->m:pT->n)+1)*(P-1);
+            
+            if(ComVol1+ComVol2 > upperBound) {
+#ifdef INFO
+                printf("Info: Achieved volume %ld is larger than upper bound %ld. Attempting to generate upper bound solution.\n", ComVol1+ComVol2, upperBound);
+#endif
+                if (!SplitMatrixUpperBound(pT, P, pOptions)) {
+                    fprintf(stderr, "DistributeMatrixMondriaan(): Unable to compute upper bound solution!\n");
+                }
+                else {
+                    /* Update variables to reflect new distribution */
+                    k = P;
+                    
+                    for (j = 0; j <= P; j++) {
+                        weight[j] = ComputeWeight(pT, pT->Pstart[j], pT->Pstart[j+1]-1, NULL, pOptions);
+                        procs[j] = 1;
+                    }
+#ifdef INFO2
+                    printf("  Number of parts = %d \n", k);
+                    printf("  Pstart = ");
+                    for (j = 0; j <= P; j++)
+                        printf("%ld ", pT->Pstart[j]);
+                    printf("\n\n");
+#endif      
+
+#ifdef INFO2
+                    /* Print all lambdas. */
+                    printf("  Row lambda histogram:\n");
+                    VerifyLambdas(pT->RowLambda, pT->m, P);
+                    printf("  Column lambda histogram:\n");
+                    VerifyLambdas(pT->ColLambda, pT->n, P);
+#endif
+                }
+            }
+        }
+    }
+    
 
     /* Set matrix type code to distributed */
     pT->MMTypeCode[0] = 'D';
@@ -1505,3 +1587,111 @@ int SplitMatrixSimple(struct sparsematrix *pT, int k, int i,
     return TRUE;
 } /* end SplitMatrixSimple */
 
+
+int SplitMatrixZeroVolume(struct sparsematrix *pT, int k, int i,
+                     long weightlo, long weighthi, const struct opts *pOptions) {
+    
+    /* This function splits part i of the sparse matrix T into two parts,
+       the first with weight <= weightlo and the second with weight <= weighthi.
+       The split is performed by searching for a split with zero communication
+       volume. If such a split is found, it is applied to pT. Otherwise, pT is
+       left untouched.
+
+       Input: T sparse matrix,
+              k current number of parts, 1 <= k < P,
+              i number of part to be split, 0 <= i < k,
+              weightlo = smallest upper bound for part weight, belongs to part 0
+              weighthi = largest upper bound for part weight, belongs to part 1.
+              
+       Output: T sparse matrix.
+               The following applies if a zero volume split is found:
+               The nonzeros of the new part i (the first part) are in positions
+                   pT->Pstart[i], pT->Pstart[i+1]-1.
+               The nonzeros of the new part i+1 (the second) are in positions
+                   pT->Pstart[i+1], pT->Pstart[i+2]-1.
+               All parts > i+1 have been shifted.
+       
+    */
+
+    long lo, hi, mid = 0, nz, weight;
+    int j;
+    struct sparsematrix A;
+    
+    if (!pT || !pOptions) {
+        fprintf(stderr, "SplitMatrixZeroVolume(): Null arguments!\n");
+        return FALSE;
+    }
+    
+    lo = pT->Pstart[i];
+    hi = pT->Pstart[i+1]-1;
+    
+    nz = hi-lo+1;
+    
+    if (nz > 0) {
+        weight = ComputeWeight(pT, lo, hi, NULL, pOptions);
+        
+        if (weight > weightlo + weighthi || weight < 0) {
+            /* Desired split is infeasible */
+            fprintf(stderr, "SplitMatrixZeroVolume(): desired split is infeasible!\n");
+            return FALSE;
+        }
+        
+        /* Copy info from T to A */
+        A = *pT;            /* A has same size as T, and same other parameters, */
+        A.i = &(pT->i[lo]); /* but only a subset of the nonzeros */
+        A.j = &(pT->j[lo]);
+        if (A.MMTypeCode[2] != 'P')
+            A.ReValue = &(pT->ReValue[lo]);
+        if (A.MMTypeCode[2] == 'C')
+            A.ImValue = &(pT->ImValue[lo]);
+        A.NrNzElts = nz;
+        
+#ifdef INFO
+#ifdef TIME
+        clock_t starttime, endtime;
+        double cputime;
+        starttime = clock();
+#ifdef UNIX
+        struct timeval starttime1, endtime1;
+        gettimeofday(&starttime1, NULL);
+#endif
+#endif
+#endif
+        /* Run zero volume search. If a zero volume split is found, ZeroVolumeSearch()
+         * will apply this split directly; we then only need to update Pstart.
+         */
+        int foundZeroVolumePartition = ZeroVolumeSearch(&A, weightlo, weighthi, &mid, pOptions);
+        
+#ifdef INFO
+#ifdef TIME
+        endtime = clock();
+        cputime = ((double) (endtime - starttime)) / CLOCKS_PER_SEC;
+        printf("  ZeroVolumeSearch CPU-time    : %f seconds\n", cputime);
+#ifdef UNIX
+        gettimeofday(&endtime1, NULL);
+        printf("  ZeroVolumeSearch elapsed time: %f seconds\n",
+                (endtime1.tv_sec - starttime1.tv_sec) +
+                (endtime1.tv_usec - starttime1.tv_usec) / 1000000.0);
+#endif
+        fflush(stdout);
+#endif
+#endif
+
+        if(!foundZeroVolumePartition) {
+            return FALSE;
+        }
+    }
+    else {
+        mid = 0; /* Pstart[i] = Pstart[i+1] */
+    }
+    
+    /* Shift Pstart for parts > i */
+    for (j = k; j > i; j--)
+        pT->Pstart[j+1] = pT->Pstart[j];
+    
+    /* Register new splitting point.
+     * mid lies in [0,hi-lo], translate it to [lo,hi] */
+    pT->Pstart[i+1] = lo + mid;
+
+    return TRUE;
+} /* end SplitMatrixZeroVolume */

@@ -130,6 +130,9 @@ char* GetDefaultOptionText() {
 "Partitioner                                    mondriaan \n"
 "Metric                                         lambda1 \n"
 "Discard_Free_Nets                              yes \n"
+"ZeroVolumeSearch                               yes \n"
+"ImproveFreeNonzeros                            yes \n"
+"CheckUpperBound                                yes \n"
 "SquareMatrix_DistributeVectorsEqual            no \n"
 "SquareMatrix_DistributeVectorsEqual_AddDummies yes \n"
 "SymmetricMatrix_UseSingleEntry                 no \n"
@@ -245,6 +248,24 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     else return FALSE;
     fprintf(Out, "\n");
     
+    fprintf(Out, "ZeroVolumeSearch ");
+    if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
+    else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    else return FALSE;
+    fprintf(Out, "\n");
+    
+    fprintf(Out, "ImproveFreeNonzeros ");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
+    else return FALSE;
+    fprintf(Out, "\n");
+    
+    fprintf(Out, "CheckUpperBound ");
+    if (Opts->CheckUpperBound == CheckUpperBoundYes) fprintf(Out, "yes");
+    else if (Opts->CheckUpperBound == CheckUpperBoundNo) fprintf(Out, "no");
+    else return FALSE;
+    fprintf(Out, "\n");
+    
     fprintf(Out, "SquareMatrix_DistributeVectorsEqual ");
     if (Opts->SquareMatrix_DistributeVectorsEqual == EqVecNo) fprintf(Out, "no");
     else if (Opts->SquareMatrix_DistributeVectorsEqual == EqVecYes) fprintf(Out, "yes");
@@ -272,7 +293,12 @@ int ExportOptions(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Coarsening_NrVertices %ld \n", Opts->Coarsening_NrVertices);
     fprintf(Out, "Coarsening_MaxCoarsenings %ld \n", Opts->Coarsening_MaxCoarsenings);
     fprintf(Out, "Coarsening_NrMatchArbitrary %ld \n", Opts->Coarsening_NrMatchArbitrary);
-    fprintf(Out, "Coarsening_MaxNrVtxInMatch %ld \n", Opts->Coarsening_MaxNrVtxInMatch);
+    
+    if(Opts->Coarsening_MaxNrVtxInMatch == -1)
+        fprintf(Out, "Coarsening_MaxNrVtxInMatch log \n");
+    else
+        fprintf(Out, "Coarsening_MaxNrVtxInMatch %ld \n", Opts->Coarsening_MaxNrVtxInMatch);
+    
     fprintf(Out, "Coarsening_StopRatio %f \n", Opts->Coarsening_StopRatio);
     fprintf(Out, "Coarsening_VtxMaxFractionOfWeight %f \n", Opts->Coarsening_VtxMaxFractionOfWeight);
     
@@ -458,6 +484,24 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     else fprintf(Out, "?");
     fprintf(Out, " \\\\\n");
     
+    fprintf(Out, "ZeroVolumeSearch & ");
+    if (Opts->ZeroVolumeSearch == ZeroVolYes) fprintf(Out, "yes");
+    else if (Opts->ZeroVolumeSearch == ZeroVolNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
+    
+    fprintf(Out, "ImproveFreeNonzeros & ");
+    if (Opts->ImproveFreeNonzeros == FreeNonzerosYes) fprintf(Out, "yes");
+    else if (Opts->ImproveFreeNonzeros == FreeNonzerosNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
+    
+    fprintf(Out, "CheckUpperBound & ");
+    if (Opts->CheckUpperBound == CheckUpperBoundYes) fprintf(Out, "yes");
+    else if (Opts->CheckUpperBound == CheckUpperBoundNo) fprintf(Out, "no");
+    else fprintf(Out, "?");
+    fprintf(Out, " \\\\\n");
+    
     fprintf(Out, "DistributeVectorsEqual & ");
     if (Opts->SquareMatrix_DistributeVectorsEqual == EqVecNo) fprintf(Out, "no");
     else if (Opts->SquareMatrix_DistributeVectorsEqual == EqVecYes) fprintf(Out, "yes");
@@ -485,7 +529,12 @@ int ExportOptionsToLaTeX(FILE *Out, const struct opts *Opts) {
     fprintf(Out, "Coarsening-NrVertices & %ld \\\\\n", Opts->Coarsening_NrVertices);
     fprintf(Out, "Coarsening-MaxCoarsenings & %ld \\\\\n", Opts->Coarsening_MaxCoarsenings);
     fprintf(Out, "Coarsening-MaxNrMatchArbitrary & %ld \\\\\n", Opts->Coarsening_NrMatchArbitrary);
-    fprintf(Out, "Coarsening-MaxNrVtxInMatch & %ld \\\\\n", Opts->Coarsening_MaxNrVtxInMatch);
+    
+    if(Opts->Coarsening_MaxNrVtxInMatch == -1)
+        fprintf(Out, "Coarsening-MaxNrVtxInMatch & log \\\\\n");
+    else
+        fprintf(Out, "Coarsening-MaxNrVtxInMatch & %ld \\\\\n", Opts->Coarsening_MaxNrVtxInMatch);
+    
     fprintf(Out, "Coarsening-StopRatio & %f \\\\\n", Opts->Coarsening_StopRatio);
     fprintf(Out, "Coarsening-VtxMaxFractionOfWeight & %f \\\\\n", Opts->Coarsening_VtxMaxFractionOfWeight);
     
@@ -646,8 +695,10 @@ int ApplyOptions(const struct opts *pOptions) {
     }
   
     if (pOptions->Coarsening_MaxNrVtxInMatch < 2) {
-        fprintf(stderr, "ApplyOptions(): Coarsening_MaxNrVtxInMatch out of range!\n");
-        return FALSE;
+        if(!(pOptions->Coarsening_MatchingATAMatcher == MatchMatcherPGA && pOptions->Coarsening_MaxNrVtxInMatch == -1)) {
+            fprintf(stderr, "ApplyOptions(): Coarsening_MaxNrVtxInMatch out of range!\n");
+            return FALSE;
+        }
     }
   
     if (pOptions->Coarsening_StopRatio < 0 || 
@@ -715,8 +766,8 @@ int ApplyOptions(const struct opts *pOptions) {
         return FALSE;
     }
     
-    if (pOptions->Coarsening_MatchingStrategy == MatchATA && pOptions->Coarsening_MaxNrVtxInMatch != 2) {
-        fprintf(stderr, "ApplyOptions(): Hybrid matching is only supported for matching groups of two vertices!\n");
+    if (pOptions->Coarsening_MatchingStrategy == MatchATA && pOptions->Coarsening_MaxNrVtxInMatch != 2 && pOptions->Coarsening_MatchingATAMatcher != MatchMatcherPGA) {
+        fprintf(stderr, "ApplyOptions(): ATA Greedy matching is only supported for matching groups of two vertices!\n");
         return FALSE;
     }
 
@@ -833,7 +884,34 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
         } else if (!strcmp(value, "no")) {
             pOptions->DiscardFreeNets = FreeNetNo;
         } else {
-            fprintf(stderr, "SetOptions(): unknown %s '%s'!\n", option, value);
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
+            return FALSE;
+        }
+    } else if (!strcmp(option, "ZeroVolumeSearch")) {
+        if (!strcmp(value, "yes")) {
+            pOptions->ZeroVolumeSearch = ZeroVolYes;
+        } else if (!strcmp(value, "no")) {
+            pOptions->ZeroVolumeSearch = ZeroVolNo;
+        } else {
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
+            return FALSE;
+        }
+    } else if (!strcmp(option, "ImproveFreeNonzeros")) {
+        if (!strcmp(value, "no") || !strcmp(value, "0")) {
+            pOptions->ImproveFreeNonzeros = FreeNonzerosNo;
+        } else if (!strcmp(value, "yes") || ! strcmp(value, "1")) {
+            pOptions->ImproveFreeNonzeros = FreeNonzerosYes;
+        } else {
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
+            return FALSE;
+        }
+    } else if (!strcmp(option, "CheckUpperBound")) {
+        if (!strcmp(value, "yes")) {
+            pOptions->CheckUpperBound = CheckUpperBoundYes;
+        } else if (!strcmp(value, "no")) {
+            pOptions->CheckUpperBound = CheckUpperBoundNo;
+        } else {
+            fprintf(stderr, "SetOption(): unknown %s '%s'!\n", option, value);
             return FALSE;
         }
     } else if (!strcmp(option, "SquareMatrix_DistributeVectorsEqual")) {
@@ -879,7 +957,10 @@ int SetOption(struct opts *pOptions, const char *option, const char *value) {
     } else if (!strcmp(option, "Coarsening_NrMatchArbitrary")) {
         pOptions->Coarsening_NrMatchArbitrary = atol(value);
     } else if (!strcmp(option, "Coarsening_MaxNrVtxInMatch")) {
-        pOptions->Coarsening_MaxNrVtxInMatch = atol(value);
+        if(!strcmp(value, "log"))
+            pOptions->Coarsening_MaxNrVtxInMatch = -1;
+        else
+            pOptions->Coarsening_MaxNrVtxInMatch = atol(value);
     } else if (!strcmp(option, "Coarsening_StopRatio")) {
         pOptions->Coarsening_StopRatio = atof(value);
     } else if (!strcmp(option, "Coarsening_VtxMaxFractionOfWeight")) {

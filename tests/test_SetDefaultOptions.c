@@ -69,6 +69,9 @@ int main(int argc, char **argv) {
         fclose(File);
         
         CheckOptions(Options);
+        
+        remove("test_SetDefaultOptions.check");
+        remove("test_SetDefaultOptions.check2");
     }
     else {
         printf("Error\n");

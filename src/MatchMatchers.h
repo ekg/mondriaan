@@ -17,7 +17,8 @@ int MatchUsingGreedy(struct biparthypergraph *pHG, struct contraction *pC,
                      int (*FreeData)(void *));
 
 
-long FindOptimalPathMatching(long *matchings[3], const double *PathWeights, const long PathLength);
+long FindOptimalPathMatching(char **Build, double *Weight[2], char *MatchingOpt,
+                             const double *PathWeights, const long NrVtxInPath, const long MaxNrVtxInMatch);
 
 int MatchUsingPGA(struct biparthypergraph *pHG, struct contraction *pC,
                   const long *iv, int *Matched,

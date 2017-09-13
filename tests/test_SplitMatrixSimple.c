@@ -48,6 +48,7 @@ int main(int argc, char **argv) {
         }
     }
 
+    A.MMTypeCode[0]='M';
     A.MMTypeCode[3]='G';
     A.NrDummies = 0;
     A.Pstart[0] = 0;
