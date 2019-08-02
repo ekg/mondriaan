@@ -114,7 +114,7 @@ int Callback(int Iteration, int LastSplit, const struct sparsematrix *A) {
 	if (++CurrentColour >= NumColours) CurrentColour = 1;
 	
 	/* Try to avoid using the same colour in adjacent processors. */
-	if (PColours[LastSplit + 1] == &Colours[3*CurrentColour]) {
+	if (LastSplit + 1 < A->NrProcs && PColours[LastSplit + 1] == &Colours[3*CurrentColour]) {
 		if (++CurrentColour >= NumColours) CurrentColour = 1;
 	}
 	
@@ -346,7 +346,7 @@ int main(int argc, char **argv) {
 	
 	for (i = 1; i <= A.NrProcs; i++) {
 		A.Pstart[i] = A.NrNzElts;
-		PColours[i] = &Colours[3];
+		PColours[i-1] = &Colours[3];
 	}
 	
 	/* Write first frame. */

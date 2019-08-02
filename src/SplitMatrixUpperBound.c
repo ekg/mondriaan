@@ -94,7 +94,7 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
     /****
      * Determine direction
      ****/
-    if(pT->m < pT->n) {
+    if(pT->m > pT->n) {
         n = pT->m;
         nzInd = pT->i;
     }
@@ -303,7 +303,7 @@ int SplitMatrixUpperBound(struct sparsematrix *pT, int P, const struct opts *pOp
     HeapDestroy(&MinHeap); MinHeapItems = NULL; /* Also free()s MinHeapItems */
     
     /* Build Pstart */
-    pT->Pstart[k] = partPointer[0] = 0;
+    pT->Pstart[0] = partPointer[0] = 0;
     for(k=1; k<P; ++k) {
         pT->Pstart[k] = partPointer[k] = partPointer[k-1]+partWeights[k-1];
     }

@@ -524,7 +524,7 @@ In this context, free nonzeros are nonzeros that may be moved between parts with
 <li><code class="option_name">CheckUpperBound</code>: <code class="option_values"><b>yes</b>, no</code><br>
 After finishing, check whether the computed partitioning has a communication volume of at most (min(m,n)+1)(P-1).
 If not, this option makes sure an alternative method is used that does produce a partitioning with volume at most (min(m,n)+1)(P-1).
-This option will only take effect if UseSingleEntry, dummies and column weights are not used.</li>
+This option will only take effect if UseSingleEntry, dummies and column weights are not used, and if two-dimensional partitionings are allowed.</li>
 <li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual</code>: <code class="option_values"><b>no</b>, yes</code><br>
 If yes, force the distribution of the vectors u and v to be the same.</li>
 <li><code class="option_name">SquareMatrix_<wbr/>DistributeVectorsEqual_<wbr/>AddDummies</code>: <code class="option_values">no, <b>yes</b></code><br>
@@ -830,7 +830,7 @@ Chapter 12 of Combinatorial Scientific Computing, Chapman and Hall/CRC, pp. 321-
 
 <hr>
 <p>
-Last updated: September 7, 2017.<br><br>
+Last updated: July 13, 2019.<br><br>
 June 9, 2009 by Rob Bisseling,<br>
 December 2, 2010 by Bas Fagginger Auer,<br>
 December 10, 2010 by A. N. Yzelman,<br>

@@ -703,7 +703,10 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
         /* To support OrderPermutation, new code should be written to recompute the permutation from scratch */
         int orderPermute  = (pOptions->OrderPermutation != OrderNone);
         
-        if(!isSymmetric && !hasDummies && !isColWeighted && !orderPermute) {
+        /* Do not apply the upperBound check when classic Mondriaan is used, as this algorithm may cut in two directions */
+        int canApply = (pOptions->SplitStrategy == FineGrain || pOptions->SplitStrategy == SFineGrain || pOptions->SplitStrategy == MediumGrain);
+        
+        if(!isSymmetric && !hasDummies && !isColWeighted && !orderPermute && canApply) {
             /* Compute volume. It should be at most (min(m,n)+1)(P-1) */
             long ComVol1, ComVol2, tmp;
             CalcCom(pT, NULL, (pT->m < pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
@@ -721,7 +724,7 @@ int DistributeMatrixMondriaan(struct sparsematrix *pT, int P, double eps, const 
                     /* Update variables to reflect new distribution */
                     k = P;
                     
-                    for (j = 0; j <= P; j++) {
+                    for (j = 0; j < P; j++) {
                         weight[j] = ComputeWeight(pT, pT->Pstart[j], pT->Pstart[j+1]-1, NULL, pOptions);
                         procs[j] = 1;
                     }
