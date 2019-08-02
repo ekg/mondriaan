@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
        No processor should own more than 1 component */
 
     for (i=0; i<P; i++){  
-        if (Ns[i] >= P || Nr[i] > (P+1)/2 || Nv[i] > 1 || Nv[i] != Nv[i] ){  
+        if (Ns[i] >= P || Nr[i] > (P+1)/2 || Nv[i] > 1 || Nv[i] != Nv1[i] ){  
             printf("Error\n") ;
             exit(1);
         } 
