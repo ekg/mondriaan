@@ -150,7 +150,7 @@ void test_FreeNonzeros(int symmetric) {
     long avgNrNzElts = pA->NrNzElts / P;
     for(p=0; p<P; ++p) {
         weight = ComputeWeight(pA, pA->Pstart[p], pA->Pstart[p+1]-1, NULL, &options);
-        totalImbalanceBefore += abs(weight-avgNrNzElts);
+        totalImbalanceBefore += labs(weight-avgNrNzElts);
     }
     long volumeBefore = ComputeVolume(pA, symmetric);
     
@@ -161,7 +161,7 @@ void test_FreeNonzeros(int symmetric) {
     long totalImbalanceAfter = 0.0;
     for(p=0; p<P; ++p) {
         weight = ComputeWeight(pA, pA->Pstart[p], pA->Pstart[p+1]-1, NULL, &options);
-        totalImbalanceAfter += abs(weight-avgNrNzElts);
+        totalImbalanceAfter += labs(weight-avgNrNzElts);
     }
     long volumeAfter = ComputeVolume(pA, symmetric);
     
