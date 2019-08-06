@@ -50,7 +50,7 @@ test_MatchATA \
 test_CoarsenGraph test_RunMLGraphPart \
 test_SparseMatrixToCRS_CCS test_DetectConnectedComponents \
 test_Heap test_TwoColorTree test_SubsetSum test_ZeroVolumeSearch \
-test_FreeNonzeros
+test_FreeNonzeros testHelper_DisconnectedMatrix
 
 .SECONDARY: ${TESTTARGETS:%=%.o}
 
