@@ -454,10 +454,10 @@ int CheckUpperBoundSolution(struct sparsematrix *pT) {
     
     /* Calculate communication volume */
     long ComVol1, ComVol2, tmp;
-    CalcCom(pT, NULL, (pT->m < pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
-    CalcCom(pT, NULL, (pT->m < pT->n)?COL:ROW, &ComVol2, &tmp, &tmp, &tmp, &tmp);
+    CalcCom(pT, NULL, (pT->m > pT->n)?ROW:COL, &ComVol1, &tmp, &tmp, &tmp, &tmp);
+    CalcCom(pT, NULL, (pT->m > pT->n)?COL:ROW, &ComVol2, &tmp, &tmp, &tmp, &tmp);
     
-    long n = (pT->m < pT->n)?pT->m:pT->n;
+    long n = (pT->m > pT->n)?pT->n:pT->m;
     if(ComVol1 > n*(P-1) || ComVol2 > P-1) {
 #ifdef INFO2
         fprintf( stderr, "CheckUpperBoundSolution(): Invalid communication result.\n" );
