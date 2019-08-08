@@ -1,4 +1,4 @@
-MONDRIAAN version 4.2 (this version released September 2017):
+MONDRIAAN version 4.2.1 (this version released August 2019):
 ------------------------
 Copyright May 2002 (version 1.0): Brendan Vastenhouw and Rob H. Bisseling
 Copyright July 2008 (version 2.0): Rob H. Bisseling, Wouter Meesen, Tristan van Leeuwen, 
@@ -12,6 +12,7 @@ Copyright November 2016 (version 4.1): Rob H. Bisseling, Bas Fagginger Auer,
                      Marco van Oort, Daniel Pelt, Albert-Jan Yzelman.
 Copyright September 2017 (version 4.2): Rob H. Bisseling, Bas Fagginger Auer,
                      Marco van Oort, Daniel Pelt, Albert-Jan Yzelman.
+Copyright August 2019 (version 4.2.1): Rob H. Bisseling, Marco van Oort.
 
 Extensive documentation is found in the `docs' directory.
                      
@@ -43,7 +44,12 @@ The Lambda-times-Lambda-minus-one communication volume metric:
 The medium-grain partitioning strategy:
    Daniel M. Pelt and Rob H. Bisseling
    "A medium-grain method for fast 2D bipartitioning of sparse matrices",
-   submitted for publication (2013).
+   Proceedings IEEE International Parallel & Distributed Processing Symposium 2014,
+   IEEE Press, pp. 529-539.
+The exact algorithm for obtaining an optimal partitioning of small matrices for 2 processors:
+   Daniel M. Pelt and Rob H. Bisseling
+   "An exact algorithm for sparse matrix bipartitioning",
+   Journal of Parallel and Distributed Computing, 85 (2015) pp. 79-90.
    
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser Public License as published by
