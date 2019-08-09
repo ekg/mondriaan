@@ -441,24 +441,29 @@ int MMSparseMatrixAppendViewType(const char view, char *line) {
 
     /* This function appends the viewtype of a matrix to an EMM banner line. */
 
+    char linebuffer[MAX_LINE_LENGTH];
+
     if(!line) {
         fprintf(stderr, "MMSparseMatrixAppendViewType(): null argument provided!\n");
         return FALSE;
     }
     switch(view) {
     case ViewTypeOriginal:
-        sprintf(line, "%s original", line);
+        sprintf(linebuffer, "%s original", line);
         break;
     case ViewTypeGlobal:
-        sprintf(line, "%s global", line);
+        sprintf(linebuffer, "%s global", line);
         break;
     case ViewTypeLocal:
-        sprintf(line, "%s local", line);
+        sprintf(linebuffer, "%s local", line);
         break;
     default:
         fprintf(stderr, "MMSparseMatrixAppendViewType(): unidentified matrix ViewType!\n");
         return FALSE;
     }
+
+    strcpy(line,linebuffer);
+
     return TRUE;
 } /* end MMSparseMatrixAppendViewType */
 

@@ -229,7 +229,7 @@ int main(int argc, char **argv) {
 	/* If needed, try to automatically determine vector distribution files */
 	long *u = NULL, *v = NULL;
 	if(auto_uv && !I2f) {
-		char basename[MAX_WORD_LENGTH], filename_vec[MAX_WORD_LENGTH];
+		char basename[MAX_WORD_LENGTH], filename_vec[MAX_WORD_LENGTH+40];
 		strcpy(basename, filename);
 		char *suffix = strrchr(basename, '-');
 		if(suffix != NULL) {

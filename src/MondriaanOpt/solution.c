@@ -342,7 +342,7 @@ void printConverted(struct options *o) {
     SetDefaultOptions(&Options);
     
     /* Remove ".mtx" from matrix name */
-    char fnI[MAXFNSIZE];
+    char fnI[MAXFNSIZE+64];
 
     /* Construct processor number file name */
     sprintf(fnI,"%s-I2f",o->fn);
