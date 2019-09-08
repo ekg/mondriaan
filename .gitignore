@@ -9,3 +9,6 @@
 *.mex*
 src/include/
 src/lib/
+build/
+lib
+*~
