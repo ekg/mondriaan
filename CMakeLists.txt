@@ -8,8 +8,8 @@ project(odgi)
 set(CMAKE_CXX_STANDARD 14)
 
 # Use all standard-compliant optimizations
-set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -DGAINBUCKET_ARRAY -DMONDRIAANVERSION=\"4.2\"")
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -DGAINBUCKET_ARRAY -DMONDRIAANVERSION=\"4.2\"")
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O3 -g -DGAINBUCKET_ARRAY -DMONDRIAANVERSION='\"4.2.1\"'")
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -DGAINBUCKET_ARRAY -DMONDRIAANVERSION='\"4.2.1\"'")
 
 # Set the output folder where your program will be created
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/bin)
